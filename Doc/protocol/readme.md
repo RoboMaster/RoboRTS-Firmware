@@ -22,54 +22,6 @@ Protocol data can be divided into two major categories in terms of communication
 
 3. Forward data: user-customized data that must be forwarded to the Referee System from the underlying layer and finally displayed on the client side;
 
-### Functional Modules
-
-#### Manual mode:
-
-Allows basic controls in remote control and mouse & keyboard mode. If some auxiliary functions, such as buff and auxiliary launching, are enabled in Manual mode, upper layer protocol communication must be enabled to obtain related data from an upper layer PC to implement these functions.
-
-Some upper layer debug interfaces are provided in Manual mode to facilitate testing and verification when debugging upper layer PC programs.
-
-#### Full Auto mode:
-
-In this mode, a chassis, gimbal and launching mechanism are fully controlled by an upper layer PC, including controlling these actuating mechanisms in a specific physical unit and also mode switching of these actuating mechanisms.
-
-#### Introduction to operating gears:
-
-##### 1. Manual gear
-
-Control data, debug, and automatic gear isolation (place the driving lever to the upper right)
-
-Control with a remote controller: place the driving lever to upper right
-
-- Turn on/off a friction wheel
-- Single shot, automatic firing
-
-Control with a mouse & keyboard: (place the driving lever to left center, upper right)
-
-- Turn on/off a friction wheel
-- Single shot, automatic firing
-- Twist the waist to dodge
-
-##### 2. Debug gear
-
-Used during robot debugging (place the driving lever to right center)
-
-- Twist the waist (upper left)
-- Armor tracking, not with the chassis (left center)
-- Armor tracking, with the chassis (lower left)
-- A friction wheel inherits the status in manual or auto mode
-- Upper layer control of launching
-
-##### 3. Automatic gear
-
-Used in competition (place the driving lever to the lower right)
-
-- Full automatic control (3 mechanisms completely trust control from an upper layer except for when the upper layer encounters a fatal_error)
-
-
-
-
 ## Introduction to Operating Mode
 
 *Note:*
@@ -791,7 +743,7 @@ typedef __packed struct
 | shoot_cmd      | Single shot command                      |
 | c_shoot_cmd    | Automatic firing command                 |
 | fric_wheel_run | Turn on/off a friction wheel, 0: off, 1: on |
-| fric_wheel_spd | Speed of a friction wheel, ranging from 0 to 100 |
+| fric_wheel_spd | Speed of a friction wheel, ranging from 1000 to 2000 |
 
 ##### 0x00A3 global error
 

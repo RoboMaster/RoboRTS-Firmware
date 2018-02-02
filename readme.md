@@ -40,7 +40,7 @@ Corresponding states of each module off-line are shown as following while the nu
 ### Documentation
 
 - Communication protocol [document](Doc/protocol/readme.md)
-- 中文说明 [文档](Doc/ch/readme.md)
+- 涓枃璇存槑 [鏂囨。](Doc/ch/readme.md)
 
 ## Quick Start
 
