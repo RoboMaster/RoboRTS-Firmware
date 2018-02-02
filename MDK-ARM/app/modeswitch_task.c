@@ -44,7 +44,8 @@
 UBaseType_t mode_stack_surplus;
 
 /* mode switch task static parameter */
-static infantry_mode_e glb_ctrl_mode;
+infantry_mode_e last_glb_ctrl_mode;
+infantry_mode_e glb_ctrl_mode;
 
 extern TaskHandle_t info_get_task_t;
 extern osTimerId chassis_timer_id;
@@ -89,29 +90,52 @@ static void kb_enable_hook(void)
 }
 void get_main_ctrl_mode(void)
 {
-  switch (rc.sw2)
+  //host PC has been connected
+  if (!g_err.list[PC_SYS_OFFLINE].err_exist)
   {
-    case RC_UP:
+    switch (rc.sw2)
     {
-      glb_ctrl_mode = MANUAL_CTRL_MODE;
-    }break;
+      case RC_UP:
+      {
+        glb_ctrl_mode = MANUAL_CTRL_MODE;
+      }break;
+      
 #ifdef AUTO_NAVIGATION
-    case RC_MI:
-    {
-      glb_ctrl_mode = SEMI_AUTO_MODE;
-    }break;
-    
-    case RC_DN:
-    {
-      glb_ctrl_mode = AUTO_CTRL_MODE;
-    }break;
+      case RC_MI:
+      {
+        glb_ctrl_mode = SEMI_AUTO_MODE;
+      }break;
+      
+      case RC_DN:
+      {
+        glb_ctrl_mode = AUTO_CTRL_MODE;
+      }break;
 #endif
-    default:
-    {
-      glb_ctrl_mode = SAFETY_MODE;
+      
+      default:
+      {
+        glb_ctrl_mode = SAFETY_MODE;
+      }break;
     }
-    break;
   }
+  //host PC offline
+  else
+  {
+    switch (rc.sw2)
+    {
+      case RC_UP:
+      {
+        glb_ctrl_mode = MANUAL_CTRL_MODE;
+      }break;
+      
+      default:
+      {
+        glb_ctrl_mode = SAFETY_MODE;
+      }break;
+    }
+  }
+  
+  
   if ((rc.sw1 == RC_DN) && (rc.sw2 == RC_DN))
     glb_ctrl_mode = SAFETY_MODE;
   
@@ -145,6 +169,9 @@ static void gimbal_mode_handle(void)
   {
     case MANUAL_CTRL_MODE:
     {
+      if (last_glb_ctrl_mode == SEMI_AUTO_MODE)
+        gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO;
+      
       /* no input control signal gimbal mode handle */
       if (gim.input.ac_mode == NO_ACTION)
       {
@@ -163,6 +190,7 @@ static void gimbal_mode_handle(void)
       }
       else  //IS_ACTION mode
       {
+        chassis.follow_gimbal = 1;
         if (gim.ctrl_mode == GIMBAL_NO_ARTI_INPUT)
         {
           gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO;
@@ -173,27 +201,29 @@ static void gimbal_mode_handle(void)
         }
       }
       
-#if 0
-      /* keybaord trigger big buff */
-      if (km.buff_ctrl && km.kb_enable)
-      {
-        gim.ctrl_mode = GIMBAL_SHOOT_BUFF;
-        chassis.follow_gimbal = 0;
-        
-        if (gim.last_ctrl_mode != GIMBAL_SHOOT_BUFF)
-        {
-          gim.auto_ctrl_cmd = CMD_CALI_FIVE;
-        }
-      }
-      else
-        chassis.follow_gimbal = 1;
-#else
-      chassis.follow_gimbal = 1;
-#endif
-      
-      /* chassis twist handle */
+      /* manual trigger chassis twist */
       if (km.twist_ctrl)
         gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO;
+      
+#if 0
+//      /* manual trigger track armor */
+//      if (km.track_ctrl)
+//        gim.ctrl_mode = GIMBAL_TRACK_ARMOR;
+//      
+//      /* manual trigger big buff */
+//      if (km.buff_ctrl && km.kb_enable)
+//      {
+//        gim.ctrl_mode = GIMBAL_SHOOT_BUFF;
+//        chassis.follow_gimbal = 0;
+//        
+//        if (gim.last_ctrl_mode != GIMBAL_SHOOT_BUFF)
+//        {
+//          gim.auto_ctrl_cmd = CMD_CALI_FIVE;
+//        }
+//      }
+//      else
+//        chassis.follow_gimbal = 1;
+#endif
       
       if (gim.last_ctrl_mode == GIMBAL_RELAX)
         gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO;
@@ -205,35 +235,17 @@ static void gimbal_mode_handle(void)
       {
         case RC_UP:
         {
-#if 0
-          /* remote control trigger big buff */
-          if (glb_sw.last_sw1 != RC_UP)
-          {
-            glb_sw.stable_time_sw1 = HAL_GetTick();
-          }
-          if (HAL_GetTick() - glb_sw.stable_time_sw1 > 1000)
-          {
-            gim.ctrl_mode = GIMBAL_SHOOT_BUFF;
-            
-            if (gim.last_ctrl_mode != GIMBAL_SHOOT_BUFF)
-            {
-              gim.auto_ctrl_cmd = CMD_CALI_FIVE;
-            }
-          }
-#else
-          /* remote control trigger chassis twist */
           gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO;
-#endif
         }break;
         
         case RC_MI:
         {
-          gim.ctrl_mode = GIMBAL_TRACK_ARMOR;
+          gim.ctrl_mode = GIMBAL_POSITION_MODE;
         }break;
         
         default:
         {
-          gim.ctrl_mode = GIMBAL_TRACK_ARMOR;
+          gim.ctrl_mode = GIMBAL_POSITION_MODE;
         }break;
       }
     }break;
@@ -289,6 +301,7 @@ void get_gimbal_mode(void)
 
 static void get_global_last_mode(void)
 {
+  last_glb_ctrl_mode = glb_ctrl_mode;
   gim.last_ctrl_mode = gim.ctrl_mode;
   chassis.last_ctrl_mode = chassis.ctrl_mode;
 }
@@ -314,7 +327,7 @@ static void chassis_mode_handle(void)
       {
         case RC_UP:
         {
-          chassis.ctrl_mode = MANUAL_SEPARATE_GIMBAL;
+          chassis.ctrl_mode = DODGE_MODE;
         }break;
         
         case RC_MI:
@@ -324,6 +337,7 @@ static void chassis_mode_handle(void)
         
         case RC_DN:
         {
+          chassis.follow_gimbal = 1;
           chassis.ctrl_mode = MANUAL_FOLLOW_GIMBAL;
         }break;
         

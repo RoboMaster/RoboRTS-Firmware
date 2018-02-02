@@ -1,9 +1,3 @@
-------
-
-[TOC]
-
-------
-
 [中文文档](ch/readme.md)
 
 ## Protocol Specifications
@@ -104,9 +98,9 @@ typedef enum
 | GIMBAL_INIT              | Gimbal is being restored from the power off status |
 | GIMBAL_NO_ARTI_INPUT     | No manual control data input mode available |
 | GIMBAL_FOLLOW_ZGYRO      | The mode in which the gimbal follows the chassis |
-| **GIMBAL_TRACK_ARMOR**   | Gimbal tracks armor                      |
+| GIMBAL_TRACK_ARMOR       | Gimbal tracks armor, icra not use        |
 | **GIMBAL_PATROL_MODE**   | Patrol mode, the gimbal yaws periodically, pitch uncontrolled |
-| **GIMBAL_SHOOT_BUFF**    | Shooting buff mode                       |
+| GIMBAL_SHOOT_BUFF        | Shooting buff mode, icra not use         |
 | **GIMBAL_POSITION_MODE** | Gimbal position mode, angle between two axes controlled on an upper layer |
 
 ### Chassis

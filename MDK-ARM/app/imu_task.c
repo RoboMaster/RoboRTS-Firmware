@@ -249,9 +249,9 @@ static void imu_AHRS_update(void)
   float q1q1 = q1*q1;
   float q1q2 = q1*q2;
   float q1q3 = q1*q3;
-  float q2q2 = q2*q2;   
+  float q2q2 = q2*q2;
   float q2q3 = q2*q3;
-  float q3q3 = q3*q3;   
+  float q3q3 = q3*q3;
 
   gx = imu.wx;
   gy = imu.wy;
@@ -269,20 +269,20 @@ static void imu_AHRS_update(void)
 
 
   //Fast inverse square-root
-  norm = invSqrt(ax*ax + ay*ay + az*az);       
+  norm = invSqrt(ax*ax + ay*ay + az*az);
   ax = ax * norm;
   ay = ay * norm;
   az = az * norm;
 
-  norm = invSqrt(mx*mx + my*my + mz*mz);          
+  norm = invSqrt(mx*mx + my*my + mz*mz);
   mx = mx * norm;
   my = my * norm;
-  mz = mz * norm; 
+  mz = mz * norm;
 
   // compute reference direction of flux
   hx = 2.0f*mx*(0.5f - q2q2 - q3q3) + 2.0f*my*(q1q2 - q0q3) + 2.0f*mz*(q1q3 + q0q2);
   hy = 2.0f*mx*(q1q2 + q0q3) + 2.0f*my*(0.5f - q1q1 - q3q3) + 2.0f*mz*(q2q3 - q0q1);
-  hz = 2.0f*mx*(q1q3 - q0q2) + 2.0f*my*(q2q3 + q0q1) + 2.0f*mz*(0.5f - q1q1 - q2q2);         
+  hz = 2.0f*mx*(q1q3 - q0q2) + 2.0f*my*(q2q3 + q0q1) + 2.0f*mz*(0.5f - q1q1 - q2q2);
   bx = sqrt((hx*hx) + (hy*hy));
   bz = hz; 
 
@@ -302,7 +302,7 @@ static void imu_AHRS_update(void)
   if(ex != 0.0f && ey != 0.0f && ez != 0.0f)
   {
       exInt = exInt + ex * Ki * halfT;
-      eyInt = eyInt + ey * Ki * halfT;	
+      eyInt = eyInt + ey * Ki * halfT;
       ezInt = ezInt + ez * Ki * halfT;
       // PI
       gx = gx + Kp*ex + exInt;
@@ -326,9 +326,9 @@ static void imu_AHRS_update(void)
 
 static void imu_attitude_update(void)
 {
-  imu.rol =  atan2(2*q2*q3 + 2*q0*q1, -2*q1*q1 - 2*q2*q2 + 1)* 57.3; // roll       -pi----pi
-  imu.pit = -asin(-2*q1*q3 + 2*q0*q2)* 57.3;                         // pitch    -pi/2----pi/2 
-  imu.yaw =  atan2(2*q1*q2 + 2*q0*q3, -2*q2*q2 - 2*q3*q3 + 1)* 57.3; // yaw        -pi----pi
+  imu.rol = atan2(2*q2*q3 + 2*q0*q1, -2*q1*q1 - 2*q2*q2 + 1)* 57.3; // roll       -pi----pi
+  imu.pit = asin(-2*q1*q3 + 2*q0*q2)* 57.3;                         // pitch    -pi/2----pi/2 
+  imu.yaw = atan2(2*q1*q2 + 2*q0*q3, -2*q2*q2 - 2*q3*q3 + 1)* 57.3; // yaw        -pi----pi
   
   
   if (imu.yaw - atti.last_yaw > 330)

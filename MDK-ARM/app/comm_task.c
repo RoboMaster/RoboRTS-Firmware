@@ -242,6 +242,7 @@ void judge_unpack_task(void const *argu)
   }
 }
 extern TaskHandle_t freq_info_task_t;
+uint8_t pc_rx_test[40];
 void pc_unpack_task(void const *argu)
 {
   osEvent event;
@@ -287,6 +288,8 @@ void pc_unpack_task(void const *argu)
         unpack_fifo_data(&pc_unpack_obj, UP_REG_ID);
         unpack_flag = 0;
       }
+      
+      //protocol_packet_pack(0xa0, (uint8_t*)&(pc_rece_mesg.chassis_control_data), sizeof(pc_rece_mesg.chassis_control_data), UP_REG_ID, pc_rx_test);
     }
     
     pc_comm_surplus = uxTaskGetStackHighWaterMark(NULL);

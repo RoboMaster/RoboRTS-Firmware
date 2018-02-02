@@ -1,4 +1,4 @@
-﻿/****************************************** ATTENTION ****************************************
+/****************************************** ATTENTION ****************************************
  *
  * 1. In order to support Chinese characters and comments, please use the UTF-8 format
  *    for all newly created files
@@ -17,10 +17,17 @@
 
 /********************************* Gimbal calibration method ********************************
 *
-* 1. First, connect j-link to the development board and the computer
-* 2. Turn the remote control levers to gimbal disabled position and infantry to power on
-* 3. Into debug mode, find this variable cali_param
-* 4. Handle the gimbal to the midpoint, then set the variable cali_param.Gimbal.cali_cmd to 1
+* Note: The calibration operation needs gimbal in disability mode
+* 
+* Method 1: (Recommended)
+* 1. Use tx1/2 or PC host computer to send the gimbal start and end calibration instructions, 
+*    the command id 0x00A5 corresponding to the data
+* 2. After the host computer receives the correct calibration data (0x0015) returned, 
+*    the gimbal calibration is successful
+* Method 2:
+* 1. Connect j-link to the development board and the computer
+* 2. Into debug mode, find this variable cali_param
+* 3. Handle the gimbal to the midpoint, then set the variable cali_param.gim_cali_data[].cali_cmd to 1
 *
 *********************************************************************************************/
 
@@ -65,10 +72,15 @@
 
 /**********************************云台校准方法*********************************
 *
-* 1、首先将jlink连接开发板和电脑
-* 2、将遥控器拨杆拨到云台失能档位，步兵上电
-* 3、进入debug模式，找到cali_param这个变量
-* 4、用手将云台扶正，云台在正中间时将变量cali_param.Gimbal.cali_cmd设为1即可
+* 注意：校准需要云台在失能模式下进行
+* 
+* 方法一：（推荐）
+* 1、使用 tx1/2 或 pc 端上位机依次发送云台开始和结束校准指令，指令为命令码 0x00A5 对应的数据
+* 2、上位机接收到返回的正确的校准数据（0x0015）后，云台校准成功
+* 方法二：
+* 1、将 jlink 连接开发板和电脑
+* 2、进入 debug 模式，找到 cali_param 这个变量
+* 3、用手将云台扶正，云台在正中间时将变量cali_param.gim_cali_data[].cali_cmd设为1即可
 *
 *******************************************************************************/
 

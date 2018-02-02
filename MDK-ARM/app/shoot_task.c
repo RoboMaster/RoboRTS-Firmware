@@ -172,7 +172,7 @@ static void fric_wheel_ctrl(void)
   }
 }
 
-int debug_speed = 1500;
+int debug_tri_speed = 1500;
 int shot_cmd;
 static void shoot_bullet_handle(void)
 {
@@ -225,7 +225,7 @@ static void shoot_bullet_handle(void)
       shot.shot_bullets++;
     }
     else
-      trig.spd_ref = debug_speed;//trig.feed_bullet_spd;
+      trig.spd_ref = debug_tri_speed;//trig.feed_bullet_spd;
     
   }
   else if (shot.c_shoot_cmd)
@@ -241,7 +241,7 @@ static void shoot_bullet_handle(void)
   else
   {
     if (trig.key)       //not trigger
-      trig.spd_ref = debug_speed;//trig.feed_bullet_spd;
+      trig.spd_ref = debug_tri_speed;//trig.feed_bullet_spd;
     else
       trig.spd_ref = 0;
   }

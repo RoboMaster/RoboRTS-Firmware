@@ -1,9 +1,3 @@
-------
-
-[TOC]
-
-------
-
 ## 协议说明
 
 ### 协议数据
@@ -102,9 +96,9 @@ typedef enum
 | GIMBAL_INIT              | 云台由断电状态回中                   |
 | GIMBAL_NO_ARTI_INPUT     | 无手动控制信息输入模式                 |
 | GIMBAL_FOLLOW_ZGYRO      | 云台跟随底盘模式                    |
-| **GIMBAL_TRACK_ARMOR**   | 云台追踪装甲                      |
+| GIMBAL_TRACK_ARMOR       | 云台追踪装甲，icra 不使用             |
 | **GIMBAL_PATROL_MODE**   | 巡逻模式，云台 yaw 周期运动，pitch 不受控制 |
-| **GIMBAL_SHOOT_BUFF**    | 打大符模式                       |
+| GIMBAL_SHOOT_BUFF        | 打大符模式，icra 不使用              |
 | **GIMBAL_POSITION_MODE** | 云台位置模式，上层控制角度两轴角度           |
 
 ### 底盘

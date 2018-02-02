@@ -42,7 +42,6 @@
 #include "bsp_imu.h"
 #include "calibrate.h"
 #include "protocol.h"
-#include "led.h"
 #include "string.h"
 #include "math.h"
 #include "sys_config.h"
@@ -163,13 +162,13 @@ void chassis_position_measure(void)
   static double v_x,v_y,w_v;
   
   rotate_ratio_fr = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f - \
-                      glb_struct.gimbal_x_offset + glb_struct.gimbal_y_offset);
+                      chassis.rotate_x_offset + chassis.rotate_y_offset);
   rotate_ratio_fl = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f - \
-                      glb_struct.gimbal_x_offset - glb_struct.gimbal_y_offset);
+                      chassis.rotate_x_offset - chassis.rotate_y_offset);
   rotate_ratio_bl = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f + \
-                      glb_struct.gimbal_x_offset - glb_struct.gimbal_y_offset);
+                      chassis.rotate_x_offset - chassis.rotate_y_offset);
   rotate_ratio_br = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f + \
-                      glb_struct.gimbal_x_offset + glb_struct.gimbal_y_offset);
+                      chassis.rotate_x_offset + chassis.rotate_y_offset);
   rpm_ratio = glb_struct.wheel_perimeter*CHASSIS_DECELE_RATIO/(4*60.0f);
   ecd_ratio = glb_struct.wheel_perimeter*CHASSIS_DECELE_RATIO/(4*8192.0f);
   
@@ -197,9 +196,9 @@ void chassis_position_measure(void)
   
   angle_w += diff_d_w;
 
-  position_x_mm = (int16_t)(position_x*1000); //mm
-  position_y_mm = (int16_t)(position_y*1000); //mm
-  angle_deg     = (int16_t)(angle_w*RADIAN_COEF);//degree
+  position_x_mm = (int32_t)(position_x); //mm
+  position_y_mm = (int32_t)(position_y); //mm
+  angle_deg     = (int32_t)(angle_w*RADIAN_COEF);//degree
 
   v_x = rpm_ratio * ( - moto_chassis[0].speed_rpm + moto_chassis[1].speed_rpm \
                       + moto_chassis[2].speed_rpm - moto_chassis[3].speed_rpm);
@@ -210,8 +209,8 @@ void chassis_position_measure(void)
                       - moto_chassis[2].speed_rpm/rotate_ratio_bl \
                       - moto_chassis[3].speed_rpm/rotate_ratio_br);
 
-  v_x_mm = (int16_t)(v_x*1000);         //mm/s
-  v_y_mm = (int16_t)(v_y*1000);         //mm/s
+  v_x_mm = (int16_t)(v_x);         //mm/s
+  v_y_mm = (int16_t)(v_y);         //mm/s
   palstance_deg = (int16_t)(w_v*RADIAN_COEF);//degree/s
 }
 
@@ -357,9 +356,10 @@ void no_cali_data_handle(void)
 extern TaskHandle_t pc_unpack_task_t;
 static void gimbal_cali_msg_hook(uint8_t cur_type, uint8_t last_type)
 {
+  gimbal_cali_hook(moto_pit.ecd, moto_yaw.ecd);
+  
   if ((last_type == GIMBAL_CALI_START) && (cur_type == GIMBAL_CALI_END))
   {
-    LED_G_ON;
     cali_param.gim_cali_data[CALI_GIMBAL_CENTER].cali_cmd = 1;
     gimbal_cali_hook(moto_pit.ecd, moto_yaw.ecd);
     
@@ -369,10 +369,6 @@ static void gimbal_cali_msg_hook(uint8_t cur_type, uint8_t last_type)
     data_packet_pack(CALI_RESPONSE_ID, (uint8_t *)&pc_send_mesg.cali_response_data,
                      sizeof(cali_response_t), UP_REG_ID);
     osSignalSet(pc_unpack_task_t, PC_UART_TX_SIGNAL);
-  }
-  else
-  {
-    LED_G_OFF;
   }
   
   if ((last_type == CAMERA_CALI_START) && (cur_type == CAMERA_CALI_END))

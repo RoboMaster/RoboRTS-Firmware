@@ -1,6 +1,6 @@
 Configuration	rm_infantry
 STM32CubeMX 	4.22.1
-Date	01/24/2018
+Date	01/26/2018
 MCU	STM32F427IIHx
 
 
@@ -63,8 +63,7 @@ USART6	Asynchronous	USART6_TX	PG14
 
 
 Pin Nb	PINs	FUNCTIONs	LABELs
-A1	PE3	GPIO_Output	IST_INT
-A2	PE2	GPIO_Output	IST_RST
+A2	PE2	GPIO_Output	IST_SET
 A3	PE1	GPIO_EXTI1	MPU_INT
 A6	PB5	TIM3_CH2	IMU_TEMP
 A7	PG14	USART6_TX	
@@ -98,7 +97,6 @@ H1	PH1/OSC_OUT	RCC_OSC_OUT
 K1	PF7	SPI5_SCK	
 K2	PF6	GPIO_Output	SPI5_NSS
 K12	PH12	TIM5_CH3	
-L1	PF10	GPIO_Input	CALI
 L2	PF9	SPI5_MOSI	
 L3	PF8	SPI5_MISO	
 L12	PH11	TIM5_CH2	
@@ -130,7 +128,7 @@ SOFTWARE PROJECT
 
 Project Settings : 
 Project Name : rm_infantry
-Project Folder : E:\infantry
+Project Folder : E:\RoboRTS-Firmware
 Toolchain / IDE : MDK-ARM V5
 Firmware Package Name and Version : STM32Cube FW_F4 V1.16.0
 

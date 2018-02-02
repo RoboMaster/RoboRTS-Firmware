@@ -138,8 +138,6 @@ static void gimbal_patrol_handle(void);
 static void big_buff_handle(void);
 static void pc_position_ctrl_handle(void);
 
-static void cascade_pid_ctrl(void);
-
 void gimbal_param_init(void);
 void gimbal_back_param(void);
 

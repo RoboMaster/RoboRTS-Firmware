@@ -1,7 +1,7 @@
-#ifndef __6500_REG__
-#define __6500_REG__
+#ifndef __MPU6500_REG__
+#define __MPU6500_REG__
 
-//mpu Reg -- Map
+/* mpu6500 register map */
 #define MPU6500_SELF_TEST_XG        (0x00)
 #define MPU6500_SELF_TEST_YG        (0x01)
 #define MPU6500_SELF_TEST_ZG        (0x02)
@@ -95,18 +95,14 @@
 #define MPU6500_FIFO_COUNTH         (0x72)
 #define MPU6500_FIFO_COUNTL         (0x73)
 #define MPU6500_FIFO_R_W            (0x74)
-#define MPU6500_WHO_AM_I            (0x75)	// mpu6500 id = 0x71
+#define MPU6500_WHO_AM_I            (0x75)
 #define MPU6500_XA_OFFSET_H         (0x77)
 #define MPU6500_XA_OFFSET_L         (0x78)
 #define MPU6500_YA_OFFSET_H         (0x7A)
 #define MPU6500_YA_OFFSET_L         (0x7B)
 #define MPU6500_ZA_OFFSET_H         (0x7D)
 #define MPU6500_ZA_OFFSET_L         (0x7E)
-	
-#define MPU6050_ID									(0x68)
-#define MPU6500_ID									(0x71)			// mpu6500 id = 0x70
 
-#define MPU_IIC_ADDR								0x68
+#define MPU6500_ID                  (0x70)
 
 #endif
-

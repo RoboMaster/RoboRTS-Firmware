@@ -130,7 +130,7 @@
 /***********************system interface setting****************************/
 
 /* automatic navigation interface */
-//#define AUTO_NAVIGATION
+#define AUTO_NAVIGATION
 
 /* can relevant */
 #define CHASSIS_CAN       hcan1
@@ -152,7 +152,6 @@
 
 
 /* gimbal relevant */
-#define GIMBAL_CASCADE_CTRL
 #define PIT_ANGLE_MAX        15
 #define PIT_ANGLE_MIN        -20
 #define YAW_ANGLE_MAX        50
