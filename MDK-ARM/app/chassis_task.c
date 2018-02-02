@@ -103,7 +103,7 @@ void chassis_task(void const *argu)
 
     case MANUAL_SEPARATE_GIMBAL:
     {
-      open_loop_handle();
+      separate_gimbal_handle();
     }break;
     
     case MANUAL_FOLLOW_GIMBAL:
@@ -152,7 +152,7 @@ static void chassis_twist_handle(void)
   chassis.position_ref = twist_angle*sin(2*PI/twist_period*twist_count);
   chassis.vw = pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, chassis.position_ref);
 }
-void open_loop_handle(void)
+void separate_gimbal_handle(void)
 {
   chassis.vy = rm.vy * CHASSIS_RC_MOVE_RATIO_Y + km.vy * CHASSIS_KB_MOVE_RATIO_Y;
   chassis.vx = rm.vx * CHASSIS_RC_MOVE_RATIO_X + km.vx * CHASSIS_KB_MOVE_RATIO_X;
@@ -164,7 +164,7 @@ void follow_gimbal_handle(void)
   
   chassis.vy = rm.vy * CHASSIS_RC_MOVE_RATIO_Y + km.vy * CHASSIS_KB_MOVE_RATIO_Y;
   chassis.vx = rm.vx * CHASSIS_RC_MOVE_RATIO_X + km.vx * CHASSIS_KB_MOVE_RATIO_X;
-  
+
   if (chassis.follow_gimbal)
     chassis.vw = pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, chassis.position_ref);
   else
@@ -184,7 +184,7 @@ void follow_gimbal_handle(void)
   *        output: every wheel speed(rpm)
   * @note  1=FR 2=FL 3=BL 4=BR
   */
-int rotation_center_gimbal = 0;
+int rotation_center_gimbal = 1;
 void mecanum_calc(float vx, float vy, float vw, int16_t speed[])
 {
   static float rotate_ratio_fr;
@@ -194,16 +194,27 @@ void mecanum_calc(float vx, float vy, float vw, int16_t speed[])
   static float wheel_rpm_ratio;
   
   taskENTER_CRITICAL();
+  if(chassis.ctrl_mode == DODGE_MODE)
+  {
+    chassis.rotate_x_offset = GIMBAL_X_OFFSET;
+    chassis.rotate_y_offset = 0;
+  }
+  else
+  {
+    chassis.rotate_x_offset = glb_struct.gimbal_x_offset;
+    chassis.rotate_y_offset = glb_struct.gimbal_y_offset;
+  }
+  
   if (rotation_center_gimbal)
   {
     rotate_ratio_fr = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f \
-                        - glb_struct.gimbal_x_offset + glb_struct.gimbal_y_offset)/RADIAN_COEF;
+                        - chassis.rotate_x_offset + chassis.rotate_y_offset)/RADIAN_COEF;
     rotate_ratio_fl = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f \
-                        - glb_struct.gimbal_x_offset - glb_struct.gimbal_y_offset)/RADIAN_COEF;
+                        - chassis.rotate_x_offset - chassis.rotate_y_offset)/RADIAN_COEF;
     rotate_ratio_bl = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f \
-                        + glb_struct.gimbal_x_offset - glb_struct.gimbal_y_offset)/RADIAN_COEF;
+                        + chassis.rotate_x_offset - chassis.rotate_y_offset)/RADIAN_COEF;
     rotate_ratio_br = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f \
-                        + glb_struct.gimbal_x_offset + glb_struct.gimbal_y_offset)/RADIAN_COEF;
+                        + chassis.rotate_x_offset + chassis.rotate_y_offset)/RADIAN_COEF;
   }
   else
   {

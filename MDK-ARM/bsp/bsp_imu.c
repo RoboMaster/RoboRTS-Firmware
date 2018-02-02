@@ -29,20 +29,17 @@
 #include "imu_task.h"
 #include "calibrate.h"
 #include "ist8310_reg.h"
-#include "pid.h"
-#include "stm32f4xx_hal.h"
-#include <math.h>
-#include "cmsis_os.h"
 #include "mpu6500_reg.h"
+#include "cmsis_os.h"
 #include "spi.h"
 #include "string.h"
 
 #define MPU_INIT_DELAY(x) HAL_Delay(x)
-#define MPU_DELAY(x)      osDelay(x)
 
 #define MPU_HSPI hspi5
-#define MPU_NSS_LOW HAL_GPIO_WritePin(GPIOF, SPI5_NSS_Pin, GPIO_PIN_RESET)
+#define MPU_NSS_LOW  HAL_GPIO_WritePin(GPIOF, SPI5_NSS_Pin, GPIO_PIN_RESET)
 #define MPU_NSS_HIGH HAL_GPIO_WritePin(GPIOF, SPI5_NSS_Pin, GPIO_PIN_SET)
+#define ENABLE_IST   HAL_GPIO_WritePin(GPIOE, IST_SET_Pin, GPIO_PIN_SET)
 
 static uint8_t tx, rx;
 static uint8_t tx_buff[14];
@@ -63,7 +60,6 @@ uint8_t mpu_read_reg(uint8_t const reg)
 {
   MPU_NSS_LOW;
   tx = reg | 0x80;
-
   HAL_SPI_TransmitReceive(&MPU_HSPI, &tx, &rx, 1, 55);
   HAL_SPI_TransmitReceive(&MPU_HSPI, &tx, &rx, 1, 55);
   MPU_NSS_HIGH;
@@ -142,9 +138,11 @@ static void mpu_mst_i2c_auto_read_config(uint8_t device_address, uint8_t reg_bas
 
 uint8_t ist8310_init(void)
 {
-  mpu_write_reg(MPU6500_USER_CTRL, 0x30); //Enable I2C master mode, Reset I2C Slave module
+  //Enable I2C master mode, Reset I2C Slave module
+  mpu_write_reg(MPU6500_USER_CTRL, 0x30); 
   MPU_INIT_DELAY(10);
-  mpu_write_reg(MPU6500_I2C_MST_CTRL, 0x0d); //I2C master clock 400kHz
+  //I2C master clock 400kHz
+  mpu_write_reg(MPU6500_I2C_MST_CTRL, 0x0d);
   MPU_INIT_DELAY(10);
 
   //turn on slave 1 for ist write and slave 4 for ist read
@@ -160,7 +158,7 @@ uint8_t ist8310_init(void)
   if (IST8310_DEVICE_ID_A != ist_reg_read_by_mpu(IST8310_WHO_AM_I))
       return 1;
 
-  ist_reg_write_by_mpu(IST8310_R_CONFB, 0x01); //rst
+  ist_reg_write_by_mpu(IST8310_R_CONFB, 0x01);
   MPU_INIT_DELAY(10);
 
   //config as ready mode to access reg
@@ -199,7 +197,6 @@ uint8_t ist8310_init(void)
   return 0;
 }
 
-uint8_t  ist_buff[6];
 void ist8310_get_data(uint8_t* buff)
 {
   mpu_read_regs(MPU6500_EXT_SENS_DATA_00, buff, 6);
@@ -218,8 +215,7 @@ void mpu_get_data(void)
   mpu_data.gy = ((mpu_buff[10] << 8 | mpu_buff[11]) - mpu_data.gy_offset);
   mpu_data.gz = ((mpu_buff[12] << 8 | mpu_buff[13]) - mpu_data.gz_offset);
 
-  ist8310_get_data(ist_buff);
-  memcpy(&mpu_data.mx, ist_buff, 6);
+  //ist8310_get_data((uint8_t*)&mpu_data.mx);
 
   memcpy(&imu.ax, &mpu_data.ax, 6 * sizeof(int16_t));
   imu.temp = 21 + mpu_data.temp / 333.87f;
@@ -227,20 +223,14 @@ void mpu_get_data(void)
   imu.wy   = mpu_data.gy / 16.384f / 57.3f; //2000dps -> rad/s
   imu.wz   = mpu_data.gz / 16.384f / 57.3f; //2000dps -> rad/s
 
-  /*
-  imu.vx   += (mpu_data.ax - mpu_data.ax_offset) / 4096.*100.*0.005; //2000dps -> rad/s
-  imu.vy   += (mpu_data.ay - mpu_data.ay_offset) / 4096.*100.*0.005; //2000dps -> rad/s
-  imu.vz   += (mpu_data.az - mpu_data.az_offset) /4096.*100.*0.005; //2000dps -> rad/s
-  */
-
   imu_cali_hook(CALI_GYRO, &mpu_data.gx);
   imu_cali_hook(CALI_ACC, &mpu_data.ax);
   imu_cali_hook(CALI_MAG, &mpu_data.mx);
 }
 
-uint8_t mpu_id;
 uint8_t mpu_device_init(void)
 {
+  ENABLE_IST;
   // Reset the internal registers
   mpu_write_reg(MPU6500_PWR_MGMT_1, 0x80);
   MPU_INIT_DELAY(100);
@@ -248,7 +238,8 @@ uint8_t mpu_device_init(void)
   mpu_write_reg(MPU6500_SIGNAL_PATH_RESET, 0x07);
   MPU_INIT_DELAY(100);
 
-  mpu_id = mpu_read_reg(MPU6500_WHO_AM_I);
+  if (MPU6500_ID != mpu_read_reg(MPU6500_WHO_AM_I))
+    return 1;
 
   uint8_t MPU6500_Init_Data[7][2] = {
     { MPU6500_PWR_MGMT_1,     0x03 }, // Auto selects Clock Source
@@ -267,10 +258,7 @@ uint8_t mpu_device_init(void)
       mpu_write_reg(MPU6500_Init_Data[i][0], MPU6500_Init_Data[i][1]);
       MPU_INIT_DELAY(1);
   }
-  //mpu_write_reg(MPU6500_GYRO_CONFIG, 0x18)  fsr << 3
-  //MPU_Set_Gyro_Fsr(3); //0=250,1=500,2=1000,3=2000dps
-  //mpu_write_reg(MPU6500_ACCEL_CONFIG, 0x10)
-  //MPU_Set_Accel_Fsr(2); //0=2g,1=4g, 2=8g, 3=16g
+  
   ist8310_init();
   mpu_offset_cal();
   return 0;
@@ -296,8 +284,8 @@ void mpu_offset_cal(void)
   mpu_data.ax_offset=mpu_data.ax_offset / 300;
   mpu_data.ay_offset=mpu_data.ay_offset / 300;
   mpu_data.az_offset=mpu_data.az_offset / 300;
-  mpu_data.gx_offset=mpu_data.gx_offset	/ 300;
-  mpu_data.gy_offset=mpu_data.gx_offset	/ 300;
-  mpu_data.gz_offset=mpu_data.gz_offset	/ 300;
+  mpu_data.gx_offset=mpu_data.gx_offset / 300;
+  mpu_data.gy_offset=mpu_data.gx_offset / 300;
+  mpu_data.gz_offset=mpu_data.gz_offset / 300;
 }
 

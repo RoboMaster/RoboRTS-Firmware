@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=D:/opensource_infantry/Inc
+HeaderPath=E:/RoboRTS-Firmware/Inc
 HeaderFiles=gpio.h;can.h;dma.h;ffconf.h;bsp_driver_sd.h;fatfs.h;FreeRTOSConfig.h;rtc.h;sdio.h;spi.h;tim.h;usart.h;stm32f4xx_it.h;stm32f4xx_hal_conf.h;main.h;
-SourcePath=D:/opensource_infantry/Src
+SourcePath=E:/RoboRTS-Firmware/Src
 SourceFiles=gpio.h;can.h;dma.h;ffconf.h;bsp_driver_sd.h;fatfs.h;FreeRTOSConfig.h;rtc.h;sdio.h;spi.h;tim.h;usart.h;stm32f4xx_it.h;stm32f4xx_hal_conf.h;main.h;gpio.c;can.c;dma.c;bsp_driver_sd.c;fatfs.c;freertos.c;rtc.c;sdio.c;spi.c;tim.c;usart.c;stm32f4xx_it.c;stm32f4xx_hal_msp.c;stm32f4xx_hal_timebase_TIM.c;main.c;
 
 [PreviousLibFiles]

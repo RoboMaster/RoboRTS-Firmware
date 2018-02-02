@@ -56,10 +56,8 @@
 
 /* Private define ------------------------------------------------------------*/
 
-#define IST_INT_Pin GPIO_PIN_3
-#define IST_INT_GPIO_Port GPIOE
-#define IST_RST_Pin GPIO_PIN_2
-#define IST_RST_GPIO_Port GPIOE
+#define IST_SET_Pin GPIO_PIN_2
+#define IST_SET_GPIO_Port GPIOE
 #define MPU_INT_Pin GPIO_PIN_1
 #define MPU_INT_GPIO_Port GPIOE
 #define IMU_TEMP_Pin GPIO_PIN_5
@@ -72,8 +70,6 @@
 #define TRIG_GPIO_Port GPIOI
 #define SPI5_NSS_Pin GPIO_PIN_6
 #define SPI5_NSS_GPIO_Port GPIOF
-#define CALI_Pin GPIO_PIN_10
-#define CALI_GPIO_Port GPIOF
 #define KEY_Pin GPIO_PIN_10
 #define KEY_GPIO_Port GPIOD
 #define LED1_Pin GPIO_PIN_14
