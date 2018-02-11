@@ -100,7 +100,7 @@ static void get_structure_param(void)
   }
 }
 
-int speed_debug = 1150;
+int speed_debug = 1230;
 void get_shoot_info(void)
 {
   switch (shot.ctrl_mode)

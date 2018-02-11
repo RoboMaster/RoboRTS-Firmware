@@ -73,7 +73,7 @@ static void chassis_operation_func(int16_t forward_back, int16_t left_right, int
 {
   rm.vx =  forward_back / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_X;
   rm.vy = -left_right / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_Y;
-  rm.vw =  rotate / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_R;
+  rm.vw = -rotate / RC_RESOLUTION * CHASSIS_RC_MAX_SPEED_R;
 }
 
 void remote_ctrl_chassis_hook(void)
