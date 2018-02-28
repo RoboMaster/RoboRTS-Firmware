@@ -76,7 +76,7 @@ extern moto_measure_t moto_chassis[];
 extern moto_measure_t moto_yaw, moto_pit, moto_trigger;
 //extern float          yaw_zgyro_angle;
 
-void encoder_data_handle(moto_measure_t* ptr, CAN_HandleTypeDef* hcan);
+void encoder_data_handler(moto_measure_t* ptr, CAN_HandleTypeDef* hcan);
 void get_moto_offset(moto_measure_t* ptr, CAN_HandleTypeDef* hcan);
 
 void can_device_init(void);

@@ -72,7 +72,7 @@ extern rc_info_t   rc;
 extern rc_ctrl_t   rm;
 extern sw_record_t glb_sw;
 
-void rc_callback_handle(rc_info_t *rc, uint8_t *buff);
+void rc_callback_handler(rc_info_t *rc, uint8_t *buff);
 
 void remote_ctrl_chassis_hook(void);
 void remote_ctrl_gimbal_hook(void);

@@ -59,7 +59,7 @@ static void uart_rx_idle_callback(UART_HandleTypeDef* huart)
     //uint32_t status = taskENTER_CRITICAL_FROM_ISR();
     if ((DBUS_MAX_LEN - dma_current_data_counter(huart->hdmarx->Instance)) == DBUS_BUFLEN)
     {
-      rc_callback_handle(&rc, dbus_buf);
+      rc_callback_handler(&rc, dbus_buf);
       err_detector_hook(REMOTE_CTRL_OFFLINE);
     }
     //taskEXIT_CRITICAL_FROM_ISR(status);

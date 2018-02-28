@@ -40,7 +40,7 @@ receive_judge_t judge_rece_mesg;
   * @brief    get judgement system message
   */
 extern TaskHandle_t pc_unpack_task_t;
-void judgement_data_handle(uint8_t *p_frame)
+void judgement_data_handler(uint8_t *p_frame)
 {
   frame_header_t *p_header = (frame_header_t*)p_frame;
   memcpy(p_header, p_frame, HEADER_LEN);

@@ -71,57 +71,57 @@ void chassis_task(void const *argu)
     {
       chassis.vx = 0;
       chassis.vy = 0;
-      chassis_twist_handle();
+      chassis_twist_handler();
     }break;
     
     case AUTO_FOLLOW_GIMBAL:
     {
       taskENTER_CRITICAL();
-      chassis.vx = (float)pc_rece_mesg.chassis_control_data.x_speed;
-      chassis.vy = (float)pc_rece_mesg.chassis_control_data.y_speed;
+      chassis.vx = (float)pc_recv_mesg.chassis_control_data.x_spd;
+      chassis.vy = (float)pc_recv_mesg.chassis_control_data.y_spd;
       chassis.position_ref = 0;
       taskEXIT_CRITICAL();
       
-      chassis.vw = pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, chassis.position_ref); 
+      chassis.vw = -pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, chassis.position_ref); 
     }break;
     
     case AUTO_SEPARATE_GIMBAL:
     {
       taskENTER_CRITICAL();
-      chassis.vx = (float)pc_rece_mesg.chassis_control_data.x_speed;
-      chassis.vy = (float)pc_rece_mesg.chassis_control_data.y_speed;
+      chassis.vx = (float)pc_recv_mesg.chassis_control_data.x_spd;
+      chassis.vy = (float)pc_recv_mesg.chassis_control_data.y_spd;
       chassis.position_ref = 0;
-      chassis.vw = pc_rece_mesg.chassis_control_data.w_info.w_speed;
+      chassis.vw = pc_recv_mesg.chassis_control_data.w_info.w_spd;
       taskEXIT_CRITICAL();
       
     }break;
     
     case CHASSIS_STOP:
     {
-      chassis_stop_handle();
+      chassis_stop_handler();
     }break;
 
     case MANUAL_SEPARATE_GIMBAL:
     {
-      separate_gimbal_handle();
+      separate_gimbal_handler();
     }break;
     
     case MANUAL_FOLLOW_GIMBAL:
     {
-      follow_gimbal_handle();
+      follow_gimbal_handler();
     }break;
 
     default:
     {
-      chassis_stop_handle();
+      chassis_stop_handler();
     }break;
   }
 
-  mecanum_calc(chassis.vx, chassis.vy, chassis.vw, chassis.wheel_speed_ref);
+  mecanum_calc(chassis.vx, chassis.vy, chassis.vw, chassis.wheel_spd_ref);
 
   for (int i = 0; i < 4; i++)
   {
-    chassis.current[i] = pid_calc(&pid_spd[i], chassis.wheel_speed_fdb[i], chassis.wheel_speed_ref[i]);
+    chassis.current[i] = pid_calc(&pid_spd[i], chassis.wheel_spd_fdb[i], chassis.wheel_spd_ref[i]);
   }
   
   if (!chassis_is_controllable())
@@ -136,7 +136,7 @@ void chassis_task(void const *argu)
 }
 
 
-void chassis_stop_handle(void)
+void chassis_stop_handler(void)
 {
   chassis.vy = 0;
   chassis.vx = 0;
@@ -144,21 +144,21 @@ void chassis_stop_handle(void)
 }
 
 uint32_t twist_count;
-static void chassis_twist_handle(void)
+static void chassis_twist_handler(void)
 {
   static int16_t twist_period = TWIST_PERIOD/CHASSIS_PERIOD;
   static int16_t twist_angle  = TWIST_ANGLE;
   twist_count++;
   chassis.position_ref = twist_angle*sin(2*PI/twist_period*twist_count);
-  chassis.vw = pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, chassis.position_ref);
+  chassis.vw = -pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, chassis.position_ref);
 }
-void separate_gimbal_handle(void)
+void separate_gimbal_handler(void)
 {
   chassis.vy = rm.vy * CHASSIS_RC_MOVE_RATIO_Y + km.vy * CHASSIS_KB_MOVE_RATIO_Y;
   chassis.vx = rm.vx * CHASSIS_RC_MOVE_RATIO_X + km.vx * CHASSIS_KB_MOVE_RATIO_X;
   chassis.vw = rm.vw * CHASSIS_RC_MOVE_RATIO_R;
 }
-void follow_gimbal_handle(void)
+void follow_gimbal_handler(void)
 {
   chassis.position_ref = 0;
   
@@ -166,16 +166,9 @@ void follow_gimbal_handle(void)
   chassis.vx = rm.vx * CHASSIS_RC_MOVE_RATIO_X + km.vx * CHASSIS_KB_MOVE_RATIO_X;
 
   if (chassis.follow_gimbal)
-    chassis.vw = pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, chassis.position_ref);
+    chassis.vw = -pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, chassis.position_ref);
   else
     chassis.vw = 0;
-  
-//  if ((gim.ctrl_mode == GIMBAL_FOLLOW_ZGYRO)
-//   || ((gim.ctrl_mode == GIMBAL_NO_ARTI_INPUT) && (gim.input.no_action_flag == 1)))
-//     chassis.vw = pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, 0); 
-//  else
-//    chassis.vw = 0;
-
 }
 
 /**
@@ -184,7 +177,7 @@ void follow_gimbal_handle(void)
   *        output: every wheel speed(rpm)
   * @note  1=FR 2=FL 3=BL 4=BR
   */
-int rotation_center_gimbal = 1;
+int rotation_center_gimbal = 0;
 void mecanum_calc(float vx, float vy, float vw, int16_t speed[])
 {
   static float rotate_ratio_fr;
@@ -201,28 +194,27 @@ void mecanum_calc(float vx, float vy, float vw, int16_t speed[])
   }
   else
   {
-    chassis.rotate_x_offset = glb_struct.gimbal_x_offset;
-    chassis.rotate_y_offset = glb_struct.gimbal_y_offset;
+    if (rotation_center_gimbal)
+    {
+      chassis.rotate_x_offset = glb_struct.gimbal_x_offset;
+      chassis.rotate_y_offset = glb_struct.gimbal_y_offset;
+    }
+    else
+    {
+      chassis.rotate_x_offset = 0;
+      chassis.rotate_y_offset = 0;
+    }
   }
   
-  if (rotation_center_gimbal)
-  {
-    rotate_ratio_fr = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f \
-                        - chassis.rotate_x_offset + chassis.rotate_y_offset)/RADIAN_COEF;
-    rotate_ratio_fl = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f \
-                        - chassis.rotate_x_offset - chassis.rotate_y_offset)/RADIAN_COEF;
-    rotate_ratio_bl = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f \
-                        + chassis.rotate_x_offset - chassis.rotate_y_offset)/RADIAN_COEF;
-    rotate_ratio_br = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f \
-                        + chassis.rotate_x_offset + chassis.rotate_y_offset)/RADIAN_COEF;
-  }
-  else
-  {
-    rotate_ratio_fr = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f)/RADIAN_COEF;
-    rotate_ratio_fl = rotate_ratio_fr;
-    rotate_ratio_bl = rotate_ratio_fr;
-    rotate_ratio_br = rotate_ratio_fr;
-  }
+  rotate_ratio_fr = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f \
+                      - chassis.rotate_x_offset + chassis.rotate_y_offset)/RADIAN_COEF;
+  rotate_ratio_fl = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f \
+                      - chassis.rotate_x_offset - chassis.rotate_y_offset)/RADIAN_COEF;
+  rotate_ratio_bl = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f \
+                      + chassis.rotate_x_offset - chassis.rotate_y_offset)/RADIAN_COEF;
+  rotate_ratio_br = ((glb_struct.wheel_base+glb_struct.wheel_track)/2.0f \
+                      + chassis.rotate_x_offset + chassis.rotate_y_offset)/RADIAN_COEF;
+
   wheel_rpm_ratio = 60.0f/(glb_struct.wheel_perimeter*CHASSIS_DECELE_RATIO);
   taskEXIT_CRITICAL();
   
@@ -234,10 +226,10 @@ void mecanum_calc(float vx, float vy, float vw, int16_t speed[])
   int16_t wheel_rpm[4];
   float   max = 0;
   
-  wheel_rpm[0] = (-vx - vy + vw * rotate_ratio_fr) * wheel_rpm_ratio;
-  wheel_rpm[1] = ( vx - vy + vw * rotate_ratio_fl) * wheel_rpm_ratio;
-  wheel_rpm[2] = ( vx + vy + vw * rotate_ratio_bl) * wheel_rpm_ratio;
-  wheel_rpm[3] = (-vx + vy + vw * rotate_ratio_br) * wheel_rpm_ratio;
+  wheel_rpm[0] = (-vx - vy - vw * rotate_ratio_fr) * wheel_rpm_ratio;
+  wheel_rpm[1] = ( vx - vy - vw * rotate_ratio_fl) * wheel_rpm_ratio;
+  wheel_rpm[2] = ( vx + vy - vw * rotate_ratio_bl) * wheel_rpm_ratio;
+  wheel_rpm[3] = (-vx + vy - vw * rotate_ratio_br) * wheel_rpm_ratio;
 
   //find max item
   for (uint8_t i = 0; i < 4; i++)
@@ -285,13 +277,13 @@ void chassis_param_init(void)
   glb_struct.chassis_config = NO_CONFIG;
   glb_struct.gimbal_config  = NO_CONFIG;
   
-  memset(&pc_rece_mesg.structure_data, 0, sizeof(pc_rece_mesg.structure_data));
+  memset(&pc_recv_mesg.structure_data, 0, sizeof(pc_recv_mesg.structure_data));
 }
 
 #if 0
 int32_t total_cur_limit;
 int32_t total_cur;
-void power_limit_handle(void)
+void power_limit_handler(void)
 {
   if (g_err.list[JUDGE_SYS_OFFLINE].err_exist)
   {

@@ -58,10 +58,10 @@
 /* yaw axis speed */
 #define GIMBAL_PC_MOVE_RATIO_YAW 1.0f
 
-/**************************shot  setting********************************/
-/* shot speed */
+/**************************shoot  setting********************************/
+/* shoot speed */
 #define DEFAULT_FRIC_WHEEL_SPEED 1150 //maximum value is 2500
-/* shot frequence */
+/* shoot frequence */
 #define TRIGGER_MOTOR_SPEED      2000 
 
 
@@ -116,9 +116,9 @@
 /* the deceleration ratio of pitch axis motor */
 #define PIT_DECELE_RATIO       1.0f
 /* the deceleration ratio of yaw axis motor */
-#define YAW_DECELE_RATIO       1.0f    //(5.0f/8.0f)
+#define YAW_DECELE_RATIO       1.0f
 /* the positive direction of pitch axis motor */
-#define PIT_MOTO_POSITIVE_DIR  1.0f
+#define PIT_MOTO_POSITIVE_DIR  -1.0f
 /* the positive direction of yaw axis motor */
 #define YAW_MOTO_POSITIVE_DIR  1.0f
 /* the positive direction of tirgger motor */

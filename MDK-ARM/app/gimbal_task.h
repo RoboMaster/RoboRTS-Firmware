@@ -58,21 +58,6 @@ typedef enum
 } gimbal_cmd_e;
 
 typedef struct
-{  
-  int32_t pit_offset;
-  int32_t yaw_offset;
-  
-  uint8_t target_num;
-  uint8_t last_num;
-  
-  float yaw_calied_5;
-  float pit_calied_5;
-  float yaw_calied_9;
-  float pit_calied_9;
-  
-} big_buff_t;
-
-typedef struct
 {
   /* position loop */
   float yaw_angle_ref;
@@ -80,10 +65,10 @@ typedef struct
   float yaw_angle_fdb;
   float pit_angle_fdb;
   /* speed loop */
-  float yaw_speed_ref;
-  float pit_speed_ref;
-  float yaw_speed_fdb;
-  float pit_speed_fdb;
+  float yaw_spd_ref;
+  float pit_spd_ref;
+  float yaw_spd_fdb;
+  float pit_spd_fdb;
 } gim_pid_t;
 
 typedef struct
@@ -129,14 +114,13 @@ typedef struct
 
 extern gimbal_t gim;
 
-static void no_action_handle(void);
-static void init_mode_handle(void);
-static void close_loop_handle(void);
+static void no_action_handler(void);
+static void init_mode_handler(void);
+static void closed_loop_handler(void);
 
-static void track_aimor_handle(void);
-static void gimbal_patrol_handle(void);
-static void big_buff_handle(void);
-static void pc_position_ctrl_handle(void);
+static void track_aimor_handler(void);
+static void gimbal_patrol_handler(void);
+static void pc_position_ctrl_handler(void);
 
 void gimbal_param_init(void);
 void gimbal_back_param(void);

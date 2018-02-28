@@ -113,8 +113,8 @@ typedef __packed struct
   float   gyro_angle;     /* chassis angle(degree) relative to ground from gyroscope */
   float   ecd_palstance;  /* chassis palstance(degree/s) from chassis motor encoder calculated */
   float   ecd_calc_angle; /* chassis angle(degree) relative to ground from chassis motor encoder calculated */
-  int16_t x_speed;        /* chassis x-axis move speed(mm/s) from chassis motor encoder calculated */
-  int16_t y_speed;        /* chassis y-axis move speed(mm/s) from chassis motor encoder calculated */
+  int16_t x_spd;        /* chassis x-axis move speed(mm/s) from chassis motor encoder calculated */
+  int16_t y_spd;        /* chassis y-axis move speed(mm/s) from chassis motor encoder calculated */
   int32_t x_position;     /* chassis x-axis position(mm) relative to the starting point */
   int32_t y_position;     /* chassis y-axis position(mm) relative to the starting point */
 } chassis_info_t;
@@ -139,7 +139,7 @@ typedef __packed struct
 typedef __packed struct
 {
   int16_t remain_bullets;  /* the member of remain bullets */
-  int16_t shot_bullets;    /* the member of bullets that have been shot */
+  int16_t shoot_bullets;    /* the member of bullets that have been shot */
   uint8_t fric_wheel_run;  /* friction run or not */
 } shoot_info_t;
 
@@ -234,7 +234,7 @@ typedef __packed struct
 {
   int16_t x_offset;   /* offset(mm) relative to the x-axis of the chassis center */
   int16_t y_offset;   /* offset(mm) relative to the y-axis of the chassis center */
-  float   w_speed;    /* rotation speed(degree/s) of chassis */
+  float   w_spd;    /* rotation speed(degree/s) of chassis */
 } chassis_rotate_t;
 
 /** 
@@ -243,8 +243,8 @@ typedef __packed struct
 typedef __packed struct
 {
   uint8_t          ctrl_mode; /* chassis control mode */
-  int16_t          x_speed;   /* x-axis move speed(mm/s) of chassis */
-  int16_t          y_speed;   /* y-axis move speed(mm/s) of chassis */
+  int16_t          x_spd;   /* x-axis move speed(mm/s) of chassis */
+  int16_t          y_spd;   /* y-axis move speed(mm/s) of chassis */
   chassis_rotate_t w_info;    /* rotation control of chassis */
 } chassis_ctrl_t;
 
@@ -336,8 +336,8 @@ typedef struct
 /* data send */
 extern send_pc_t    pc_send_mesg;
 /* data receive */
-extern receive_pc_t pc_rece_mesg;
+extern receive_pc_t pc_recv_mesg;
 
-void pc_data_handle(uint8_t *p_frame);
+void pc_data_handler(uint8_t *p_frame);
 
 #endif

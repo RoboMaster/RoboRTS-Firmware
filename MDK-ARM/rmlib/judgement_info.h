@@ -109,7 +109,7 @@ typedef __packed struct
 {
   uint8_t reserved1;
   uint8_t bullet_freq;
-  float   bullet_speed;
+  float   bullet_spd;
   float   reserved2;
 } real_shoot_t;
 
@@ -177,6 +177,6 @@ typedef struct
 /* data receive */
 extern receive_judge_t judge_rece_mesg;
 
-void  judgement_data_handle(uint8_t *p_frame);
+void  judgement_data_handler(uint8_t *p_frame);
 
 #endif

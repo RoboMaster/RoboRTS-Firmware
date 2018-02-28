@@ -289,7 +289,7 @@ void pc_unpack_task(void const *argu)
         unpack_flag = 0;
       }
       
-      //protocol_packet_pack(0xa0, (uint8_t*)&(pc_rece_mesg.chassis_control_data), sizeof(pc_rece_mesg.chassis_control_data), UP_REG_ID, pc_rx_test);
+      //protocol_packet_pack(0xa0, (uint8_t*)&(pc_recv_mesg.chassis_control_data), sizeof(pc_recv_mesg.chassis_control_data), UP_REG_ID, pc_rx_test);
     }
     
     pc_comm_surplus = uxTaskGetStackHighWaterMark(NULL);
