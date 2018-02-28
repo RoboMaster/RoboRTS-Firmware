@@ -114,7 +114,7 @@ void key_fsm(kb_state_e *sta, uint8_t key)
   }
 }
 
-static void move_speed_ctrl(uint8_t fast, uint8_t slow)
+static void move_spd_ctrl(uint8_t fast, uint8_t slow)
 {
   if (fast)
   {
@@ -182,27 +182,27 @@ static void chassis_operation_func(uint8_t twist_chassis)
 static void kb_fric_ctrl(uint8_t open_fric,  uint8_t close_fric)
 {
   if (open_fric)
-    shot.fric_wheel_run = 1;
+    shoot.fric_wheel_run = 1;
   
   if (close_fric)
-    shot.fric_wheel_run = 0;
+    shoot.fric_wheel_run = 0;
 }
 
 static void kb_shoot_cmd(uint8_t single_fir, uint8_t cont_fir)
 {
   if (single_fir)
   {
-    shot.shoot_cmd   = 1;
-    shot.c_shoot_cmd = 0;
+    shoot.shoot_cmd   = 1;
+    shoot.c_shoot_cmd = 0;
   }
   
   if (cont_fir)
   {
-    shot.shoot_cmd   = 0;
-    shot.c_shoot_cmd = 1;
+    shoot.shoot_cmd   = 0;
+    shoot.c_shoot_cmd = 1;
   }
   else
-    shot.c_shoot_cmd = 0;
+    shoot.c_shoot_cmd = 0;
 
 }
 static void gimbal_operation_func(int16_t pit_ref_spd, int16_t yaw_ref_spd,
@@ -244,7 +244,7 @@ void keyboard_chassis_hook(void)
 {
   if (km.kb_enable)
   {
-    move_speed_ctrl(FAST_SPD, SLOW_SPD);
+    move_spd_ctrl(FAST_SPD, SLOW_SPD);
     
     move_direction_ctrl(FORWARD, BACK, LEFT, RIGHT);
     

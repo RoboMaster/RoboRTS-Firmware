@@ -53,12 +53,11 @@ void uart_dma_full_signal(UART_HandleTypeDef *huart);
 
 void get_dma_memory_msg(DMA_Stream_TypeDef *dma_stream, uint8_t *mem_id, uint16_t *remain_cnt);
 
-void no_cali_data_handle(void);
+void no_cali_data_handler(void);
 void get_infantry_info(void);
 void get_custom_data_info(void);
 
-uint8_t read_gimbal_offset(int32_t *pit_offset, int32_t *yaw_offset,
-                           int32_t *pit_buff_offset, int32_t *yaw_buff_offset);
+uint8_t read_gimbal_offset(int32_t *pit_offset, int32_t *yaw_offset);
 
 static void get_structure_param(void);
 static void gimbal_cali_msg_hook(uint8_t cur_type, uint8_t last_type);

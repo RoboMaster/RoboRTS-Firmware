@@ -58,8 +58,8 @@ typedef struct
   float           gyro_angle;
   float           gyro_palstance;
 
-  int16_t         wheel_speed_fdb[4];
-  int16_t         wheel_speed_ref[4];
+  int16_t         wheel_spd_fdb[4];
+  int16_t         wheel_spd_ref[4];
   int16_t         current[4];
   
   int16_t         position_ref;
@@ -70,12 +70,12 @@ typedef struct
 void chassis_task(void const *argu);
 
 void chassis_param_init(void);
-void power_limit_handle(void);
+void power_limit_handler(void);
 
-static void chassis_twist_handle(void);
-static void chassis_stop_handle(void);
-static void separate_gimbal_handle(void);
-static void follow_gimbal_handle(void);
+static void chassis_twist_handler(void);
+static void chassis_stop_handler(void);
+static void separate_gimbal_handler(void);
+static void follow_gimbal_handler(void);
 
 static void mecanum_calc(float vx, float vy, float vw, int16_t speed[]);
 

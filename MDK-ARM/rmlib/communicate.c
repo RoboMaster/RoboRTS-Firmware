@@ -121,11 +121,11 @@ void unpack_fifo_data(unpack_data_t *p_obj, uint8_t sof)
           {
             if (sof == UP_REG_ID)
             {
-              pc_data_handle(p_obj->protocol_packet);
+              pc_data_handler(p_obj->protocol_packet);
             }
             else  //DN_REG_ID
             {
-              judgement_data_handle(p_obj->protocol_packet);
+              judgement_data_handler(p_obj->protocol_packet);
             }
           }
         }
@@ -217,7 +217,7 @@ uint8_t* protocol_packet_pack(uint16_t cmd_id, uint8_t *p_data, uint16_t len, ui
   return tx_buf;
 }
 
-void data_upload_handle(uint16_t cmd_id, uint8_t *p_data, uint16_t len, uint8_t sof, uint8_t *tx_buf)
+void data_upload_handler(uint16_t cmd_id, uint8_t *p_data, uint16_t len, uint8_t sof, uint8_t *tx_buf)
 {
   uint16_t frame_length = HEADER_LEN + CMD_LEN + len + CRC_LEN;
   

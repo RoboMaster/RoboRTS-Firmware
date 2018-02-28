@@ -52,19 +52,19 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* _hcan)
       static uint8_t i;
       i = _hcan->pRxMsg->StdId - CAN_3510_M1_ID;
 
-      moto_chassis[i].msg_cnt++ <= 50 ? get_moto_offset(&moto_chassis[i], _hcan) : encoder_data_handle(&moto_chassis[i], _hcan);
+      moto_chassis[i].msg_cnt++ <= 50 ? get_moto_offset(&moto_chassis[i], _hcan) : encoder_data_handler(&moto_chassis[i], _hcan);
       err_detector_hook(CHASSIS_M1_OFFLINE + i);
     }
     break;
     case CAN_YAW_MOTOR_ID:
     {
-      encoder_data_handle(&moto_yaw, _hcan);
+      encoder_data_handler(&moto_yaw, _hcan);
       err_detector_hook(GIMBAL_YAW_OFFLINE);
     }
     break;
     case CAN_PIT_MOTOR_ID:
     {
-      encoder_data_handle(&moto_pit, _hcan);
+      encoder_data_handler(&moto_pit, _hcan);
       err_detector_hook(GIMBAL_PIT_OFFLINE);
     }
     break;
@@ -73,7 +73,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* _hcan)
       if (_hcan == &TRIGGER_CAN)
       {
         moto_trigger.msg_cnt++;
-        moto_trigger.msg_cnt <= 10 ? get_moto_offset(&moto_trigger, _hcan) : encoder_data_handle(&moto_trigger, _hcan);
+        moto_trigger.msg_cnt <= 10 ? get_moto_offset(&moto_trigger, _hcan) : encoder_data_handler(&moto_trigger, _hcan);
         err_detector_hook(TRIGGER_MOTO_OFFLINE);
       }
       else
@@ -127,7 +127,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* _hcan)
   * @param     ptr: Pointer to a moto_measure_t structure
   * @attention this function should be called after get_moto_offset() function
   */
-void encoder_data_handle(moto_measure_t* ptr, CAN_HandleTypeDef* hcan)
+void encoder_data_handler(moto_measure_t* ptr, CAN_HandleTypeDef* hcan)
 {
   ptr->last_ecd = ptr->ecd;
   ptr->ecd      = (uint16_t)(hcan->pRxMsg->Data[0] << 8 | hcan->pRxMsg->Data[1]);
@@ -257,10 +257,12 @@ void send_gimbal_cur(int16_t yaw_iq, int16_t pit_iq, int16_t trigger_iq)
   GIMBAL_CAN.pTxMsg->IDE     = CAN_ID_STD;
   GIMBAL_CAN.pTxMsg->RTR     = CAN_RTR_DATA;
   GIMBAL_CAN.pTxMsg->DLC     = 8;
-  GIMBAL_CAN.pTxMsg->Data[0] = yaw_iq >> 8;
-  GIMBAL_CAN.pTxMsg->Data[1] = yaw_iq;
-  GIMBAL_CAN.pTxMsg->Data[2] = pit_iq >> 8;
-  GIMBAL_CAN.pTxMsg->Data[3] = pit_iq;
+  /* adding minus due to clockwise rotation of the gimbal motor with positive current */
+  GIMBAL_CAN.pTxMsg->Data[0] = -yaw_iq >> 8;
+  GIMBAL_CAN.pTxMsg->Data[1] = -yaw_iq;
+  /* adding minus due to clockwise rotation of the gimbal motor with positive current */
+  GIMBAL_CAN.pTxMsg->Data[2] = -pit_iq >> 8;
+  GIMBAL_CAN.pTxMsg->Data[3] = -pit_iq;
   GIMBAL_CAN.pTxMsg->Data[4] = trigger_iq >> 8;
   GIMBAL_CAN.pTxMsg->Data[5] = trigger_iq;
   GIMBAL_CAN.pTxMsg->Data[6] = 0;

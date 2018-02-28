@@ -71,14 +71,14 @@ void chassis_task(void const *argu)
     {
       chassis.vx = 0;
       chassis.vy = 0;
-      chassis_twist_handle();
+      chassis_twist_handler();
     }break;
     
     case AUTO_FOLLOW_GIMBAL:
     {
       taskENTER_CRITICAL();
-      chassis.vx = (float)pc_rece_mesg.chassis_control_data.x_speed;
-      chassis.vy = (float)pc_rece_mesg.chassis_control_data.y_speed;
+      chassis.vx = (float)pc_recv_mesg.chassis_control_data.x_spd;
+      chassis.vy = (float)pc_recv_mesg.chassis_control_data.y_spd;
       chassis.position_ref = 0;
       taskEXIT_CRITICAL();
       
@@ -88,40 +88,40 @@ void chassis_task(void const *argu)
     case AUTO_SEPARATE_GIMBAL:
     {
       taskENTER_CRITICAL();
-      chassis.vx = (float)pc_rece_mesg.chassis_control_data.x_speed;
-      chassis.vy = (float)pc_rece_mesg.chassis_control_data.y_speed;
+      chassis.vx = (float)pc_recv_mesg.chassis_control_data.x_spd;
+      chassis.vy = (float)pc_recv_mesg.chassis_control_data.y_spd;
       chassis.position_ref = 0;
-      chassis.vw = pc_rece_mesg.chassis_control_data.w_info.w_speed;
+      chassis.vw = pc_recv_mesg.chassis_control_data.w_info.w_spd;
       taskEXIT_CRITICAL();
       
     }break;
     
     case CHASSIS_STOP:
     {
-      chassis_stop_handle();
+      chassis_stop_handler();
     }break;
 
     case MANUAL_SEPARATE_GIMBAL:
     {
-      separate_gimbal_handle();
+      separate_gimbal_handler();
     }break;
     
     case MANUAL_FOLLOW_GIMBAL:
     {
-      follow_gimbal_handle();
+      follow_gimbal_handler();
     }break;
 
     default:
     {
-      chassis_stop_handle();
+      chassis_stop_handler();
     }break;
   }
 
-  mecanum_calc(chassis.vx, chassis.vy, chassis.vw, chassis.wheel_speed_ref);
+  mecanum_calc(chassis.vx, chassis.vy, chassis.vw, chassis.wheel_spd_ref);
 
   for (int i = 0; i < 4; i++)
   {
-    chassis.current[i] = pid_calc(&pid_spd[i], chassis.wheel_speed_fdb[i], chassis.wheel_speed_ref[i]);
+    chassis.current[i] = pid_calc(&pid_spd[i], chassis.wheel_spd_fdb[i], chassis.wheel_spd_ref[i]);
   }
   
   if (!chassis_is_controllable())
@@ -136,7 +136,7 @@ void chassis_task(void const *argu)
 }
 
 
-void chassis_stop_handle(void)
+void chassis_stop_handler(void)
 {
   chassis.vy = 0;
   chassis.vx = 0;
@@ -144,7 +144,7 @@ void chassis_stop_handle(void)
 }
 
 uint32_t twist_count;
-static void chassis_twist_handle(void)
+static void chassis_twist_handler(void)
 {
   static int16_t twist_period = TWIST_PERIOD/CHASSIS_PERIOD;
   static int16_t twist_angle  = TWIST_ANGLE;
@@ -152,13 +152,13 @@ static void chassis_twist_handle(void)
   chassis.position_ref = twist_angle*sin(2*PI/twist_period*twist_count);
   chassis.vw = -pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, chassis.position_ref);
 }
-void separate_gimbal_handle(void)
+void separate_gimbal_handler(void)
 {
   chassis.vy = rm.vy * CHASSIS_RC_MOVE_RATIO_Y + km.vy * CHASSIS_KB_MOVE_RATIO_Y;
   chassis.vx = rm.vx * CHASSIS_RC_MOVE_RATIO_X + km.vx * CHASSIS_KB_MOVE_RATIO_X;
   chassis.vw = rm.vw * CHASSIS_RC_MOVE_RATIO_R;
 }
-void follow_gimbal_handle(void)
+void follow_gimbal_handler(void)
 {
   chassis.position_ref = 0;
   
@@ -169,13 +169,6 @@ void follow_gimbal_handle(void)
     chassis.vw = -pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, chassis.position_ref);
   else
     chassis.vw = 0;
-  
-//  if ((gim.ctrl_mode == GIMBAL_FOLLOW_ZGYRO)
-//   || ((gim.ctrl_mode == GIMBAL_NO_ARTI_INPUT) && (gim.input.no_action_flag == 1)))
-//     chassis.vw = -pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, 0); 
-//  else
-//    chassis.vw = 0;
-
 }
 
 /**
@@ -284,13 +277,13 @@ void chassis_param_init(void)
   glb_struct.chassis_config = NO_CONFIG;
   glb_struct.gimbal_config  = NO_CONFIG;
   
-  memset(&pc_rece_mesg.structure_data, 0, sizeof(pc_rece_mesg.structure_data));
+  memset(&pc_recv_mesg.structure_data, 0, sizeof(pc_recv_mesg.structure_data));
 }
 
 #if 0
 int32_t total_cur_limit;
 int32_t total_cur;
-void power_limit_handle(void)
+void power_limit_handler(void)
 {
   if (g_err.list[JUDGE_SYS_OFFLINE].err_exist)
   {

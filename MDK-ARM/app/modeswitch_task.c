@@ -163,7 +163,7 @@ static action_mode_e remote_is_action(void)
 
 
 
-static void gimbal_mode_handle(void)
+static void gimbal_mode_handler(void)
 {
   switch (glb_ctrl_mode)
   {
@@ -257,7 +257,7 @@ static void gimbal_mode_handle(void)
         case RC_UP:
         case RC_MI:
         {
-          gim.ctrl_mode = (gimbal_mode_e)pc_rece_mesg.gimbal_control_data.ctrl_mode;
+          gim.ctrl_mode = (gimbal_mode_e)pc_recv_mesg.gimbal_control_data.ctrl_mode;
         }break;
         
         default:
@@ -281,7 +281,7 @@ void get_gimbal_mode(void)
   
   if (gim.ctrl_mode != GIMBAL_INIT)
   {
-    gimbal_mode_handle();
+    gimbal_mode_handler();
   }
 
   if (gim.ctrl_mode != GIMBAL_PATROL_MODE)
@@ -307,7 +307,7 @@ static void get_global_last_mode(void)
 }
 
 
-static void chassis_mode_handle(void)
+static void chassis_mode_handler(void)
 {
   switch (glb_ctrl_mode)
   {
@@ -351,7 +351,7 @@ static void chassis_mode_handle(void)
         case RC_UP:
         case RC_MI:
         {
-          chassis.ctrl_mode = (chassis_mode_e)pc_rece_mesg.chassis_control_data.ctrl_mode;
+          chassis.ctrl_mode = (chassis_mode_e)pc_recv_mesg.chassis_control_data.ctrl_mode;
         }break;
         
         case RC_DN:
@@ -383,7 +383,7 @@ void get_chassis_mode(void)
   }
   else
   {
-    chassis_mode_handle();
+    chassis_mode_handler();
   }
   
 }
@@ -415,29 +415,29 @@ void get_shoot_mode(void)
     case MANUAL_CTRL_MODE:
     {
       if (km.kb_enable)
-        shot.ctrl_mode = KEYBOARD_CTRL_SHOT;
+        shoot.ctrl_mode = KEYBOARD_CTRL_SHOT;
       else
-        shot.ctrl_mode = REMOTE_CTRL_SHOT;
+        shoot.ctrl_mode = REMOTE_CTRL_SHOT;
     }break;
     
     case SEMI_AUTO_MODE:
     {
-      shot.ctrl_mode = SEMIAUTO_CTRL_SHOT;
+      shoot.ctrl_mode = SEMIAUTO_CTRL_SHOT;
     }break;
     
     case AUTO_CTRL_MODE:
     {
-      shot.ctrl_mode = AUTO_CTRL_SHOT;
+      shoot.ctrl_mode = AUTO_CTRL_SHOT;
     }break;
     
     default:
     {
-      shot.ctrl_mode = SHOT_DISABLE;
+      shoot.ctrl_mode = SHOT_DISABLE;
     }break;
     
   }
 
   if (gim.ctrl_mode == GIMBAL_RELAX)
-    shot.ctrl_mode = SHOT_DISABLE;
+    shoot.ctrl_mode = SHOT_DISABLE;
 
 }

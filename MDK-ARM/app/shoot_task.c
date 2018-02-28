@@ -43,13 +43,13 @@
 /* stack usage monitor */
 UBaseType_t shoot_stack_surplus;
 
-/* shot task global parameter */
-shoot_t   shot;
+/* shoot task global parameter */
+shoot_t   shoot;
 trigger_t trig;
 
 uint32_t shoot_time_last;
 int shoot_time_ms;
-void shot_task(void const *argu)
+void shoot_task(void const *argu)
 {
   osEvent event;
   
@@ -66,51 +66,51 @@ void shot_task(void const *argu)
         
         fric_wheel_ctrl();
         
-        if (!shot.fric_wheel_run)
+        if (!shoot.fric_wheel_run)
         {
-          shot.shoot_cmd   = 0;
-          shot.c_shoot_cmd = 0;
+          shoot.shoot_cmd   = 0;
+          shoot.c_shoot_cmd = 0;
         }
         
 #ifdef OLD_TRIGGER  
         /*
-        if (shot.fric_wheel_run)
+        if (shoot.fric_wheel_run)
         {
           if (glb_sw.last_sw1 == RC_DN)
             trig.pos_ref = moto_trigger.total_ecd;
-          if (shot.shoot_cmd)
+          if (shoot.shoot_cmd)
           {
             trig.pos_ref = moto_trigger.total_ecd;
             trig.pos_ref += 130922 * trig.dir;
-            shot.shoot_cmd = 0;
+            shoot.shoot_cmd = 0;
           }
         
           pid_calc(&pid_trigger, moto_trigger.total_ecd / 100, trig.pos_ref / 100);
           
-          if (shot.c_shoot_cmd)
+          if (shoot.c_shoot_cmd)
             trig.spd_ref = -4000;
           else
             trig.spd_ref = pid_trigger.out;
           
-          block_bullet_handle();
-          pid_calc(&pid_trigger_speed, moto_trigger.speed_rpm, trig.spd_ref);
+          block_bullet_handler();
+          pid_calc(&pid_trigger_spd, moto_trigger.speed_rpm, trig.spd_ref);
         }
         else
         {
-          pid_trigger_speed.out = 0;
+          pid_trigger_spd.out = 0;
         }
         */
 #else
         
         trig.key = get_trigger_key_state();
         
-        if (shot.fric_wheel_run)
+        if (shoot.fric_wheel_run)
         {
-          shoot_bullet_handle();
+          shoot_bullet_handler();
         }
         else
         {
-          pid_trigger_speed.out = 0;
+          pid_trigger_spd.out = 0;
         }
         
         trig.key_last = trig.key;
@@ -124,13 +124,13 @@ void shot_task(void const *argu)
 
 
 
-void block_bullet_handle(void)
+void block_bullet_handler(void)
 {
   uint32_t stall_count = 0;
   uint32_t stall_inv_count = 0;
   uint8_t  stall_f = 0;
   
-  if (pid_trigger_speed.out <= -4000)
+  if (pid_trigger_spd.out <= -4000)
   {
     if (stall_f == 0)
       stall_count ++;
@@ -160,9 +160,9 @@ void block_bullet_handle(void)
 
 static void fric_wheel_ctrl(void)
 {
-  if (shot.fric_wheel_run)
+  if (shoot.fric_wheel_run)
   {
-    turn_on_friction_wheel(shot.fric_wheel_spd);
+    turn_on_friction_wheel(shoot.fric_wheel_spd);
     turn_on_laser();
   }
   else
@@ -172,12 +172,12 @@ static void fric_wheel_ctrl(void)
   }
 }
 
-int debug_tri_speed = 1500;
-int shot_cmd;
-static void shoot_bullet_handle(void)
+int debug_tri_spd = 1500;
+int shoot_cmd;
+static void shoot_bullet_handler(void)
 {
-  shot_cmd = shot.shoot_cmd;
-  if (shot.shoot_cmd)
+  shoot_cmd = shoot.shoot_cmd;
+  if (shoot.shoot_cmd)
   {
     if (trig.one_sta == TRIG_INIT)
     {
@@ -221,47 +221,47 @@ static void shoot_bullet_handle(void)
       trig.spd_ref = 0;
       trig.one_sta = TRIG_INIT;
       
-      shot.shoot_cmd = 0;
-      shot.shot_bullets++;
+      shoot.shoot_cmd = 0;
+      shoot.shoot_bullets++;
     }
     else
-      trig.spd_ref = debug_tri_speed;//trig.feed_bullet_spd;
+      trig.spd_ref = debug_tri_spd;//trig.feed_bullet_spd;
     
   }
-  else if (shot.c_shoot_cmd)
+  else if (shoot.c_shoot_cmd)
   {
     trig.one_sta = TRIG_INIT;
-    trig.spd_ref = trig.c_shot_spd;
+    trig.spd_ref = trig.c_shoot_spd;
     
     if ((trig.key_last == 0) && (trig.key == 1))
-      shot.shot_bullets++;
+      shoot.shoot_bullets++;
     
-    //block_bullet_handle();
+    //block_bullet_handler();
   }
   else
   {
     if (trig.key)       //not trigger
-      trig.spd_ref = debug_tri_speed;//trig.feed_bullet_spd;
+      trig.spd_ref = debug_tri_spd;//trig.feed_bullet_spd;
     else
       trig.spd_ref = 0;
   }
   
-  pid_calc(&pid_trigger_speed, moto_trigger.speed_rpm, trig.spd_ref);
+  pid_calc(&pid_trigger_spd, moto_trigger.speed_rpm, trig.spd_ref);
 }
 
-void shot_param_init(void)
+void shoot_param_init(void)
 {
-  memset(&shot, 0, sizeof(shoot_t));
+  memset(&shoot, 0, sizeof(shoot_t));
   
-  shot.ctrl_mode      = SHOT_DISABLE;
-  shot.fric_wheel_spd = DEFAULT_FRIC_WHEEL_SPEED;
-  //shot.remain_bullets = 0;
+  shoot.ctrl_mode      = SHOT_DISABLE;
+  shoot.fric_wheel_spd = DEFAULT_FRIC_WHEEL_SPEED;
+  //shoot.remain_bullets = 0;
   
   memset(&trig, 0, sizeof(trigger_t));
   
   trig.dir             = 1;
   trig.feed_bullet_spd = 2000;
-  trig.c_shot_spd      = 4000;
+  trig.c_shoot_spd      = 4000;
   trig.one_sta         = TRIG_INIT;
   
 }
