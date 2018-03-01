@@ -43,7 +43,8 @@ typedef enum
 typedef struct
 {
   uint16_t set_timeout;
-  uint16_t delta_time;
+  /* uint32_t prevent delta_time overflow */
+  uint32_t delta_time;
   uint32_t last_time;
 } offline_dev_t;
 
