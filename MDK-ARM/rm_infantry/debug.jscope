@@ -10,7 +10,7 @@
             <DataFile Name="" />
             <RawFile Name="" />
             <Scope>
-                <Options TimeResolutionUs="10000000" />
+                <Options TimeResolutionUs="1000000" />
             </Scope>
         </Configuration>
         <Windows>
@@ -19,7 +19,13 @@
         </Windows>
         <SelectedSymbols>
             <Symbol>
-                <Options Name="delta_time" Address="0x200002A8" Type="int" TypeID="12" Size="4" GraphColorRed="255" GraphColorGreen="215" GraphColorBlue="0" YMinSampled="18067" YMaxSampled="55167" YAvgSampled="54186" Offset="4" ShowInGraph="1" YOffset="110" IsAutoConfig="0" YResolution="50000" MaxValue="2000000000" File="app\detect_task.c" Scope="0" DrawStyle="0" />
+                <Options Name="yaw_pc_angle" Address="0x200002DC" Type="int" TypeID="12" Size="4" GraphColorRed="255" GraphColorGreen="215" GraphColorBlue="0" YMinSampled="-60" YMaxSampled="60" YAvgSampled="5" Offset="4" ShowInGraph="1" YOffset="200" IsAutoConfig="0" YResolution="100" MaxValue="100" File="rmlib\infantry_info.c" Scope="0" DrawStyle="0" />
+            </Symbol>
+            <Symbol>
+                <Options Name="fifo_overflow" Address="0x200002D8" Type="int" TypeID="12" Size="4" GraphColorRed="0" GraphColorGreen="255" GraphColorBlue="0" YMinSampled="0" YMaxSampled="0" YAvgSampled="0" Offset="8" ShowInGraph="1" YOffset="50" IsAutoConfig="1" YResolution="1" MaxValue="2" File="rmlib\communicate.c" Scope="0" DrawStyle="0" />
+            </Symbol>
+            <Symbol>
+                <Options Name="dma_write_len" Address="0x200002D4" Type="int" TypeID="12" Size="4" GraphColorRed="0" GraphColorGreen="0" GraphColorBlue="176" YMinSampled="13" YMaxSampled="38" YAvgSampled="18" Offset="12" ShowInGraph="1" YOffset="200" IsAutoConfig="1" YResolution="50" MaxValue="100" File="rmlib\communicate.c" Scope="0" DrawStyle="0" />
             </Symbol>
         </SelectedSymbols>
     </Project>

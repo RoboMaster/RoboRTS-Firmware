@@ -488,11 +488,13 @@ void uart_dma_full_signal(UART_HandleTypeDef *huart)
 {
   if (huart == &JUDGE_HUART)
   {
-    osSignalSet(judge_unpack_task_t, JUDGE_DMA_FULL_SIGNAL);
+    /* remove DMA buffer full interrupt handler */
+    //osSignalSet(judge_unpack_task_t, JUDGE_DMA_FULL_SIGNAL);
   }
   else if (huart == &COMPUTER_HUART)
   {
-    osSignalSet(pc_unpack_task_t, PC_DMA_FULL_SIGNAL);
+    /* remove DMA buffer full interrupt handler */
+    //osSignalSet(pc_unpack_task_t, PC_DMA_FULL_SIGNAL);
   }
 }
 

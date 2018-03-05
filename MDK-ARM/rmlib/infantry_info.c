@@ -39,6 +39,9 @@ send_pc_t    pc_send_mesg;
 /* data receive */
 receive_pc_t pc_recv_mesg;
 
+//for debug
+int yaw_pc_angle;
+
 /**
   * @brief    get computer control message
   */
@@ -62,6 +65,7 @@ void pc_data_handler(uint8_t *p_frame)
 
     case GIMBAL_CTRL_ID:
       memcpy(&pc_recv_mesg.gimbal_control_data, data_addr, data_length);
+      yaw_pc_angle = pc_recv_mesg.gimbal_control_data.yaw_ref;
     break;
 
     case SHOOT_CTRL_ID:
