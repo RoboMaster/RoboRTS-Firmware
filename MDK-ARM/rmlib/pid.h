@@ -140,13 +140,13 @@ float pid_calc(pid_t *pid, float fdb, float ref);
 
 extern pid_t pid_pit;
 extern pid_t pid_yaw;
-extern pid_t pid_pit_speed;
-extern pid_t pid_yaw_speed;
+extern pid_t pid_pit_spd;
+extern pid_t pid_yaw_spd;
 extern pid_t pid_spd[4];
 
 extern pid_t pid_chassis_angle;
 extern pid_t pid_trigger;
-extern pid_t pid_trigger_speed;
+extern pid_t pid_trigger_spd;
 extern pid_t pid_imu_tmp;
 
 #endif

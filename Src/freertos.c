@@ -69,7 +69,7 @@
 osThreadId defaultTaskHandle;
 
 /* USER CODE BEGIN Variables */
-TaskHandle_t shot_task_t;
+TaskHandle_t shoot_task_t;
 TaskHandle_t can_msg_send_task_t;
 
 TaskHandle_t mode_sw_task_t;
@@ -170,8 +170,8 @@ void MX_FREERTOS_Init(void) {
   /* add threads, ... */
   
     /* high priority task */
-    osThreadDef(shotTask, shot_task, osPriorityAboveNormal, 0, 128);
-    shot_task_t = osThreadCreate(osThread(shotTask), NULL);
+    osThreadDef(shotTask, shoot_task, osPriorityAboveNormal, 0, 128);
+    shoot_task_t = osThreadCreate(osThread(shotTask), NULL);
   
     osThreadDef(canTask, can_msg_send_task, osPriorityAboveNormal, 0, 128);
     can_msg_send_task_t = osThreadCreate(osThread(canTask), NULL);

@@ -58,7 +58,7 @@ typedef __packed struct
   uint8_t      c_shoot_cmd;
   uint8_t      fric_wheel_run; //run or not
   uint16_t     fric_wheel_spd;
-  uint16_t     shot_bullets;
+  uint16_t     shoot_bullets;
   uint16_t     remain_bullets;
 } shoot_t;
 
@@ -72,7 +72,7 @@ typedef __packed struct
   uint8_t   key_last;
   uint32_t  one_time;
   int32_t   feed_bullet_spd;
-  int32_t   c_shot_spd;
+  int32_t   c_shoot_spd;
   
   trig_state_e one_sta;
 } trigger_t;
@@ -83,13 +83,13 @@ typedef enum
   FRIC_CTRL,
 } shoot_type_e;
 
-void shot_param_init(void);
-void shot_task(void const *argu);
+void shoot_param_init(void);
+void shoot_task(void const *argu);
 
-static void shoot_bullet_handle(void);
+static void shoot_bullet_handler(void);
 static void fric_wheel_ctrl(void);
 
-extern shoot_t   shot;
+extern shoot_t   shoot;
 extern trigger_t trig;
 
 #endif

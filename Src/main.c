@@ -139,7 +139,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   //software parameter initialize
   gimbal_param_init();
-  shot_param_init();
+  shoot_param_init();
   chassis_param_init();
   detector_param_init();
   communicate_param_init();

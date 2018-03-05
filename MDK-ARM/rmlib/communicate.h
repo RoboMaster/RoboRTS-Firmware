@@ -76,7 +76,7 @@ void dma_buffer_to_unpack_buffer(uart_dma_rxdata_t *dma_obj, uart_it_type_e it_t
 
 void unpack_fifo_data(unpack_data_t *p_obj, uint8_t sof);
 
-void data_upload_handle(uint16_t cmd_id, uint8_t *p_data, uint16_t len, uint8_t sof, uint8_t *tx_buf);
+void data_upload_handler(uint16_t cmd_id, uint8_t *p_data, uint16_t len, uint8_t sof, uint8_t *tx_buf);
 
 uint32_t send_packed_fifo_data(fifo_s_t *pfifo, uint8_t sof);
 
