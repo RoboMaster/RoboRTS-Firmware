@@ -171,27 +171,6 @@ int32_t fifo_s_puts(fifo_s_t *pfifo, uint8_t *psource, uint32_t number)
   return puts_num;
 }
 
-int32_t fifo_s_puts_no_mutex(fifo_s_t *pfifo, uint8_t *psource, uint32_t number)
-{
-  int puts_num = 0;
-  
-  //! Check input parameters.
-  ASSERT(NULL != pfifo);
-  
-  if(psource == NULL)
-      return -1;
-  
-  for(int i = 0; (i < number) && (pfifo->free > 0); i++)
-  {
-    pfifo->start_addr[pfifo->write_index++] = psource[i];
-    pfifo->write_index %= pfifo->buf_size;
-    pfifo->free--;
-    pfifo->used++;
-    puts_num++;
-  }
-  return puts_num;
-}
-
 /******************************************************************************************
 //
 //! \brief  Get an element from FIFO(in single mode).
@@ -208,33 +187,15 @@ uint8_t fifo_s_get(fifo_s_t* pfifo)
   //! Check input parameters.
   ASSERT(NULL != pfifo);
   
-  taskENTER_CRITICAL();
+  MUTEX_WAIT();
   retval = pfifo->start_addr[pfifo->read_index++];
   pfifo->read_index %= pfifo->buf_size;
   pfifo->free++;
   pfifo->used--;
-  taskEXIT_CRITICAL();
+  MUTEX_RELEASE();
 
   return retval;
 }
-
-uint8_t fifo_s_get_no_mutex(fifo_s_t* pfifo)
-{
-  uint8_t   retval = 0;
-  
-  //! Check input parameters.
-  ASSERT(NULL != pfifo);
-  
-  retval = pfifo->start_addr[pfifo->read_index++];
-  pfifo->read_index %= pfifo->buf_size;
-  pfifo->free++;
-  pfifo->used--;
-
-  return retval;
-}
-
-
-
 
 uint16_t fifo_s_gets(fifo_s_t* pfifo, uint8_t* source, uint8_t len)
 {
@@ -243,8 +204,7 @@ uint16_t fifo_s_gets(fifo_s_t* pfifo, uint8_t* source, uint8_t len)
   //! Check input parameters.
   ASSERT(NULL != pfifo);
   
-  //Enter critical region and close interrupt
-  taskENTER_CRITICAL();
+  MUTEX_WAIT();
   for (int i = 0; (i < len) && (pfifo->used > 0); i++)
   {
     source[i] = pfifo->start_addr[pfifo->read_index++];
@@ -253,30 +213,10 @@ uint16_t fifo_s_gets(fifo_s_t* pfifo, uint8_t* source, uint8_t len)
     pfifo->used--;
     retval++;
   }
-  taskEXIT_CRITICAL();
+  MUTEX_RELEASE();
 
   return retval;
 }
-
-uint16_t fifo_s_gets_no_mutex(fifo_s_t* pfifo, uint8_t* source, uint8_t len)
-{
-  uint8_t   retval = 0;
-  
-  //! Check input parameters.
-  ASSERT(NULL != pfifo);
-  
-  for (int i = 0; (i < len) && (pfifo->used > 0); i++)
-  {
-    source[i] = pfifo->start_addr[pfifo->read_index++];
-    pfifo->read_index %= pfifo->buf_size;
-    pfifo->free++;
-    pfifo->used--;
-    retval++;
-  }
-
-  return retval;
-}
-
 
 /******************************************************************************************
 //

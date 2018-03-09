@@ -30,7 +30,7 @@
 #include "stm32f4xx_hal.h"
 #include "judgement_info.h"
 
-#define COMPUTER_FRAME_BUFLEN 200
+#define COMPUTER_FIFO_BUFLEN 500
 
 
 /** 

@@ -42,8 +42,7 @@ void unpack_fifo_data(unpack_data_t *p_obj, uint8_t sof)
   
   while ( fifo_used_count(p_obj->data_fifo) )
   {
-    //independent thread, need not mutex
-    byte = fifo_s_get_no_mutex(p_obj->data_fifo);
+    byte = fifo_s_get(p_obj->data_fifo);
     switch(p_obj->unpack_step)
     {
       case STEP_HEADER_SOF:
@@ -193,20 +192,19 @@ void dma_buffer_to_unpack_buffer(uart_dma_rxdata_t *dma_obj, uart_it_type_e it_t
   }
 #endif
   
-  //independent thread, puts fifo need not mutex
   if (dma_obj->write_index < dma_obj->read_index)
   {
     dma_write_len = dma_obj->buff_size*2 - dma_obj->read_index + dma_obj->write_index;
     
     tmp_len = dma_obj->buff_size*2 - dma_obj->read_index;
-    if (tmp_len != fifo_s_puts_no_mutex(dma_obj->data_fifo, &pdata[dma_obj->read_index], tmp_len))
+    if (tmp_len != fifo_s_puts(dma_obj->data_fifo, &pdata[dma_obj->read_index], tmp_len))
       fifo_overflow = 1;
     else
       fifo_overflow = 0;
     dma_obj->read_index = 0;
     
     tmp_len = dma_obj->write_index;
-    if (tmp_len != fifo_s_puts_no_mutex(dma_obj->data_fifo, &pdata[dma_obj->read_index], tmp_len))
+    if (tmp_len != fifo_s_puts(dma_obj->data_fifo, &pdata[dma_obj->read_index], tmp_len))
       fifo_overflow = 1;
     else
       fifo_overflow = 0;
@@ -217,7 +215,7 @@ void dma_buffer_to_unpack_buffer(uart_dma_rxdata_t *dma_obj, uart_it_type_e it_t
     dma_write_len = dma_obj->write_index - dma_obj->read_index;
     
     tmp_len = dma_obj->write_index - dma_obj->read_index;
-    if (tmp_len != fifo_s_puts_no_mutex(dma_obj->data_fifo, &pdata[dma_obj->read_index], tmp_len))
+    if (tmp_len != fifo_s_puts(dma_obj->data_fifo, &pdata[dma_obj->read_index], tmp_len))
       fifo_overflow = 1;
     else
       fifo_overflow = 0;
@@ -261,7 +259,12 @@ void data_upload_handler(uint16_t cmd_id, uint8_t *p_data, uint16_t len, uint8_t
 
 uint32_t send_packed_fifo_data(fifo_s_t *pfifo, uint8_t sof)
 {
-  uint8_t  tx_buf[PROTOCAL_FRAME_MAX_SIZE];
+#if (JUDGE_FIFO_BUFLEN > COMPUTER_FIFO_BUFLEN)
+  uint8_t  tx_buf[JUDGE_FIFO_BUFLEN];
+#else
+  uint8_t  tx_buf[COMPUTER_FIFO_BUFLEN];
+#endif
+  
   uint32_t fifo_count = fifo_used_count(pfifo);
   
   if (fifo_count)

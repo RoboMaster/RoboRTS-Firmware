@@ -49,21 +49,21 @@ motor_current_t glb_cur;
 /* judge system receive data fifo and buffer*/
 static osMutexId judge_rxdata_mutex;
 static fifo_s_t  judge_rxdata_fifo;
-static uint8_t   pc_rxdata_buf[COMPUTER_FRAME_BUFLEN];
+static uint8_t   pc_rxdata_buf[COMPUTER_FIFO_BUFLEN];
 /* judge system send data fifo and buffer*/
 static osMutexId judge_txdata_mutex;
 static fifo_s_t  judge_txdata_fifo;
-static uint8_t   pc_txdata_buf[COMPUTER_FRAME_BUFLEN];
+static uint8_t   pc_txdata_buf[COMPUTER_FIFO_BUFLEN];
 /* judge system dma receive data object */
 static uart_dma_rxdata_t judge_rx_obj;
 /* pc receive data fifo and buffer */
 static osMutexId pc_rxdata_mutex;
 static fifo_s_t  pc_rxdata_fifo;
-static uint8_t   judge_rxdata_buf[JUDGE_FRAME_BUFLEN];
+static uint8_t   judge_rxdata_buf[JUDGE_FIFO_BUFLEN];
 /* pc send data fifo and buffer */
 static osMutexId pc_txdata_mutex;
 static fifo_s_t  pc_txdata_fifo;
-static uint8_t   judge_txdata_buf[JUDGE_FRAME_BUFLEN];
+static uint8_t   judge_txdata_buf[JUDGE_FIFO_BUFLEN];
 /* pc system dma receive data object */
 static uart_dma_rxdata_t pc_rx_obj;
 /* unpack object */
@@ -328,12 +328,12 @@ void communicate_param_init(void)
   pc_txdata_mutex = osMutexCreate(osMutex(pc_txdata_mutex));
 
   /* judge data fifo init */
-  fifo_s_init(&judge_rxdata_fifo, judge_rxdata_buf, JUDGE_FRAME_BUFLEN, judge_rxdata_mutex);
-  fifo_s_init(&judge_txdata_fifo, judge_txdata_buf, JUDGE_FRAME_BUFLEN, judge_txdata_mutex);
+  fifo_s_init(&judge_rxdata_fifo, judge_rxdata_buf, JUDGE_FIFO_BUFLEN, judge_rxdata_mutex);
+  fifo_s_init(&judge_txdata_fifo, judge_txdata_buf, JUDGE_FIFO_BUFLEN, judge_txdata_mutex);
 
   /* pc data fifo init */
-  fifo_s_init(&pc_rxdata_fifo, pc_rxdata_buf, COMPUTER_FRAME_BUFLEN, pc_rxdata_mutex);
-  fifo_s_init(&pc_txdata_fifo, pc_txdata_buf, COMPUTER_FRAME_BUFLEN, pc_txdata_mutex);
+  fifo_s_init(&pc_rxdata_fifo, pc_rxdata_buf, COMPUTER_FIFO_BUFLEN, pc_rxdata_mutex);
+  fifo_s_init(&pc_txdata_fifo, pc_txdata_buf, COMPUTER_FIFO_BUFLEN, pc_txdata_mutex);
   
   /* initial judge data dma receiver object */
   judge_rx_obj.huart = &JUDGE_HUART;
@@ -372,7 +372,7 @@ void communicate_param_init(void)
 
 void data_packet_pack(uint16_t cmd_id, uint8_t *p_data, uint16_t len, uint8_t sof)
 {
-  uint8_t tx_buf[COMPUTER_FRAME_BUFLEN];
+  uint8_t tx_buf[PROTOCAL_FRAME_MAX_SIZE];
   
   uint16_t frame_length = HEADER_LEN + CMD_LEN + len + CRC_LEN;
   
