@@ -177,21 +177,6 @@ void dma_buffer_to_unpack_buffer(uart_dma_rxdata_t *dma_obj, uart_it_type_e it_t
 #endif
   }
   
-#if 0
-  if (UART_IDLE_IT == it_type)
-  {
-    dma_obj->write_index = dma_obj->buff_size - remain_data_counter;
-  }
-  else if (UART_DMA_HALF_IT == it_type)
-  {
-    dma_obj->write_index = dma_obj->buff_size/2;
-  }
-  else if (UART_DMA_FULL_IT == it_type)
-  {
-    dma_obj->write_index = dma_obj->buff_size;
-  }
-#endif
-  
   if (dma_obj->write_index < dma_obj->read_index)
   {
     dma_write_len = dma_obj->buff_size*2 - dma_obj->read_index + dma_obj->write_index;
@@ -273,8 +258,8 @@ uint32_t send_packed_fifo_data(fifo_s_t *pfifo, uint8_t sof)
     
     if (sof == UP_REG_ID)
       write_uart_blocking(&COMPUTER_HUART, tx_buf, fifo_count);
-    //else if (sof == DN_REG_ID)
-      //write_uart_blocking(&JUDGE_HUART, tx_buf, fifo_count);
+    else if (sof == DN_REG_ID)
+      write_uart_blocking(&JUDGE_HUART, tx_buf, fifo_count);
     else
       return 0;
   }
