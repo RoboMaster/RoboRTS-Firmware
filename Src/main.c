@@ -139,7 +139,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   //software parameter initialize
   gimbal_param_init();
-  shoot_param_init();
+  shot_param_init();
   chassis_param_init();
   detector_param_init();
   communicate_param_init();
@@ -149,7 +149,7 @@ int main(void)
   pwm_device_init();
   mpu_device_init();
   can_device_init();
-  gyro_device_init();
+  //gyro_device_init(); //commited by H.F. 03/04
   
   //open can receive it
   can_receive_start();

@@ -206,8 +206,13 @@ void mpu_get_data(void)
 {
   mpu_read_regs(MPU6500_ACCEL_XOUT_H, mpu_buff, 14);
 
-  mpu_data.ax   = mpu_buff[0] << 8 | mpu_buff[1];
-  mpu_data.ay   = mpu_buff[2] << 8 | mpu_buff[3];
+  /*mpu_data.ax   = mpu_buff[0] << 8 | mpu_buff[1]; 
+  mpu_data.ay   = mpu_buff[2] << 8 | mpu_buff[3]; */ //changed by H.F. 0308
+	
+	mpu_data.ay   = mpu_buff[0] << 8 | mpu_buff[1]; // Y(x)=x Physical x 
+  mpu_data.ax   = mpu_buff[2] << 8 | mpu_buff[3];  // X(y)=-y pysical -y
+	mpu_data.ax   = -mpu_data.ax;
+	
   mpu_data.az   = mpu_buff[4] << 8 | mpu_buff[5];
   mpu_data.temp = mpu_buff[6] << 8 | mpu_buff[7];
 
@@ -218,14 +223,21 @@ void mpu_get_data(void)
   //ist8310_get_data((uint8_t*)&mpu_data.mx);
 
   memcpy(&imu.ax, &mpu_data.ax, 6 * sizeof(int16_t));
+//  memcpy(&imu.ay, &mpu_data.ay, 6 * sizeof(int16_t)); //changed by H.F.
+
   imu.temp = 21 + mpu_data.temp / 333.87f;
   imu.wx   = mpu_data.gx / 16.384f / 57.3f; //2000dps -> rad/s
-  imu.wy   = mpu_data.gy / 16.384f / 57.3f; //2000dps -> rad/s
+  imu.wy   = mpu_data.gy / 16.384f / 57.3f; //2000dps -> rad/s  //commited by H.F 03088
+	//imu.wx   = -mpu_data.gy / 16.384f / 57.3f; //2000dps -> rad/s
+  imu.wy   = mpu_data.gx / 16.384f / 57.3f; //2000dps -> rad/s
   imu.wz   = mpu_data.gz / 16.384f / 57.3f; //2000dps -> rad/s
-
+	
   imu_cali_hook(CALI_GYRO, &mpu_data.gx);
   imu_cali_hook(CALI_ACC, &mpu_data.ax);
-  imu_cali_hook(CALI_MAG, &mpu_data.mx);
+  imu_cali_hook(CALI_MAG, &mpu_data.mx); 
+	
+
+	// We should need to change x-->y
 }
 
 uint8_t mpu_device_init(void)

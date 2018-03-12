@@ -58,15 +58,15 @@ typedef __packed struct
 {
   int32_t yaw_offset;
   int32_t pitch_offset;
-  uint8_t cali_cmd;    //1:calibrate  0:no operate
+  uint8_t cali_cmd;    //1:calibrae  0:no operate
   uint8_t calied_done; //0x55:already calied
 } gim_cali_t;
 
 typedef __packed struct
 {
   int16_t offset[3];   //x,y,z
-  uint8_t cali_cmd;
-  uint8_t calied_done;
+  uint8_t cali_cmd;    //1:calibrae  0:not
+  uint8_t calied_done; 
   char*   name;
 } imu_cali_t;
 

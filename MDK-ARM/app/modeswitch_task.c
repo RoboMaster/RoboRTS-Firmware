@@ -163,7 +163,7 @@ static action_mode_e remote_is_action(void)
 
 
 
-static void gimbal_mode_handler(void)
+static void gimbal_mode_handle(void)
 {
   switch (glb_ctrl_mode)
   {
@@ -193,12 +193,15 @@ static void gimbal_mode_handler(void)
         chassis.follow_gimbal = 1;
         if (gim.ctrl_mode == GIMBAL_NO_ARTI_INPUT)
         {
-          gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO;
+          //gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO;
+					gim.ctrl_mode = GIMBAL_PATROL_MODE;
           gim.input.no_action_flag = 0;
           
           gim.pid.yaw_angle_ref = 0;
           gim.yaw_offset_angle = gim.sensor.gyro_angle;
         }
+				//gim.ctrl_mode = GIMBAL_RELAX; // write and commit  by H.F. 0308
+
       }
       
       /* manual trigger chassis twist */
@@ -257,7 +260,7 @@ static void gimbal_mode_handler(void)
         case RC_UP:
         case RC_MI:
         {
-          gim.ctrl_mode = (gimbal_mode_e)pc_recv_mesg.gimbal_control_data.ctrl_mode;
+          gim.ctrl_mode = (gimbal_mode_e)pc_rece_mesg.gimbal_control_data.ctrl_mode;
         }break;
         
         default:
@@ -281,7 +284,7 @@ void get_gimbal_mode(void)
   
   if (gim.ctrl_mode != GIMBAL_INIT)
   {
-    gimbal_mode_handler();
+    gimbal_mode_handle();
   }
 
   if (gim.ctrl_mode != GIMBAL_PATROL_MODE)
@@ -307,13 +310,14 @@ static void get_global_last_mode(void)
 }
 
 
-static void chassis_mode_handler(void)
+static void chassis_mode_handle(void)
 {
   switch (glb_ctrl_mode)
   {
     case MANUAL_CTRL_MODE:
     {
-      chassis.ctrl_mode = MANUAL_FOLLOW_GIMBAL;
+      //chassis.ctrl_mode = MANUAL_FOLLOW_GIMBAL;
+			 chassis.ctrl_mode = MANUAL_SEPARATE_GIMBAL;
       
       /* keyboard trigger chassis twist mode */
       if (km.twist_ctrl)
@@ -351,7 +355,7 @@ static void chassis_mode_handler(void)
         case RC_UP:
         case RC_MI:
         {
-          chassis.ctrl_mode = (chassis_mode_e)pc_recv_mesg.chassis_control_data.ctrl_mode;
+          chassis.ctrl_mode = (chassis_mode_e)pc_rece_mesg.chassis_control_data.ctrl_mode;
         }break;
         
         case RC_DN:
@@ -383,7 +387,7 @@ void get_chassis_mode(void)
   }
   else
   {
-    chassis_mode_handler();
+    chassis_mode_handle();
   }
   
 }
@@ -415,29 +419,29 @@ void get_shoot_mode(void)
     case MANUAL_CTRL_MODE:
     {
       if (km.kb_enable)
-        shoot.ctrl_mode = KEYBOARD_CTRL_SHOT;
+        shot.ctrl_mode = KEYBOARD_CTRL_SHOT;
       else
-        shoot.ctrl_mode = REMOTE_CTRL_SHOT;
+        shot.ctrl_mode = REMOTE_CTRL_SHOT;
     }break;
     
     case SEMI_AUTO_MODE:
     {
-      shoot.ctrl_mode = SEMIAUTO_CTRL_SHOT;
+      shot.ctrl_mode = SEMIAUTO_CTRL_SHOT;
     }break;
     
     case AUTO_CTRL_MODE:
     {
-      shoot.ctrl_mode = AUTO_CTRL_SHOT;
+      shot.ctrl_mode = AUTO_CTRL_SHOT;
     }break;
     
     default:
     {
-      shoot.ctrl_mode = SHOT_DISABLE;
+      shot.ctrl_mode = SHOT_DISABLE;
     }break;
     
   }
 
   if (gim.ctrl_mode == GIMBAL_RELAX)
-    shoot.ctrl_mode = SHOT_DISABLE;
+    shot.ctrl_mode = SHOT_DISABLE;
 
 }

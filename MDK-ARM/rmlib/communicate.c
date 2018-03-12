@@ -121,11 +121,11 @@ void unpack_fifo_data(unpack_data_t *p_obj, uint8_t sof)
           {
             if (sof == UP_REG_ID)
             {
-              pc_data_handler(p_obj->protocol_packet);
+              pc_data_handle(p_obj->protocol_packet);
             }
             else  //DN_REG_ID
             {
-              judgement_data_handler(p_obj->protocol_packet);
+              judgement_data_handle(p_obj->protocol_packet);
             }
           }
         }
@@ -140,16 +140,14 @@ void unpack_fifo_data(unpack_data_t *p_obj, uint8_t sof)
   }
 }
 
-//for debug
-int dma_write_len = 0;
-int fifo_overflow = 0;
-
 void dma_buffer_to_unpack_buffer(uart_dma_rxdata_t *dma_obj, uart_it_type_e it_type)
 {
-  int16_t  tmp_len;
+  uint16_t tmp_len;
   uint8_t  current_memory_id;
   uint16_t remain_data_counter;
-  uint8_t  *pdata = dma_obj->buff[0];
+  
+  uint8_t  *pdata        = dma_obj->buff[0];
+  uint16_t write_counter = fifo_free_count(dma_obj->data_fifo);
   
   get_dma_memory_msg(dma_obj->huart->hdmarx->Instance, &current_memory_id, &remain_data_counter);
   
@@ -166,7 +164,6 @@ void dma_buffer_to_unpack_buffer(uart_dma_rxdata_t *dma_obj, uart_it_type_e it_t
   }
   else if (UART_DMA_FULL_IT == it_type)
   {
-#if 0
     if (current_memory_id)
     {
       dma_obj->write_index = dma_obj->buff_size;
@@ -175,7 +172,6 @@ void dma_buffer_to_unpack_buffer(uart_dma_rxdata_t *dma_obj, uart_it_type_e it_t
     {
       dma_obj->write_index = dma_obj->buff_size*2;
     }
-#endif
   }
   
 #if 0
@@ -193,36 +189,10 @@ void dma_buffer_to_unpack_buffer(uart_dma_rxdata_t *dma_obj, uart_it_type_e it_t
   }
 #endif
   
-  //independent thread, puts fifo need not mutex
-  if (dma_obj->write_index < dma_obj->read_index)
-  {
-    dma_write_len = dma_obj->buff_size*2 - dma_obj->read_index + dma_obj->write_index;
-    
-    tmp_len = dma_obj->buff_size*2 - dma_obj->read_index;
-    if (tmp_len != fifo_s_puts_no_mutex(dma_obj->data_fifo, &pdata[dma_obj->read_index], tmp_len))
-      fifo_overflow = 1;
-    else
-      fifo_overflow = 0;
-    dma_obj->read_index = 0;
-    
-    tmp_len = dma_obj->write_index;
-    if (tmp_len != fifo_s_puts_no_mutex(dma_obj->data_fifo, &pdata[dma_obj->read_index], tmp_len))
-      fifo_overflow = 1;
-    else
-      fifo_overflow = 0;
-    dma_obj->read_index = dma_obj->write_index;
-  }
-  else
-  {
-    dma_write_len = dma_obj->write_index - dma_obj->read_index;
-    
-    tmp_len = dma_obj->write_index - dma_obj->read_index;
-    if (tmp_len != fifo_s_puts_no_mutex(dma_obj->data_fifo, &pdata[dma_obj->read_index], tmp_len))
-      fifo_overflow = 1;
-    else
-      fifo_overflow = 0;
-    dma_obj->read_index = (dma_obj->write_index) % (dma_obj->buff_size*2);
-  }
+  tmp_len = dma_obj->write_index - dma_obj->read_index;
+  //independent thread, need not mutex
+  write_counter = fifo_s_puts_no_mutex(dma_obj->data_fifo, &pdata[dma_obj->read_index], tmp_len);
+  dma_obj->read_index = (dma_obj->read_index + write_counter) % (dma_obj->buff_size*2);
 }
 
 
@@ -247,7 +217,7 @@ uint8_t* protocol_packet_pack(uint16_t cmd_id, uint8_t *p_data, uint16_t len, ui
   return tx_buf;
 }
 
-void data_upload_handler(uint16_t cmd_id, uint8_t *p_data, uint16_t len, uint8_t sof, uint8_t *tx_buf)
+void data_upload_handle(uint16_t cmd_id, uint8_t *p_data, uint16_t len, uint8_t sof, uint8_t *tx_buf)
 {
   uint16_t frame_length = HEADER_LEN + CMD_LEN + len + CRC_LEN;
   

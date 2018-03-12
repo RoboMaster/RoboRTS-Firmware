@@ -28,14 +28,14 @@
 /* remote mode chassis move speed limit */
 /* left and right speed (mm/s) */
 #define CHASSIS_RC_MAX_SPEED_X  3300.0f
-#define CHASSIS_RC_MOVE_RATIO_X 1.0f
+#define CHASSIS_RC_MOVE_RATIO_X 15.0f
 /* back and forward speed (mm/s) */
 #define CHASSIS_RC_MAX_SPEED_Y  3300.0f
-#define CHASSIS_RC_MOVE_RATIO_Y 1.0f
+#define CHASSIS_RC_MOVE_RATIO_Y 10.0f
 /* chassis rotation speed (deg/s) */
 /* used only chassis open loop mode */
 #define CHASSIS_RC_MAX_SPEED_R 300.0f
-#define CHASSIS_RC_MOVE_RATIO_R 1.0f
+#define CHASSIS_RC_MOVE_RATIO_R 5.0f
 
 /* keyboard mode speed limit */
 /* left and right speed (mm/s) */
@@ -58,10 +58,10 @@
 /* yaw axis speed */
 #define GIMBAL_PC_MOVE_RATIO_YAW 1.0f
 
-/**************************shoot  setting********************************/
-/* shoot speed */
-#define DEFAULT_FRIC_WHEEL_SPEED 1150 //maximum value is 2500
-/* shoot frequence */
+/**************************shot  setting********************************/
+/* shot speed */
+#define DEFAULT_FRIC_WHEEL_SPEED 2000 //maximum value is 2500
+/* shot frequence */
 #define TRIGGER_MOTOR_SPEED      2000 
 
 
@@ -84,7 +84,7 @@
 
 /* chassis motor use 3508 default */
 /* define CHASSIS_EC60 to use EC60 */
-#define CHASSIS_EC60
+//#define CHASSIS_EC60
 
 #ifdef CHASSIS_EC60
   /* chassis motor use EC60 */
@@ -116,9 +116,9 @@
 /* the deceleration ratio of pitch axis motor */
 #define PIT_DECELE_RATIO       1.0f
 /* the deceleration ratio of yaw axis motor */
-#define YAW_DECELE_RATIO       1.0f
+#define YAW_DECELE_RATIO       1.0f    //(5.0f/8.0f)
 /* the positive direction of pitch axis motor */
-#define PIT_MOTO_POSITIVE_DIR  -1.0f
+#define PIT_MOTO_POSITIVE_DIR  1.0f
 /* the positive direction of yaw axis motor */
 #define YAW_MOTO_POSITIVE_DIR  1.0f
 /* the positive direction of tirgger motor */
@@ -130,7 +130,7 @@
 /***********************system interface setting****************************/
 
 /* automatic navigation interface */
-#define AUTO_NAVIGATION
+//#define AUTO_NAVIGATION
 
 /* can relevant */
 #define CHASSIS_CAN       hcan1
@@ -154,7 +154,7 @@
 /* gimbal relevant */
 #define PIT_ANGLE_MAX        15
 #define PIT_ANGLE_MIN        -20
-#define YAW_ANGLE_MAX        50
+#define YAW_ANGLE_MAX         50
 #define YAW_ANGLE_MIN        -50
 
 #define LEFT_FRICTION        TIM1->CCR1
@@ -171,7 +171,7 @@
 
 /* imu temperature control */
 #define IMU_PWM_PULSE      TIM3->CCR2
-#define DEFAULT_IMU_TEMP   50
+#define DEFAULT_IMU_TEMP   30
 
 /* math relevant */
 
