@@ -263,7 +263,7 @@ void chassis_param_init(void)
 #ifdef CHASSIS_EC60
   for (int k = 0; k < 4; k++)
   {
-    PID_struct_init(&pid_spd[k], POSITION_PID, 10000, 2000, 25, 0.1, 0);
+    PID_struct_init(&pid_spd[k], POSITION_PID, 10000, 2500, 25, 1.2, 0);
   }
 #else
   for (int k = 0; k < 4; k++)
