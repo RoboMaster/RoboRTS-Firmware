@@ -49,21 +49,21 @@ motor_current_t glb_cur;
 /* judge system receive data fifo and buffer*/
 static osMutexId judge_rxdata_mutex;
 static fifo_s_t  judge_rxdata_fifo;
-static uint8_t   pc_rxdata_buf[COMPUTER_FRAME_BUFLEN];
+static uint8_t   pc_rxdata_buf[COMPUTER_FIFO_BUFLEN];
 /* judge system send data fifo and buffer*/
 static osMutexId judge_txdata_mutex;
 static fifo_s_t  judge_txdata_fifo;
-static uint8_t   pc_txdata_buf[COMPUTER_FRAME_BUFLEN];
+static uint8_t   pc_txdata_buf[COMPUTER_FIFO_BUFLEN];
 /* judge system dma receive data object */
 static uart_dma_rxdata_t judge_rx_obj;
 /* pc receive data fifo and buffer */
 static osMutexId pc_rxdata_mutex;
 static fifo_s_t  pc_rxdata_fifo;
-static uint8_t   judge_rxdata_buf[JUDGE_FRAME_BUFLEN];
+static uint8_t   judge_rxdata_buf[JUDGE_FIFO_BUFLEN];
 /* pc send data fifo and buffer */
 static osMutexId pc_txdata_mutex;
 static fifo_s_t  pc_txdata_fifo;
-static uint8_t   judge_txdata_buf[JUDGE_FRAME_BUFLEN];
+static uint8_t   judge_txdata_buf[JUDGE_FIFO_BUFLEN];
 /* pc system dma receive data object */
 static uart_dma_rxdata_t pc_rx_obj;
 /* unpack object */
@@ -192,23 +192,18 @@ void freq_info_task(void const *argu)
   }
 
 }
-#define UART_RX_BUFF_LEN 50
-uint8_t judge_buff[UART_RX_BUFF_LEN];
-uint8_t pc_buff[UART_RX_BUFF_LEN];
+
 void judge_unpack_task(void const *argu)
 {
   osEvent event;
-  uint8_t unpack_flag = 0;
   
   /* open judge uart receive it */
   judgement_uart_init();
   
   while (1)
   {
-    
     event = osSignalWait(JUDGE_UART_TX_SIGNAL | \
-                         JUDGE_UART_IDLE_SIGNAL | \
-                         JUDGE_DMA_FULL_SIGNAL, osWaitForever);
+                         JUDGE_UART_IDLE_SIGNAL, osWaitForever);
     
     if (event.status == osEventSignal)
     {
@@ -216,13 +211,7 @@ void judge_unpack_task(void const *argu)
       if (event.value.signals & JUDGE_UART_IDLE_SIGNAL)
       {
         dma_buffer_to_unpack_buffer(&judge_rx_obj, UART_IDLE_IT);
-        unpack_flag = 1;
-      }
-      
-      if (event.value.signals & JUDGE_DMA_FULL_SIGNAL)
-      {
-        dma_buffer_to_unpack_buffer(&judge_rx_obj, UART_DMA_FULL_IT);
-        unpack_flag = 1;
+        unpack_fifo_data(&judge_unpack_obj, DN_REG_ID);
       }
       
       //send data to judge system
@@ -231,22 +220,16 @@ void judge_unpack_task(void const *argu)
         send_packed_fifo_data(&judge_txdata_fifo, DN_REG_ID);
       }
       
-      if (unpack_flag)
-      {
-        unpack_fifo_data(&judge_unpack_obj, DN_REG_ID);
-        unpack_flag = 0;
-      }
     }
     
     judge_comm_surplus = uxTaskGetStackHighWaterMark(NULL);
   }
 }
 extern TaskHandle_t freq_info_task_t;
-uint8_t pc_rx_test[40];
+//uint8_t pc_rx_test[40];
 void pc_unpack_task(void const *argu)
 {
   osEvent event;
-  uint8_t unpack_flag = 0;
   
   taskENTER_CRITICAL();
   /* open pc uart receive it */
@@ -259,8 +242,7 @@ void pc_unpack_task(void const *argu)
   while (1)
   {
     event = osSignalWait(PC_UART_TX_SIGNAL | \
-                         PC_UART_IDLE_SIGNAL | \
-                         PC_DMA_FULL_SIGNAL, osWaitForever);
+                         PC_UART_IDLE_SIGNAL, osWaitForever);
     
     if (event.status == osEventSignal)
     {
@@ -268,25 +250,13 @@ void pc_unpack_task(void const *argu)
       if (event.value.signals & PC_UART_IDLE_SIGNAL)
       {
         dma_buffer_to_unpack_buffer(&pc_rx_obj, UART_IDLE_IT);
-        unpack_flag = 1;
-      }
-      
-      if (event.value.signals & PC_DMA_FULL_SIGNAL)
-      {
-        dma_buffer_to_unpack_buffer(&pc_rx_obj, UART_DMA_FULL_IT);
-        unpack_flag = 1;
+        unpack_fifo_data(&pc_unpack_obj, UP_REG_ID);
       }
       
       //send data to pc system
       if (event.value.signals & PC_UART_TX_SIGNAL)
       {
         send_packed_fifo_data(&pc_txdata_fifo, UP_REG_ID);
-      }
-      
-      if (unpack_flag)
-      {
-        unpack_fifo_data(&pc_unpack_obj, UP_REG_ID);
-        unpack_flag = 0;
       }
       
       //protocol_packet_pack(0xa0, (uint8_t*)&(pc_recv_mesg.chassis_control_data), sizeof(pc_recv_mesg.chassis_control_data), UP_REG_ID, pc_rx_test);
@@ -328,12 +298,12 @@ void communicate_param_init(void)
   pc_txdata_mutex = osMutexCreate(osMutex(pc_txdata_mutex));
 
   /* judge data fifo init */
-  fifo_s_init(&judge_rxdata_fifo, judge_rxdata_buf, JUDGE_FRAME_BUFLEN, judge_rxdata_mutex);
-  fifo_s_init(&judge_txdata_fifo, judge_txdata_buf, JUDGE_FRAME_BUFLEN, judge_txdata_mutex);
+  fifo_s_init(&judge_rxdata_fifo, judge_rxdata_buf, JUDGE_FIFO_BUFLEN, judge_rxdata_mutex);
+  fifo_s_init(&judge_txdata_fifo, judge_txdata_buf, JUDGE_FIFO_BUFLEN, judge_txdata_mutex);
 
   /* pc data fifo init */
-  fifo_s_init(&pc_rxdata_fifo, pc_rxdata_buf, COMPUTER_FRAME_BUFLEN, pc_rxdata_mutex);
-  fifo_s_init(&pc_txdata_fifo, pc_txdata_buf, COMPUTER_FRAME_BUFLEN, pc_txdata_mutex);
+  fifo_s_init(&pc_rxdata_fifo, pc_rxdata_buf, COMPUTER_FIFO_BUFLEN, pc_rxdata_mutex);
+  fifo_s_init(&pc_txdata_fifo, pc_txdata_buf, COMPUTER_FIFO_BUFLEN, pc_txdata_mutex);
   
   /* initial judge data dma receiver object */
   judge_rx_obj.huart = &JUDGE_HUART;
@@ -372,7 +342,7 @@ void communicate_param_init(void)
 
 void data_packet_pack(uint16_t cmd_id, uint8_t *p_data, uint16_t len, uint8_t sof)
 {
-  uint8_t tx_buf[COMPUTER_FRAME_BUFLEN];
+  uint8_t tx_buf[PROTOCAL_FRAME_MAX_SIZE];
   
   uint16_t frame_length = HEADER_LEN + CMD_LEN + len + CRC_LEN;
   

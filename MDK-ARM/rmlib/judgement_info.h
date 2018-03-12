@@ -29,7 +29,7 @@
 
 #include "stm32f4xx_hal.h"
 
-#define JUDGE_FRAME_BUFLEN 200
+#define JUDGE_FIFO_BUFLEN 500
 
 /** 
   * @brief  judgement data command id
