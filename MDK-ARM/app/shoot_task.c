@@ -172,7 +172,7 @@ static void fric_wheel_ctrl(void)
   }
 }
 
-int debug_tri_speed = 1500;
+int debug_tri_speed = -8000;
 int shot_cmd;
 static void shoot_bullet_handle(void)
 {

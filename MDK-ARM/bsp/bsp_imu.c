@@ -216,9 +216,14 @@ void mpu_get_data(void)
   mpu_data.az   = mpu_buff[4] << 8 | mpu_buff[5];
   mpu_data.temp = mpu_buff[6] << 8 | mpu_buff[7];
 
-  mpu_data.gx = ((mpu_buff[8] << 8 | mpu_buff[9])   - mpu_data.gx_offset);
+  /*mpu_data.gx = ((mpu_buff[8] << 8 | mpu_buff[9])   - mpu_data.gx_offset);
   mpu_data.gy = ((mpu_buff[10] << 8 | mpu_buff[11]) - mpu_data.gy_offset);
-  mpu_data.gz = ((mpu_buff[12] << 8 | mpu_buff[13]) - mpu_data.gz_offset);
+  mpu_data.gz = ((mpu_buff[12] << 8 | mpu_buff[13]) - mpu_data.gz_offset);*/ //commit by H.F.
+	mpu_data.gy = ((mpu_buff[8] << 8 | mpu_buff[9])   - mpu_data.gx_offset); // Y(x)=x
+  mpu_data.gx = ((mpu_buff[10] << 8 | mpu_buff[11]) - mpu_data.gy_offset);
+	mpu_data.gx = -mpu_data.gx; // X(y)=-y
+	mpu_data.gz = ((mpu_buff[12] << 8 | mpu_buff[13]) - mpu_data.gz_offset);
+	mpu_data.gz = - mpu_data.gz;  // Z(z)=-z by H.F. 0314
 
   //ist8310_get_data((uint8_t*)&mpu_data.mx);
 

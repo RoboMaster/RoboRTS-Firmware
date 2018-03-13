@@ -134,7 +134,7 @@ void gimbal_task(void const *argu)
   /* pitch axis limited angle */
   //VAL_LIMIT(gim.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
   
-  
+  //角度环做内环
   pid_calc(&pid_yaw, gim.pid.yaw_angle_fdb, gim.pid.yaw_angle_ref);
   pid_calc(&pid_pit, gim.pid.pit_angle_fdb, gim.pid.pit_angle_ref);
   
@@ -151,7 +151,10 @@ void gimbal_task(void const *argu)
   if (gimbal_is_controllable())
   {
     glb_cur.gimbal_cur[0] = -YAW_MOTO_POSITIVE_DIR*pid_yaw_speed.out;
-    glb_cur.gimbal_cur[1] = -PIT_MOTO_POSITIVE_DIR*pid_pit_speed.out;
+		//glb_cur.gimbal_cur[0] = -YAW_MOTO_POSITIVE_DIR*pid_yaw.out; //只做位置环
+
+    glb_cur.gimbal_cur[1] = -PIT_MOTO_POSITIVE_DIR*pid_pit_speed.out; 
+	
     glb_cur.gimbal_cur[2] = pid_trigger_speed.out;
   }
   else
@@ -232,17 +235,23 @@ void close_loop_handle(void)
   static float limit_angle_range = 2;
   
   gim.pid.pit_angle_fdb = gim.sensor.pit_relative_angle;
-  gim.pid.yaw_angle_fdb = gim.sensor.gyro_angle - gim.yaw_offset_angle;
-  
+  //gim.pid.yaw_angle_fdb = gim.sensor.gyro_angle - gim.yaw_offset_angle; // I don't know why
+  gim.pid.yaw_angle_fdb = gim.sensor.yaw_relative_angle; // I change to relative_angle H.F. 0314
+	
   /* chassis angle relative to gim.pid.yaw_angle_fdb */
   chassis_angle_tmp = gim.pid.yaw_angle_fdb - gim.sensor.yaw_relative_angle;
+	
   /* limit gimbal yaw axis angle */
   if ((gim.sensor.yaw_relative_angle >= YAW_ANGLE_MIN - limit_angle_range) && \
       (gim.sensor.yaw_relative_angle <= YAW_ANGLE_MAX + limit_angle_range))
   {
-    gim.pid.yaw_angle_ref += rm.yaw_v * GIMBAL_RC_MOVE_RATIO_YAW
+   /* gim.pid.yaw_angle_ref += rm.yaw_v * GIMBAL_RC_MOVE_RATIO_YAW
                        + km.yaw_v * GIMBAL_PC_MOVE_RATIO_YAW;
     VAL_LIMIT(gim.pid.yaw_angle_ref, chassis_angle_tmp + YAW_ANGLE_MIN, chassis_angle_tmp + YAW_ANGLE_MAX);
+		*/ //commit by H.F. 0313
+		 gim.pid.yaw_angle_ref = 0; //hold yaw
+		 VAL_LIMIT(gim.pid.yaw_angle_ref, YAW_ANGLE_MIN, YAW_ANGLE_MAX);
+
   }
   /* limit gimbal pitch axis angle */
   if ((gim.sensor.pit_relative_angle >= PIT_ANGLE_MIN - limit_angle_range) && \
@@ -364,17 +373,17 @@ void gimbal_param_init(void)
   
   /* pitch axis motor pid parameter */
   PID_struct_init(&pid_pit, POSITION_PID, 2000, 0,
-                  30, 0, 0); // changed by H.F. 0308
+                  30, 0, 0); 
                   //30, 0, 0); //
   PID_struct_init(&pid_pit_speed, POSITION_PID, 7000, 3000,
-	                 5, 0, 0);//change by H.F. 008
-                  //15, 0.2, 0);
+	                 15, 0, 0);
 
   /* yaw axis motor pid parameter */
-  PID_struct_init(&pid_yaw, POSITION_PID, 2000, 0,
-                  30, 0, 0); //
+  PID_struct_init(&pid_yaw, POSITION_PID, 7000, 0,
+                  50, 0, 0); //
+//  PID_struct_init(&pid_yaw_speed, POSITION_PID, 7000, 1000, chagned by H.F. 20180308
   PID_struct_init(&pid_yaw_speed, POSITION_PID, 7000, 1000,
-                  1, 0, 0); // changed by H.F. 0308
+                  13, 0, 0); // changed by H.F. 0308
                   //13, 0, 0);
   
   /* bullet trigger motor pid parameter */

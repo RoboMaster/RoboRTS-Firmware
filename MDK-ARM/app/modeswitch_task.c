@@ -193,8 +193,8 @@ static void gimbal_mode_handle(void)
         chassis.follow_gimbal = 1;
         if (gim.ctrl_mode == GIMBAL_NO_ARTI_INPUT)
         {
-          //gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO;
-					gim.ctrl_mode = GIMBAL_PATROL_MODE;
+          gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO;
+					//gim.ctrl_mode = GIMBAL_PATROL_MODE;
           gim.input.no_action_flag = 0;
           
           gim.pid.yaw_angle_ref = 0;
