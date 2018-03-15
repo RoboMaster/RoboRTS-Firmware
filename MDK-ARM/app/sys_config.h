@@ -28,14 +28,14 @@
 /* remote mode chassis move speed limit */
 /* left and right speed (mm/s) */
 #define CHASSIS_RC_MAX_SPEED_X  3300.0f
-#define CHASSIS_RC_MOVE_RATIO_X 15.0f
+#define CHASSIS_RC_MOVE_RATIO_X 1.0f
 /* back and forward speed (mm/s) */
 #define CHASSIS_RC_MAX_SPEED_Y  3300.0f
-#define CHASSIS_RC_MOVE_RATIO_Y 10.0f
+#define CHASSIS_RC_MOVE_RATIO_Y 1.0f
 /* chassis rotation speed (deg/s) */
 /* used only chassis open loop mode */
 #define CHASSIS_RC_MAX_SPEED_R 300.0f
-#define CHASSIS_RC_MOVE_RATIO_R 5.0f
+#define CHASSIS_RC_MOVE_RATIO_R 1.0f
 
 /* keyboard mode speed limit */
 /* left and right speed (mm/s) */
