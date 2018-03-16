@@ -264,10 +264,10 @@ typedef __packed struct
   */
 typedef __packed struct
 {
-  uint8_t shoot_cmd;      /* single shoot command */
-  uint8_t c_shoot_cmd;    /* continuous shoot command */
-  uint8_t fric_wheel_run; /* friction run or not */
-  uint8_t fric_wheel_spd; /* fricrion wheel speed */
+  uint8_t  shoot_cmd;      /* single shoot command */
+  uint8_t  c_shoot_cmd;    /* continuous shoot command */
+  uint8_t  fric_wheel_run; /* friction run or not */
+  uint16_t fric_wheel_spd; /* fricrion wheel speed */
 } shoot_ctrl_t;
 
 /** 
