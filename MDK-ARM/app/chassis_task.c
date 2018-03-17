@@ -57,7 +57,7 @@ chassis_t chassis;
 uint32_t chassis_time_last;
 int chassis_time_ms;
 
-uint32_t sentry_ms;
+int32_t sentry_ms=-1;//
 
 
 extern TaskHandle_t can_msg_send_task_t;
@@ -65,6 +65,7 @@ void chassis_task(void const *argu)
 {
   chassis_time_ms = HAL_GetTick() - chassis_time_last;
   chassis_time_last = HAL_GetTick();
+	
   
 //    get_chassis_info();
 //    get_chassis_mode();
@@ -102,15 +103,18 @@ void chassis_task(void const *argu)
 		
     // add setnry_chassis mode by H.F 20180317
 		case SENTRY_CHASSIS:
-    {      
-			chassis.vy = -1000;
-			
-			//HAL_Delay (1000);
-      //chassis.vx = 100;
-			chassis.vy = 1000;
-
-			//HAL_Delay (1000);
-      chassis.position_ref = 0;
+    { 
+			if(sentry_ms==-1)sentry_ms=HAL_GetTick();//init timer
+			if((HAL_GetTick()-sentry_ms)<1000)
+			{
+				chassis.vy = -1000;
+			}
+			else if((HAL_GetTick()-sentry_ms)<2000)
+			{		
+				chassis.vy = 1000;
+			}
+			else sentry_ms=HAL_GetTick();//reset timer
+      chassis.position_ref = 0;											//autocontrol test by ZJ 20180317 
     }break;
     
 		
