@@ -111,10 +111,12 @@ void get_main_ctrl_mode(void)
         glb_ctrl_mode = AUTO_CTRL_MODE;
       }break;
 #endif
-      
+			
       default:
       {
         glb_ctrl_mode = SAFETY_MODE;
+				
+			 
       }break;
     }
   }
@@ -140,7 +142,11 @@ void get_main_ctrl_mode(void)
     glb_ctrl_mode = SAFETY_MODE;
   
   kb_enable_hook();
-  
+	
+	// reset mode to sentry, by H.F. 20180317
+ 	#ifdef SENTRY
+        glb_ctrl_mode = SENTRY_MODE ;
+				#endif      
 }
 
 
@@ -316,9 +322,10 @@ static void chassis_mode_handle(void)
   {
     case MANUAL_CTRL_MODE:
     {
-      //chassis.ctrl_mode = MANUAL_FOLLOW_GIMBAL;
+				
+			//chassis.ctrl_mode = MANUAL_FOLLOW_GIMBAL;
 			 chassis.ctrl_mode = MANUAL_SEPARATE_GIMBAL;
-      
+					
       /* keyboard trigger chassis twist mode */
       if (km.twist_ctrl)
         chassis.ctrl_mode = DODGE_MODE;
@@ -365,7 +372,12 @@ static void chassis_mode_handle(void)
         
       }
     }break;
-    
+    // add SETRY_MODE by H.F.
+		case SENTRY_MODE:
+    {
+			 chassis.ctrl_mode = SENTRY_CHASSIS;
+    }break;
+		
     default:
     {
       chassis.ctrl_mode = CHASSIS_STOP;

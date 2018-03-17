@@ -170,6 +170,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+		
+		//chassis.vx = 100;
+    //chassis.vy = 100;
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */

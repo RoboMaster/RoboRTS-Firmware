@@ -34,6 +34,7 @@ typedef enum
   SEMI_AUTO_MODE,
   AUTO_CTRL_MODE,
   SAFETY_MODE,
+	SENTRY_MODE,
 } infantry_mode_e;
 
 void mode_switch_task(void const *argu);

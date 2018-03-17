@@ -131,6 +131,7 @@
 
 /* automatic navigation interface */
 //#define AUTO_NAVIGATION
+#define SENTRY
 
 /* can relevant */
 #define CHASSIS_CAN       hcan1

@@ -41,8 +41,11 @@ typedef enum
   MANUAL_FOLLOW_GIMBAL   = 3,
   DODGE_MODE             = 4,
   AUTO_SEPARATE_GIMBAL   = 5,
+	SENTRY_CHASSIS         = 7,
   AUTO_FOLLOW_GIMBAL     = 6,
+	
 } chassis_mode_e;
+// add SENTRY_MODE by HF 20180317
 
 typedef struct
 {

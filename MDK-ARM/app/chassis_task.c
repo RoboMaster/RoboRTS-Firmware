@@ -56,6 +56,10 @@ chassis_t chassis;
 
 uint32_t chassis_time_last;
 int chassis_time_ms;
+
+uint32_t sentry_ms;
+
+
 extern TaskHandle_t can_msg_send_task_t;
 void chassis_task(void const *argu)
 {
@@ -95,7 +99,21 @@ void chassis_task(void const *argu)
       taskEXIT_CRITICAL();
       
     }break;
+		
+    // add setnry_chassis mode by H.F 20180317
+		case SENTRY_CHASSIS:
+    {      
+			chassis.vy = -1000;
+			
+			//HAL_Delay (1000);
+      //chassis.vx = 100;
+			chassis.vy = 1000;
+
+			//HAL_Delay (1000);
+      chassis.position_ref = 0;
+    }break;
     
+		
     case CHASSIS_STOP:
     {
       chassis_stop_handle();
