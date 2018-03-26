@@ -130,8 +130,9 @@
 /***********************system interface setting****************************/
 
 /* automatic navigation interface */
-//#define AUTO_NAVIGATION
-#define SENTRY
+
+#define AUTO_NAVIGATION
+//#define SENTRY 
 
 /* can relevant */
 #define CHASSIS_CAN       hcan1

@@ -77,8 +77,10 @@ void power_limit_handle(void);
 
 static void chassis_twist_handle(void);
 static void chassis_stop_handle(void);
+static void chassis_sentry_handle(void);  //added by ZJ 20180319
 static void separate_gimbal_handle(void);
 static void follow_gimbal_handle(void);
+
 
 static void mecanum_calc(float vx, float vy, float vw, int16_t speed[]);
 

@@ -104,17 +104,7 @@ void chassis_task(void const *argu)
     // add setnry_chassis mode by H.F 20180317
 		case SENTRY_CHASSIS:
     { 
-			if(sentry_ms==-1)sentry_ms=HAL_GetTick();//init timer
-			if((HAL_GetTick()-sentry_ms)<1000)
-			{
-				chassis.vy = -1000;
-			}
-			else if((HAL_GetTick()-sentry_ms)<2000)
-			{		
-				chassis.vy = 1000;
-			}
-			else sentry_ms=HAL_GetTick();//reset timer
-      chassis.position_ref = 0;											//autocontrol test by ZJ 20180317 
+			chassis_sentry_handle();
     }break;
     
 		
@@ -167,6 +157,37 @@ void chassis_stop_handle(void)
   chassis.vy = 0;
   chassis.vx = 0;
   chassis.vw = 0;
+}
+
+void chassis_sentry_handle(void)
+{
+			if(sentry_ms==-1)sentry_ms=HAL_GetTick();//init timer
+			if((HAL_GetTick()-sentry_ms)<1000)
+			{
+				chassis.vy = -1000;
+				chassis.vx = 0;
+				chassis.vw = 0;
+			}
+			if((HAL_GetTick()-sentry_ms)<2000)
+			{
+				chassis.vy = 0;
+				chassis.vx = 1000;
+				chassis.vw = 0;
+			}
+			if((HAL_GetTick()-sentry_ms)<3000)
+			{
+				chassis.vy = 1000;
+				chassis.vx = 0;
+				chassis.vw = 0;
+			}
+			if((HAL_GetTick()-sentry_ms)<4000)
+			{
+				chassis.vy = 0;
+				chassis.vx = -1000;
+				chassis.vw = 0;
+			}
+			else sentry_ms=HAL_GetTick();//reset timer
+      chassis.position_ref = 0;											//autocontrol test by ZJ 20180317 
 }
 
 uint32_t twist_count;

@@ -126,6 +126,10 @@ void gimbal_task(void const *argu)
       pc_position_ctrl_handle();
 
     break;
+		
+		case GIMBAL_SENTRY_MODE: 			//added by ZJ 20180319
+			sentry_mode_handle();
+		break;
 
     default:
     break;
@@ -263,6 +267,20 @@ void close_loop_handle(void)
   }
 }
 
+void sentry_mode_handle(void)
+{
+	static int16_t patrol_period = PATROL_PERIOD/GIMBAL_PERIOD;
+	static int16_t patrol_angle  = PATROL_ANGLE;
+  
+  gim.pid.pit_angle_fdb = gim.sensor.pit_relative_angle;
+  gim.pid.yaw_angle_fdb = gim.sensor.yaw_relative_angle;
+  
+  patrol_count++;
+  gim.pid.yaw_angle_ref = patrol_angle*sin(2*PI/patrol_period*patrol_count);
+  gim.pid.pit_angle_ref = patrol_angle*cos(2*PI/patrol_period*patrol_count)/2;
+}
+
+
 void pc_position_ctrl_handle(void)
 {
   static float chassis_angle_tmp;
@@ -275,8 +293,10 @@ void pc_position_ctrl_handle(void)
   gim.pid.pit_angle_ref = pc_rece_mesg.gimbal_control_data.pit_ref;
   gim.pid.yaw_angle_ref = pc_rece_mesg.gimbal_control_data.yaw_ref;
   
-  VAL_LIMIT(gim.pid.yaw_angle_ref, chassis_angle_tmp + YAW_ANGLE_MIN, chassis_angle_tmp + YAW_ANGLE_MAX);
+  //VAL_LIMIT(gim.pid.yaw_angle_ref, chassis_angle_tmp + YAW_ANGLE_MIN, chassis_angle_tmp + YAW_ANGLE_MAX);
+	VAL_LIMIT(gim.pid.yaw_angle_ref, YAW_ANGLE_MIN, YAW_ANGLE_MAX); // change by H.F. 20180326
   VAL_LIMIT(gim.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
+	
   taskEXIT_CRITICAL();
     
 }

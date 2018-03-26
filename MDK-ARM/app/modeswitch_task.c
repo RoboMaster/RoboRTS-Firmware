@@ -146,7 +146,7 @@ void get_main_ctrl_mode(void)
 	// reset mode to sentry, by H.F. 20180317
  	#ifdef SENTRY
         glb_ctrl_mode = SENTRY_MODE ;
-				#endif      
+	#endif      
 }
 
 
@@ -275,8 +275,15 @@ static void gimbal_mode_handle(void)
         }break;
       }
     }break;
+		
+				
+		case SENTRY_MODE:
+		{
+			
+		}break;       //Added by ZJ 20180319							
     
-    default:
+		
+		default:
     {
       gim.ctrl_mode = GIMBAL_RELAX;
     }break;

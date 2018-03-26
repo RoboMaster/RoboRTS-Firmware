@@ -42,6 +42,7 @@ typedef enum
   GIMBAL_PATROL_MODE   = 5,
   GIMBAL_SHOOT_BUFF    = 6,
   GIMBAL_POSITION_MODE = 7,
+  GIMBAL_SENTRY_MODE   = 8,               //Added by ZJ 20180319
 } gimbal_mode_e;
 
 typedef enum
@@ -132,6 +133,8 @@ extern gimbal_t gim;
 static void no_action_handle(void);
 static void init_mode_handle(void);
 static void close_loop_handle(void);
+
+static void sentry_mode_handle(void);  //added by ZJ 20180319
 
 static void track_aimor_handle(void);
 static void gimbal_patrol_handle(void);
