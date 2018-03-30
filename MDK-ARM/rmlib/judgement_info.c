@@ -48,6 +48,7 @@ void judgement_data_handler(uint8_t *p_frame)
   uint16_t data_length = p_header->data_length;
   uint16_t cmd_id      = *(uint16_t *)(p_frame + HEADER_LEN);
   uint8_t *data_addr   = p_frame + HEADER_LEN + CMD_LEN;
+  uint8_t  invalid_cmd = 0;
   
   switch (cmd_id)
   {
@@ -63,7 +64,7 @@ void judgement_data_handler(uint8_t *p_frame)
       memcpy(&judge_rece_mesg.real_shoot_data, data_addr, data_length);
     break;
 
-    case REAL_FIELD_DATA_ID:
+    case FIELD_RFID_DATA_ID:
       memcpy(&judge_rece_mesg.rfid_data, data_addr, data_length);
     break;
 
@@ -74,14 +75,21 @@ void judgement_data_handler(uint8_t *p_frame)
     case GAIN_BUFF_ID:
       memcpy(&judge_rece_mesg.get_buff_data, data_addr, data_length);
     break;
-
-    case CLIENT_TO_ROBOT_ID:
-      memcpy(&judge_rece_mesg.student_download_data, data_addr, data_length);
+    
+    case ROBOT_POS_DATA_ID:
+      memcpy(&judge_rece_mesg.robot_pos_data, data_addr, data_length);
+    break;
+    
+    default:
+      invalid_cmd = 1;
     break;
   }
   
-  /* forward data */
-  data_packet_pack(cmd_id, data_addr, data_length, UP_REG_ID);
-  osSignalSet(pc_unpack_task_t, PC_UART_TX_SIGNAL);
+  /* valid forward data */
+  if (!invalid_cmd)
+  {
+    data_packet_pack(cmd_id, data_addr, data_length, UP_REG_ID);
+    osSignalSet(pc_unpack_task_t, PC_UART_TX_SIGNAL);
+  }
 }
 

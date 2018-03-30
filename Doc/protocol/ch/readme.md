@@ -243,7 +243,6 @@ typedef __packed struct
   uint8_t    reserved;
   uint16_t   remain_hp;
   uint16_t   max_hp;
-  position_t position;
 } game_robot_state_t;
 ```
 
@@ -260,32 +259,6 @@ typedef __packed struct
 | reserved          | 保留位           |
 | remain_hp         | 机器人当前血量       |
 | max_hp            | 机器人满血量        |
-| position          | 位置、角度信息       |
-
-*备注：*
-
-位置、角度控制信息包含在 position_t 结构体中：
-
-```c
-typedef __packed struct
-{
-  uint8_t valid_flag;
-  float x;
-  float y;
-  float z;
-  float yaw;
-} position_t;
-```
-
-| 数据         | 说明           |
-| ---------- | ------------ |
-| valid_flag | 位置、角度信息有效标志位 |
-|            | 0: 无效        |
-|            | 1: 有效        |
-| x          | 位置 X 坐标值     |
-| y          | 位置 Y 坐标值     |
-| z          | 位置 Z 坐标值     |
-| yaw        | 枪口朝向角度值      |
 
 ##### 0x0002 伤害数据 
 
@@ -331,38 +304,56 @@ typedef __packed struct
 ```c
 typedef __packed struct
 {
-  uint8_t reserved;
+  uint8_t bullet_type;
   uint8_t bullet_freq;
   float   bullet_speed;
-  float   reserved;
 } real_shoot_data_t;
 ```
 
-| 数据           | 说明   |
-| ------------ | ---- |
-| reserved     | 保留   |
-| bullet_freq  | 弹丸射频 |
-| bullet_speed | 弹丸射速 |
-| reserved     | 保留   |
+| 数据           | 说明            |
+| ------------ | ------------- |
+| bullet_type  | 弹丸类型          |
+|              | 0x01: 17mm 弹丸 |
+|              | 0x02: 42mm 弹丸 |
+| bullet_freq  | 弹丸射频          |
+| bullet_speed | 弹丸射速          |
+
+##### 0x0004 实时功率
+
+对应数据结构 real_power_data_t，实时功率、热量信息
+
+```c
+typedef __packed struct
+{
+  float chassis_volt;
+  float chassis_current;
+  float chassis_power;
+  float chassis_pwr_buf;
+  uint16_t shooter1_heat;
+  uint16_t shooter2_heat;
+} real_power_data_t;
+```
+
+ICRA 比赛中不使用这些数据，不做详细介绍。
 
 ##### 0x0005 场地交互
 
-对应数据结构 rfid_detect_t，场地交互数据
+对应数据结构 field_rfid_t，场地交互数据
 
 ```c
 typedef __packed struct
 {
   uint8_t card_type;
   uint8_t card_idx;
-} rfid_detect_t;
+} field_rfid_t;
 ```
 
-| 数据        | 说明             |
-| --------- | -------------- |
-| card_type | 卡类型            |
-|           | 0: 攻击加成卡       |
-|           | 1: 防御加成卡       |
-| card_idx  | 卡索引号，可用于区分不同区域 |
+| 数据        | 说明              |
+| --------- | --------------- |
+| card_type | 卡类型             |
+|           | 11: ICRA 大符卡    |
+|           | 其他: 非 ICRA 比赛用卡 |
+| card_idx  | 卡索引号，ICRA中无效    |
 
 ##### 0x0006 比赛结果 
 
@@ -389,17 +380,36 @@ typedef __packed struct
 ```c
 typedef __packed struct
 {
-  uint8_t buff_type;
-  uint8_t buff_addition;
+  uint16_t buff_musk;
 } get_buff_t;
 ```
 
-| 数据            | 说明      |
-| ------------- | ------- |
-| buff_type     | Buff类型  |
-|               | 0: 攻击加成 |
-|               | 1: 防御加成 |
-| buff_addition | 加成百分比   |
+| 数据        | 说明                          |
+| --------- | --------------------------- |
+| buff_musk | 全场buff信息，0 ~ 15位bit的数据，1为有效 |
+|           | bit13: ICRA 己方获得buff        |
+|           | bit14: ICRA 敌方获得buff        |
+
+##### 0x0008 机器人位置
+
+对应数据结构 position_t，机器人的位置、角度信息
+
+```c
+typedef __packed struct
+{
+  float x;
+  float y;
+  float z;
+  float yaw;
+} position_t;
+```
+
+| 数据   | 说明       |
+| ---- | -------- |
+| x    | 位置 X 坐标值 |
+| y    | 位置 Y 坐标值 |
+| z    | 位置 Z 坐标值 |
+| yaw  | 枪口朝向角度值  |
 
 #### 第二类
 
@@ -1066,4 +1076,6 @@ void data_handle(uint8_t *p_frame)
 
 ## 协议版本
 
-当前版本 v1.3
+v1.4：
+
+1、更新裁判系统学生端口数据协议；
