@@ -152,9 +152,11 @@ typedef enum
   GAME_INFO_ID        = 0x0001,
   REAL_BLOOD_DATA_ID  = 0x0002,
   REAL_SHOOT_DATA_ID  = 0x0003,
-  REAL_FIELD_DATA_ID  = 0x0005,
+  REAL_POWER_DATA_ID  = 0x0004,
+  FIELD_RFID_DATA_ID  = 0x0005,
   GAME_RESULT_ID      = 0x0006,
   GAIN_BUFF_ID        = 0x0007,
+  ROBOT_POS_DATA_ID   = 0x0008,
   
   CHASSIS_DATA_ID     = 0x0010,
   GIMBAL_DATA_ID      = 0x0011,
@@ -186,9 +188,11 @@ typedef enum
 | 0x0001 | 主控-->PC | 比赛时机器人状态         | 裁判系统10Hz       |
 | 0x0002 | 主控-->PC | 实时伤害数据           | 受到攻击时发送        |
 | 0x0003 | 主控-->PC | 实时射击数据           | 裁判系统           |
-| 0x0005 | 主控-->PC | 场地交互数据           | 检测到 IC 卡发送     |
+| 0x0004 | 主控-->PC | 实时功率、热量数据        | ICRA不使用，不发送    |
+| 0x0005 | 主控-->PC | 场地 RFID 数据       | 检测到 IC 卡发送     |
 | 0x0006 | 主控-->PC | 比赛结果数据           | 比赛结束时发送        |
 | 0x0007 | 主控-->PC | 获得 buff 数据       | 裁判系统           |
+| 0x0008 | 主控-->PC | 场地 UWB 数据        | 裁判系统           |
 |        |         |                  |                |
 | 0x0010 | 主控-->PC | 机器人底盘相关信息        | 50Hz定频         |
 | 0x0011 | 主控-->PC | 机器人云台相关信息        | 50Hz定频         |
@@ -226,7 +230,7 @@ typedef enum
 
 ##### 0x0001 比赛进程 
 
-对应数据结构 game_info_t，比赛进程信息
+对应数据结构 game_robot_state_t，比赛进程信息
 
 ```c
 typedef __packed struct
@@ -392,7 +396,7 @@ typedef __packed struct
 
 ##### 0x0008 机器人位置
 
-对应数据结构 position_t，机器人的位置、角度信息
+对应数据结构 robot_position_t，机器人的位置、角度信息
 
 ```c
 typedef __packed struct
@@ -401,7 +405,7 @@ typedef __packed struct
   float y;
   float z;
   float yaw;
-} position_t;
+} robot_position_t;
 ```
 
 | 数据   | 说明       |

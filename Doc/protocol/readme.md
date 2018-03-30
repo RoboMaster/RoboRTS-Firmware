@@ -154,9 +154,11 @@ typedef enum
   GAME_INFO_ID        = 0x0001,
   REAL_BLOOD_DATA_ID  = 0x0002,
   REAL_SHOOT_DATA_ID  = 0x0003,
-  REAL_FIELD_DATA_ID  = 0x0005,
+  REAL_POWER_DATA_ID  = 0x0004,
+  FIELD_RFID_DATA_ID  = 0x0005,
   GAME_RESULT_ID      = 0x0006,
   GAIN_BUFF_ID        = 0x0007,
+  ROBOT_POS_DATA_ID   = 0x0008,
   
   CHASSIS_DATA_ID     = 0x0010,
   GIMBAL_DATA_ID      = 0x0011,
@@ -188,9 +190,11 @@ Data transmission direction and specific features of command codes are as follow
 | 0x0001       | Main control module > PC | Robot status in competition              | Referee System 10 Hz                     |
 | 0x0002       | Main control module > PC | Real-time damage data                    | Transmitted when hit                     |
 | 0x0003       | Main control module > PC | Real-time shooting data                  | Referee system                           |
-| 0x0005       | Main control module > PC | Field interaction data                   | Transmitted when an IC card is detected  |
+| 0x0004       | Main control module > PC | Real-time power/heat data                | No use, never send                       |
+| 0x0005       | Main control module > PC | Field RFID data                          | Transmitted when an IC card is detected  |
 | 0x0006       | Main control module > PC | Competition result data                  | Transmitted when competition ends        |
 | 0x0007       | Main control module > PC | Obtain buff data                         | Referee System                           |
+| 0x0008       | Main control module > PC | Field UWB data                           | Referee System                           |
 |              |                          |                                          |                                          |
 | 0x0010       | Main control module > PC | Robot chassis-related information        | Fixed 50Hz                               |
 | 0x0011       | Main control module > PC | Robot gimbal-related information         | Fixed 50Hz                               |
@@ -228,7 +232,7 @@ The data structure corresponding to a command code ID. Data length is the size o
 
 ##### 0x0001 game process
 
-Corresponds to data structure game_info_t (game process information)
+Corresponds to data structure game_robot_state_t(game process information)
 
 ```c
 typedef __packed struct
@@ -245,7 +249,6 @@ typedef __packed struct
   uint8_t    reserved;
   uint16_t   remain_hp;
   uint16_t   max_hp;
-  position_t position;
 } game_robot_state_t;
 ```
 
@@ -262,32 +265,6 @@ typedef __packed struct
 | reserved          | Bits reserved                            |
 | remain_hp         | Robot's current HP                       |
 | max_hp            | Robot's maximum HP                       |
-| position          | Position/angle information               |
-
-*Note:*
-
-Position/angle control information is included in the position_t structure:
-
-```c
-typedef __packed struct
-{
-  uint8_t valid_flag;
-  float x;
-  float y;
-  float z;
-  float yaw;
-} position_t;
-```
-
-| Data       | Description                              |
-| ---------- | ---------------------------------------- |
-| valid_flag | Position/angle information effective zone bit |
-|            | 0: Invalid                               |
-|            | 1: Valid                                 |
-| x          | X value of location                      |
-| y          | Y value of location                      |
-| z          | Z value of location                      |
-| yaw        | Barrel direction angle value             |
 
 ##### 0x0002 damage data
 
@@ -333,38 +310,56 @@ Corresponds to the data structure real_shoot_data_t (real-time shooting informat
 ```c
 typedef __packed struct
 {
-  uint8_t reserved1;
+  uint8_t bullet_type;
   uint8_t bullet_freq;
   float   bullet_speed;
-  float   reserved2;
 } real_shoot_data_t;
 ```
 
 | Data         | Description                |
 | ------------ | -------------------------- |
-| reserved1    | Reserved                   |
+| bullet_type  | bullets type               |
+|              | 0x01: 17mm bullets         |
+|              | 0x02: 42mm bullets         |
 | bullet_freq  | bullets shooting frequency |
 | bullet_speed | bullets shooting speed     |
-| reserved2    | Reserved                   |
+
+##### 0x0004 real-time power data
+
+Corresponds to the data structure real_power_data_t(real-time chassis power, shooter heat)
+
+```c
+typedef __packed struct
+{
+  float chassis_volt;
+  float chassis_current;
+  float chassis_power;
+  float chassis_pwr_buf;
+  uint16_t shooter1_heat;
+  uint16_t shooter2_heat;
+} real_power_data_t;
+```
+
+These data are not used in ICRA competition and are not described in detail.
 
 ##### 0x0005 field interaction
 
-Corresponds to the data structure rfid_detect_t (field interaction data)
+Corresponds to the data structure field_rfid_t(field interaction data)
 
 ```c
 typedef __packed struct
 {
   uint8_t card_type;
   uint8_t card_idx;
-} rfid_detect_t;
+} field_rfid_t;
 ```
 
 | Data      | Description                              |
 | --------- | ---------------------------------------- |
 | card_type | Card type                                |
-|           | 0: Attack buff card                      |
-|           | 1: Defense buff card                     |
-| card_idx  | Card index number; used to distinguish different sections |
+|           | 11: ICRA buff card                       |
+|           | other: Not ICRA competition card         |
+| card_idx  | Card index number, ICRA competition is invalid |
 
 ##### 0x0006 competition result
 
@@ -391,17 +386,36 @@ Corresponds to the data structure get_buff_t (obtained buff data)
 ```c
 typedef __packed struct
 {
-  uint8_t buff_type;
-  uint8_t buff_addition;
+  uint16_t buff_musk;
 } get_buff_t;
 ```
 
-| Data          | Description     |
-| ------------- | --------------- |
-| buff_type     | Buff type       |
-|               | 0: Attack buff  |
-|               | 1: Defense buff |
-| buff_addition | Buff percentage |
+| Data      | Description                              |
+| --------- | ---------------------------------------- |
+| buff_musk | Global buff information, 0 ~ 15 bit data, bitx = 1 this buff is effective |
+|           | bit13: One's own get buff                |
+|           | bit14: Other party get buff              |
+
+##### 0x0008 robot position data
+
+Corresponds to the data structure robot_position_t(robot position, angle data)
+
+```c
+typedef __packed struct
+{
+  float x;
+  float y;
+  float z;
+  float yaw;
+} robot_position_t;
+```
+
+| Data | Description                  |
+| ---- | ---------------------------- |
+| x    | X value of location          |
+| y    | Y value of location          |
+| z    | Z value of location          |
+| yaw  | Barrel direction angle value |
 
 #### Class 2
 
