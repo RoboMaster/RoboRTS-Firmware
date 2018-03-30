@@ -36,12 +36,14 @@
   */
 typedef enum
 {
-  GAME_INFO_ID       = 0x0001,  //10Hz
+  GAME_INFO_ID       = 0x0001,
   REAL_BLOOD_DATA_ID = 0x0002,
   REAL_SHOOT_DATA_ID = 0x0003,
-  REAL_FIELD_DATA_ID = 0x0005,  //10hZ
+  REAL_POWER_DATA_ID = 0x0004,
+  FIELD_RFID_DATA_ID = 0x0005,
   GAME_RESULT_ID     = 0x0006,
   GAIN_BUFF_ID       = 0x0007,
+  ROBOT_POS_DATA_ID  = 0x0008,
   
   STU_CUSTOM_DATA_ID = 0x0100,
   ROBOT_TO_CLIENT_ID = 0x0101,
@@ -50,20 +52,7 @@ typedef enum
 
 
 /** 
-  * @brief  GPS state structures definition
-  */
-typedef __packed struct
-{
-  uint8_t valid_flag;
-  float x;
-  float y;
-  float z;
-  float yaw;
-} position_t;
-
-/** 
   * @brief  game information structures definition(0x0001)
-  *         this package send frequency is 50Hz
   */
 typedef __packed struct
 {
@@ -79,7 +68,6 @@ typedef __packed struct
   uint8_t    reserved;
   uint16_t   remain_hp;
   uint16_t   max_hp;
-  position_t position;
 } game_robot_state_t;
 
 /** 
@@ -107,20 +95,33 @@ typedef __packed struct
   */
 typedef __packed struct
 {
-  uint8_t reserved1;
+  uint8_t bullet_type;
   uint8_t bullet_freq;
   float   bullet_spd;
-  float   reserved2;
 } real_shoot_t;
 
 /** 
-  * @brief  rfid detect data(0x0005)
+  * @brief  real chassis power and shoot heat data(0x0004)
+  *         icra need not this data
+  */
+typedef __packed struct
+{
+  float chassis_volt;
+  float chassis_current;
+  float chassis_power;
+  float chassis_pwr_buf;
+  uint16_t shooter1_heat;
+  uint16_t shooter2_heat;
+} real_power_data_t;
+
+/** 
+  * @brief  field rfid data(0x0005)
   */
 typedef __packed struct
 {
   uint8_t card_type;
   uint8_t card_idx;
-} rfid_detect_t;
+} field_rfid_t;
 
 /** 
   * @brief  game result data(0x0006)
@@ -135,12 +136,24 @@ typedef __packed struct
   */
 typedef __packed struct
 {
-  uint8_t buff_type;
-  uint8_t buff_addition;
+  uint16_t buff_musk;
 } get_buff_t;
 
 /** 
+  * @brief  field UWB data(0x0008)
+  */
+typedef __packed struct
+{
+  uint8_t valid_flag;
+  float x;
+  float y;
+  float z;
+  float yaw;
+} robot_position_t;
+
+/** 
   * @brief  student custom data
+  *         icra need not these data
   */
 typedef __packed struct
 {
@@ -164,13 +177,14 @@ typedef __packed struct
   */
 typedef struct
 {
-  game_robot_state_t game_information;
-  robot_hurt_data_t  blood_changed_data;
-  real_shoot_t       real_shoot_data;
-  rfid_detect_t      rfid_data;
-  game_result_t      game_result_data;
-  get_buff_t         get_buff_data;
-  server_to_user_t   student_download_data;
+  game_robot_state_t game_information;   //0x0001
+  robot_hurt_data_t  blood_changed_data; //0x0002
+  real_shoot_t       real_shoot_data;    //0x0003
+  real_power_data_t  power_heat_data;    //0x0004
+  field_rfid_t       rfid_data;          //0x0005
+  game_result_t      game_result_data;   //0x0006
+  get_buff_t         get_buff_data;      //0x0007
+  robot_position_t   robot_pos_data;     //0x0008
 } receive_judge_t;
 
 /* data send (forward) */

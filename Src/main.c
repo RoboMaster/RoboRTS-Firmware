@@ -149,6 +149,7 @@ int main(void)
   pwm_device_init();
   mpu_device_init();
   can_device_init();
+  //if do not use single gyroscope module in chassis, need to close gyro_device_init()
   gyro_device_init();
   
   //open can receive it
