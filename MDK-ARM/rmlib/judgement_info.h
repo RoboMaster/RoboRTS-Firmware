@@ -144,7 +144,6 @@ typedef __packed struct
   */
 typedef __packed struct
 {
-  uint8_t valid_flag;
   float x;
   float y;
   float z;
