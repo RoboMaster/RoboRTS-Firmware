@@ -138,7 +138,7 @@ void chassis_task(void const *argu)
 	
 	float wheel_speed_ref_fix= 1.4;
 	chassis.current[0] = pid_calc(&pid_spd[0], chassis.wheel_speed_fdb[0], chassis.wheel_speed_ref[0]);
-	chassis.current[1] = pid_calc(&pid_spd[1], chassis.wheel_speed_fdb[1], chassis.wheel_speed_ref[1]*wheel_speed_ref_fix);
+	chassis.current[1] = pid_calc(&pid_spd[1], chassis.wheel_speed_fdb[1], chassis.wheel_speed_ref[1]);
 	chassis.current[2] = pid_calc(&pid_spd[2], chassis.wheel_speed_fdb[2], chassis.wheel_speed_ref[2]);
 	chassis.current[3] = pid_calc(&pid_spd[3], chassis.wheel_speed_fdb[3], chassis.wheel_speed_ref[3]);
   
@@ -327,7 +327,7 @@ void chassis_param_init(void)
 #else
   for (int k = 0; k < 4; k++)
   {
-    PID_struct_init(&pid_spd[k], POSITION_PID, 10000, 1000, 1.0f, 0, 0);
+    PID_struct_init(&pid_spd[k], POSITION_PID, 10000, 1000, 5.0f, 0, 0);
 //		    PID_struct_init(&pid_spd[k], POSITION_PID, 10000, 1000, 3.0f, 0, 0);
 
   }

@@ -133,7 +133,7 @@
 
 /* automatic navigation interface */
 
-//#define AUTO_NAVIGATION
+#define AUTO_NAVIGATION
 //#define SENTRY 
 
 /* can relevant */
