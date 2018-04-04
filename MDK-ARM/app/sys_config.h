@@ -41,6 +41,8 @@
 /* left and right speed (mm/s) */
 #define CHASSIS_KB_MAX_SPEED_X  3300.0f 
 #define CHASSIS_KB_MOVE_RATIO_X 1.0f
+#define CHASSIS_KB_MOVE_RATIO_R 2.0f
+
 /* back and forward speed (mm/s) */
 #define CHASSIS_KB_MAX_SPEED_Y  3300.0f
 #define CHASSIS_KB_MOVE_RATIO_Y 1.0f
@@ -60,7 +62,7 @@
 
 /**************************shot  setting********************************/
 /* shot speed */
-#define DEFAULT_FRIC_WHEEL_SPEED 2000 //maximum value is 2500
+#define DEFAULT_FRIC_WHEEL_SPEED 1500 //maximum value is 2500
 /* shot frequence */
 #define TRIGGER_MOTOR_SPEED      2000 
 
@@ -122,7 +124,7 @@
 /* the positive direction of yaw axis motor */
 #define YAW_MOTO_POSITIVE_DIR  1.0f
 /* the positive direction of tirgger motor */
-#define TRI_MOTO_POSITIVE_DIR  1.0f
+#define TRI_MOTO_POSITIVE_DIR  -1.0f
 
 
 
@@ -131,7 +133,7 @@
 
 /* automatic navigation interface */
 
-#define AUTO_NAVIGATION
+//#define AUTO_NAVIGATION
 //#define SENTRY 
 
 /* can relevant */
@@ -154,9 +156,9 @@
 
 
 /* gimbal relevant */
-#define PIT_ANGLE_MAX        15
+#define PIT_ANGLE_MAX        40
 #define PIT_ANGLE_MIN        -20
-#define YAW_ANGLE_MAX         50
+#define YAW_ANGLE_MAX        50
 #define YAW_ANGLE_MIN        -50
 
 #define LEFT_FRICTION        TIM1->CCR1

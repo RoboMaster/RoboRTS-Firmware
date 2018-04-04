@@ -26,9 +26,9 @@ RoboRTS infantry control firmware
 
 When one of the modules is off-line, user can find out which module is out of work based on indicated light and buzzer in board.
 
-In this project, error warns depend on the priority of off-line modules. 
+In this project, error warns depend on the priority of off-line modules.
 
-Corresponding states of each module off-line are shown as following while the number corresponds the number of times of the red light flashes. 
+Corresponding states of each module off-line are shown as following while the number corresponds the number of times of the red light flashes.
 
 1. Remote controller off-line
 2. Gimbal motor off-line
@@ -50,11 +50,18 @@ The following is the location of each interface of the main control board.
 
 ![](Doc/image/main_board_interface.PNG)
 
+``` bash
+-|-----|-
+ |     |
+ |     |
+-|-----|-
+```
+
 ### Function Module
 
 #### Manual Mode:
 
-Basic control command including remote control and key-mouse control is executed in manual mode. 
+Basic control command including remote control and key-mouse control is executed in manual mode.
 
 ATTENTION: If the `AUTO_NAVIGATION` macro is defined in the `sys_config.h` file, the Debug Mode and Full-auto Mode will be turned on.
 
@@ -190,11 +197,11 @@ typedef enum
 
 #### Program Structure
 
-1. The board support package layer (BSP) is based on the HAL library, which mainly offers communication ports and configuration of  can, uart, spi, flash and io. 
+1. The board support package layer (BSP) is based on the HAL library, which mainly offers communication ports and configuration of  can, uart, spi, flash and io.
 2. Data exchange layer is the only place which calls the BSP layer program and exchanges data between applied program and hardware equipment.
 3. Communication layer is responsible for receiving and transmitting data and control information. Additionally, this layer is capable of packaging and unpacking data including protocol part.
 4. Data receiving layer transforms the direct data from exchange layer or  parsed data from communication layer to feedback and control information.
-5. Without changing the software framework, mode switch task can implement different user-defined modes based on existing functional module. 
+5. Without changing the software framework, mode switch task can implement different user-defined modes based on existing functional module.
 6. Control task, control of the three structures including the cloud platform, the chassis, and the shooting.
 
 ### Software System
@@ -229,10 +236,9 @@ Data transmitted to upper layer from bottom layer:
 Data received from upper layer to bottom layer:
 
 1. Control information part is used to control the three executed mechanism in the bottom layer which are gimbal, chassis and shooting module respectively.
-2. Configuration information part includes main information to set up structural of the robot such as tread, wheelbase and initial gimbal position and running state of upper layer. 
-3. Forward data information part consists of the data that forwards to referee system through bottom layer and the user-defined information that should be shown in  server. 
+2. Configuration information part includes main information to set up structural of the robot such as tread, wheelbase and initial gimbal position and running state of upper layer.
+3. Forward data information part consists of the data that forwards to referee system through bottom layer and the user-defined information that should be shown in  server.
 
 #### Data Flow Diagram
 
 ![](Doc/image/data_flow.PNG)
-

@@ -208,9 +208,10 @@ static void kb_shoot_cmd(uint8_t single_fir, uint8_t cont_fir)
 static void gimbal_operation_func(int16_t pit_ref_spd, int16_t yaw_ref_spd,
                                   uint8_t shoot_buff,  uint8_t track_armor)
 {
-  km.pit_v = -pit_ref_spd * 0.01f;
-  km.yaw_v = -yaw_ref_spd * 0.01f;
-  
+  km.pit_v = -pit_ref_spd * 0.01f; //0.01f; changed by H.F. 20180405
+  km.yaw_v = -yaw_ref_spd * 0.05f; //0.01f;
+	km.vw = -yaw_ref_spd; //0.01f; add by H.F.
+ 
   
   
   if (shoot_buff)

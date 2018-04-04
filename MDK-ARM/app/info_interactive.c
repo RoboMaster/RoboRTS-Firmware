@@ -107,13 +107,13 @@ void get_shoot_info(void)
   {
     case REMOTE_CTRL_SHOT:
     {
-      shot.fric_wheel_spd = speed_debug;//DEFAULT_FRIC_WHEEL_SPEED;
+      shot.fric_wheel_spd = DEFAULT_FRIC_WHEEL_SPEED;//_SPEEDspeed_debug;
       remote_ctrl_shoot_hook();
     }break;
     
     case KEYBOARD_CTRL_SHOT:
     {
-      shot.fric_wheel_spd = speed_debug;//DEFAULT_FRIC_WHEEL_SPEED;
+      shot.fric_wheel_spd = DEFAULT_FRIC_WHEEL_SPEED;//speed_debug;
       remote_ctrl_shoot_hook();
       keyboard_shoot_hook();
     }break;

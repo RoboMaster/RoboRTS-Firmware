@@ -57,7 +57,7 @@ chassis_t chassis;
 uint32_t chassis_time_last;
 int chassis_time_ms;
 
-int32_t sentry_ms=-1;//
+int32_t sentry_ms=-1;//write by MZJ
 
 
 extern TaskHandle_t can_msg_send_task_t;
@@ -77,7 +77,7 @@ void chassis_task(void const *argu)
       chassis.vx = 0;
       chassis.vy = 0;
       chassis_twist_handle();
-    }break;
+    }break; 
     
     case AUTO_FOLLOW_GIMBAL:
     {
@@ -131,19 +131,22 @@ void chassis_task(void const *argu)
 
   mecanum_calc(chassis.vx, chassis.vy, chassis.vw, chassis.wheel_speed_ref);
 
-  for (int i = 0; i < 4; i++)
+  /*for (int i = 0; i < 4; i++)
   {
     chassis.current[i] = pid_calc(&pid_spd[i], chassis.wheel_speed_fdb[i], chassis.wheel_speed_ref[i]);
-  }
-	/*chassis.current[0] = - pid_calc(&pid_spd[0], -chassis.wheel_speed_fdb[0], chassis.wheel_speed_ref[0]);
-	chassis.current[1] = - pid_calc(&pid_spd[1], -chassis.wheel_speed_fdb[1], chassis.wheel_speed_ref[1]);
+  }*/
+	
+	float wheel_speed_ref_fix= 1.4;
+	chassis.current[0] = pid_calc(&pid_spd[0], chassis.wheel_speed_fdb[0], chassis.wheel_speed_ref[0]);
+	chassis.current[1] = pid_calc(&pid_spd[1], chassis.wheel_speed_fdb[1], chassis.wheel_speed_ref[1]*wheel_speed_ref_fix);
 	chassis.current[2] = pid_calc(&pid_spd[2], chassis.wheel_speed_fdb[2], chassis.wheel_speed_ref[2]);
-	chassis.current[3] = pid_calc(&pid_spd[3], chassis.wheel_speed_fdb[3], chassis.wheel_speed_ref[3]);*/
+	chassis.current[3] = pid_calc(&pid_spd[3], chassis.wheel_speed_fdb[3], chassis.wheel_speed_ref[3]);
   
   if (!chassis_is_controllable())
   {
     memset(chassis.current, 0, sizeof(chassis.current));
   }
+	
   
   memcpy(glb_cur.chassis_cur, chassis.current, sizeof(chassis.current));
   osSignalSet(can_msg_send_task_t, CHASSIS_MOTOR_MSG_SEND);
@@ -203,8 +206,8 @@ void separate_gimbal_handle(void)
 {
   chassis.vy = rm.vy * CHASSIS_RC_MOVE_RATIO_Y + km.vy * CHASSIS_KB_MOVE_RATIO_Y;
   chassis.vx = rm.vx * CHASSIS_RC_MOVE_RATIO_X + km.vx * CHASSIS_KB_MOVE_RATIO_X;
-  chassis.vw = rm.vw * CHASSIS_RC_MOVE_RATIO_R;
-}
+	chassis.vw = rm.vw * CHASSIS_RC_MOVE_RATIO_R + km.vw * CHASSIS_KB_MOVE_RATIO_R; 
+}	
 void follow_gimbal_handle(void)
 {
   chassis.position_ref = 0;
@@ -281,7 +284,8 @@ void mecanum_calc(float vx, float vy, float vw, int16_t speed[])
   int16_t wheel_rpm[4];
   float   max = 0;
   
-  wheel_rpm[0] = (-vx - vy + vw * rotate_ratio_fr) * wheel_rpm_ratio;
+	//float wheel_rpm_ratio_debug = 2;
+  wheel_rpm[0] = (-vx - vy + vw * rotate_ratio_fr) * wheel_rpm_ratio; //*wheel_rpm_ratio_debug;
   wheel_rpm[1] = ( vx - vy + vw * rotate_ratio_fl) * wheel_rpm_ratio;
   wheel_rpm[2] = ( vx + vy + vw * rotate_ratio_bl) * wheel_rpm_ratio;
   wheel_rpm[3] = (-vx + vy + vw * rotate_ratio_br) * wheel_rpm_ratio;

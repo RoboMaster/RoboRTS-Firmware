@@ -172,10 +172,13 @@ static void fric_wheel_ctrl(void)
   }
 }
 
-int debug_tri_speed = -8000;
+int debug_tri_speed = 2000;
 int shot_cmd;
 static void shoot_bullet_handle(void)
 {
+	// Added by H.F. For debug
+	trig.key = 0;
+
   shot_cmd = shot.shoot_cmd;
   if (shot.shoot_cmd)
   {
@@ -189,7 +192,7 @@ static void shoot_bullet_handle(void)
     }
     else if (trig.one_sta == TRIG_PRESS_DOWN)
     {
-      if (HAL_GetTick() - trig.one_time >= 2000) //before the rising
+      if (HAL_GetTick() - trig.one_time >= 1000) //2000) //before the rising
       {
         trig.one_sta = TRIG_ONE_DONE;
       }
@@ -202,7 +205,7 @@ static void shoot_bullet_handle(void)
     }
     else if (trig.one_sta == TRIG_BOUNCE_UP)
     {
-      if (HAL_GetTick() - trig.one_time >= 2000)
+      if (HAL_GetTick() - trig.one_time >= 1000) //2000)
       {
         trig.one_sta = TRIG_ONE_DONE;
       }
@@ -225,7 +228,7 @@ static void shoot_bullet_handle(void)
       shot.shot_bullets++;
     }
     else
-      trig.spd_ref = debug_tri_speed;//trig.feed_bullet_spd;
+      trig.spd_ref = trig.feed_bullet_spd;
     
   }
   else if (shot.c_shoot_cmd)
@@ -234,19 +237,19 @@ static void shoot_bullet_handle(void)
     trig.spd_ref = trig.c_shot_spd;
     
     if ((trig.key_last == 0) && (trig.key == 1))
-      shot.shot_bullets++;
+      shot.shot_bullets++;  
     
     //block_bullet_handle();
   }
   else
   {
     if (trig.key)       //not trigger
-      trig.spd_ref = debug_tri_speed;//trig.feed_bullet_spd;
+      trig.spd_ref = trig.feed_bullet_spd;
     else
       trig.spd_ref = 0;
   }
   
-  pid_calc(&pid_trigger_speed, moto_trigger.speed_rpm, trig.spd_ref);
+  pid_calc(&pid_trigger_speed, moto_trigger.speed_rpm, trig.spd_ref*trig.dir);
 }
 
 void shot_param_init(void)
@@ -254,14 +257,14 @@ void shot_param_init(void)
   memset(&shot, 0, sizeof(shoot_t));
   
   shot.ctrl_mode      = SHOT_DISABLE;
-  shot.fric_wheel_spd = DEFAULT_FRIC_WHEEL_SPEED;
+  shot.fric_wheel_spd = 2500;
   //shot.remain_bullets = 0;
   
   memset(&trig, 0, sizeof(trigger_t));
   
-  trig.dir             = 1;
-  trig.feed_bullet_spd = 2000;
-  trig.c_shot_spd      = 4000;
+  trig.dir             = TRI_MOTO_POSITIVE_DIR;
+  trig.feed_bullet_spd = TRIGGER_MOTOR_SPEED; //2000; //changed by H.F.
+  trig.c_shot_spd      = TRIGGER_MOTOR_SPEED; // chagned by H.F.
   trig.one_sta         = TRIG_INIT;
   
 }

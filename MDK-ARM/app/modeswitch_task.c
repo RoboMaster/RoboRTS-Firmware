@@ -331,7 +331,7 @@ static void chassis_mode_handle(void)
     {
 				
 			//chassis.ctrl_mode = MANUAL_FOLLOW_GIMBAL;
-			 chassis.ctrl_mode = MANUAL_SEPARATE_GIMBAL;
+			chassis.ctrl_mode = MANUAL_SEPARATE_GIMBAL;
 					
       /* keyboard trigger chassis twist mode */
       if (km.twist_ctrl)
