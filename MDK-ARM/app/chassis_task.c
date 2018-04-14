@@ -147,7 +147,9 @@ void chassis_task(void const *argu)
     memset(chassis.current, 0, sizeof(chassis.current));
   }
 	
-  
+	if (judge_rece_mesg.game_information.remain_hp < WARNING_ENERGY)
+  {  
+  }
   memcpy(glb_cur.chassis_cur, chassis.current, sizeof(chassis.current));
   osSignalSet(can_msg_send_task_t, CHASSIS_MOTOR_MSG_SEND);
   
@@ -351,11 +353,11 @@ void power_limit_handle(void)
     //judge system offline, mandatory limit current
     total_cur_limit = 8000;
   }
-  else
+  else 
   {
-    if (judge_rece_mesg.game_information.remain_power < WARNING_ENERGY)
-      total_cur_limit = ((judge_rece_mesg.game_information.remain_power * \
-                          judge_rece_mesg.game_information.remain_power)/ \
+    if (judge_rece_mesg.game_information.remain_hp < WARNING_ENERGY)
+      total_cur_limit = ((judge_rece_mesg.game_information.remain_hp * \
+                          judge_rece_mesg.game_information.remain_hp)/ \
                           (WARNING_ENERGY*WARNING_ENERGY)) * 40000;
     else
       total_cur_limit = 40000;

@@ -40,7 +40,7 @@ typedef enum
   REAL_BLOOD_DATA_ID = 0x0002,
   REAL_SHOOT_DATA_ID = 0x0003,
   REAL_POWER_DATA_ID = 0x0004,
-  FIELD_RFID_DATA_ID = 0x0005; 
+  FIELD_RFID_DATA_ID = 0x0005, 
   GAME_RESULT_ID     = 0x0006,
   GAIN_BUFF_ID       = 0x0007,
   ROBOT_POS_DATA_ID  = 0x0008,
@@ -149,7 +149,7 @@ typedef __packed struct
   float y;
   float z;
   float yaw;
-} robot_position_t
+} robot_position_t;
 /** 
   * @brief  student custom data
   */

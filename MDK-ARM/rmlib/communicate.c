@@ -120,11 +120,11 @@ void unpack_fifo_data(unpack_data_t *p_obj, uint8_t sof)
           {
             if (sof == UP_REG_ID)
             {
-              pc_data_handler(p_obj->protocol_packet);
+              pc_data_handle(p_obj->protocol_packet);
             }
             else  //DN_REG_ID
             {
-              judgement_data_handler(p_obj->protocol_packet);
+              judgement_data_handle(p_obj->protocol_packet);
             }
           }
         }

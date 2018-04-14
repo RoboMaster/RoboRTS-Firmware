@@ -64,7 +64,7 @@ void judgement_data_handle(uint8_t *p_frame)
       memcpy(&judge_rece_mesg.real_shoot_data, data_addr, data_length);
     break;
 
-    case REAL_RFID_DATA_ID:
+    case FIELD_RFID_DATA_ID:
       memcpy(&judge_rece_mesg.rfid_data, data_addr, data_length);
     break;
 
