@@ -38,10 +38,21 @@ void turn_off_laser(void)
   HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_RESET);
 }
 
-uint8_t get_trigger_key_state(void)
+uint8_t get_bbkey_state(void)
 {
-	
-  return HAL_GPIO_ReadPin(TRIG_GPIO_Port, TRIG_Pin); //changed by H.F. 20180405
+  static uint32_t last_change_time = 0;
+  static uint8_t last_state = 0;
+  uint8_t state = HAL_GPIO_ReadPin(TRIG_GPIO_Port, TRIG_Pin);
+  if(state == last_state){
+    last_change_time = HAL_GetTick();
+  } else {
+    if(HAL_GetTick()-last_change_time >= 3){
+      //change keep 3ms
+      //the purpose is to remove the jitter of key
+      last_change_time = state;
+    }
+  }
+  return last_state; //changed by Mr.bin 20180421
 }
 
 
