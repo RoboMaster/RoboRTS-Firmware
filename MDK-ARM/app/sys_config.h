@@ -64,7 +64,7 @@
 /* shot speed */
 #define DEFAULT_FRIC_WHEEL_SPEED 1500 //maximum value is 2500
 /* shot frequence */
-#define TRIGGER_MOTOR_SPEED      2000 
+#define TRIGGER_MOTOR_SPEED      8000 
 
 
 
@@ -126,6 +126,11 @@
 /* the positive direction of tirgger motor */
 #define TRI_MOTO_POSITIVE_DIR  -1.0f
 
+#ifdef SENTRY
+
+#define TRI_MOTO_POSITIVE_DIR  1.0f
+
+#endif
 
 
 

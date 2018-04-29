@@ -66,9 +66,10 @@
 #define LASER_GPIO_Port GPIOG
 #define BEEP_Pin GPIO_PIN_4
 #define BEEP_GPIO_Port GPIOB
-#define TRIG_Pin GPIO_PIN_9
+//#define TRIG_Pin GPIO_PIN_9 //hf 0429
+#define TRIG_Pin GPIO_PIN_2 
 #define TRIG_GPIO_Port GPIOI
-#define SPI5_NSS_Pin GPIO_PIN_6
+#define SPI5_NSS_Pin GPIO_PIN_6 
 #define SPI5_NSS_GPIO_Port GPIOF
 #define KEY_Pin GPIO_PIN_10
 #define KEY_GPIO_Port GPIOD

@@ -44,8 +44,9 @@
 #define BUFF_CTRL  (rc.kb.bit.F)
 #define TRACK_CTRL (km.rk_sta == KEY_PRESS_LONG)
 //      shoot relevant       key or mouse operation
-#define KB_SINGLE_SHOOT     (km.lk_sta == KEY_PRESS_ONCE)
-#define KB_CONTINUE_SHOOT   (km.lk_sta == KEY_PRESS_LONG)
+//#define KB_CONTINUE_SHOOT   (km.lk_sta == KEY_PRESS_LONG)
+#define KB_SHOOT     (km.lk_sta == KEY_PRESS_ONCE)
+#define KB_SHOOT_SWITCH   (rc.kb.bit.R)
 #define KB_OPEN_FRIC_WHEEL  (rc.kb.bit.Q)
 #define KB_CLOSE_FIRC_WHEEL (rc.kb.bit.Q && rc.kb.bit.SHIFT)
 
@@ -69,7 +70,7 @@
 //#define C 			0x2000
 //#define V 			0x4000		//bit 15
 //#define B				0x8000
-/******************************************************/
+/********************************** ********************/
 
 typedef enum 
 {

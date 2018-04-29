@@ -123,7 +123,7 @@ void get_shoot_info(void)
       //shot.fric_wheel_run = pc_rece_mesg.shoot_control_data.fric_wheel_run;
       //shot.fric_wheel_spd = pc_rece_mesg.shoot_control_data.fric_wheel_spd;
       shot.shoot_cmd      = pc_rece_mesg.shoot_control_data.shoot_cmd;
-      shot.c_shoot_cmd    = pc_rece_mesg.shoot_control_data.c_shoot_cmd;
+      //shot.c_shoot_cmd    = pc_rece_mesg.shoot_control_data.c_shoot_cmd; // hf 20180448
     }break;
     
     case AUTO_CTRL_SHOT:
@@ -131,14 +131,14 @@ void get_shoot_info(void)
       shot.fric_wheel_run = pc_rece_mesg.shoot_control_data.fric_wheel_run;
       shot.fric_wheel_spd = pc_rece_mesg.shoot_control_data.fric_wheel_spd;
       shot.shoot_cmd      = pc_rece_mesg.shoot_control_data.shoot_cmd;
-      shot.c_shoot_cmd    = pc_rece_mesg.shoot_control_data.c_shoot_cmd;
+      //shot.c_shoot_cmd    = pc_rece_mesg.shoot_control_data.c_shoot_cmd; // hf20180428
     }break;
     
     default:
     {
       shot.fric_wheel_run = 0;
       shot.shoot_cmd      = 0;
-      shot.c_shoot_cmd    = 0;
+      //shot.c_shoot_cmd    = 0; // hf 20180428
     }break;
   }
   /* get remote and keyboard friction wheel control information */
@@ -269,7 +269,7 @@ void get_infantry_info(void)
 
 void get_custom_data_info(void)
 {
-  //memcpy(&pc_rece_mesg.pc_to_server_data, &student_to_judgesys_data, sizeof(user_to_server_t));
+ // memcpy(&pc_rece_mesg.pc_to_server_data, &student_to_judgesys_data, sizeof(user_to_server_t));
 }
 
 

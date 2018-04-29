@@ -85,7 +85,9 @@ void pc_data_handle(uint8_t *p_frame)
     break;
     
     case ROBOT_TO_CLIENT_ID:
-      memcpy(&pc_rece_mesg.pc_to_server_data, data_addr, data_length);
+      //memcpy(&pc_rece_mesg.pc_to_server_data, data_addr, data_length);
+		  memcpy(&pc_rece_mesg.pc_to_server_data, data_addr, data_length);
+
     break;
     
 

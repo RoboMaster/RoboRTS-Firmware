@@ -104,18 +104,20 @@ static void rc_shoot_cmd(uint8_t single_fir, uint8_t cont_fir)
 {
   if (single_fir)
   {
-    shot.c_shoot_time = HAL_GetTick();
+    //shot.c_shoot_time = HAL_GetTick() ;
     shot.shoot_cmd   = 1;
-    shot.c_shoot_cmd = 0;
+		switch_shoot_mode(SEMI_ONE); //shot.shoot_mode = 
+    //shot.c_shoot_cmd = 0;
   }
   
-  if (cont_fir && (HAL_GetTick() - shot.c_shoot_time >= 2000))
-  {
-    shot.shoot_cmd   = 0;
-    shot.c_shoot_cmd = 1;
+//  if (cont_fir && (HAL_GetTick() - shot.c_shoot_time >= 2000))
+  if (cont_fir){
+
+    shot.shoot_cmd   = 1;
+		switch_shoot_mode(AUTO); 
   }
   else
-    shot.c_shoot_cmd = 0;
+    shot.shoot_cmd = 0;
 }
 
 

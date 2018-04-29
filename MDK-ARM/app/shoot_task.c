@@ -41,7 +41,7 @@
 #include "string.h"
 
 /* setting */
-#define RELOAD_TIMEOUT 5000
+#define RELOAD_TIMEOUT 2500
 #define ABS(num) ((num)>0?(num):-(num))
 
 /* stack usage monitor */
@@ -50,6 +50,8 @@ UBaseType_t shoot_stack_surplus;
 /* shot task global parameter */
 shoot_t   shot;
 bullet_supply_t bupply;
+client_show_data_t client_show_data;
+//client_show_data.data1 = 100;
 
 void shot_task(void const *argu)
 {
@@ -62,7 +64,9 @@ void shot_task(void const *argu)
     if (event.status == osEventSignal)
     {
       if (event.value.signals & SHOT_TASK_EXE_SIGNAL)
-      {
+      {	
+				//data_packet_pack(STU_CUSTOM_DATA_ID, (uint8_t *)&pc_rece_mesg.show_in_client_data,
+          //           sizeof(client_show_data_t), 0xA5);
         fric_wheel_ctrl();
         bupply.bbkey_state = get_bbkey_state();
         
@@ -81,7 +85,7 @@ void shot_task(void const *argu)
             } else{
               shot.shoot_cmd = 0;
             }
-          } else if(shot.shoot_cmd == 2){
+        } else if(shot.shoot_cmd == 2){
             bupply.spd_ref = bupply.feed_bullet_spd;
             shot.timestamp = HAL_GetTick();
             shot.shoot_state = RELOADING;
@@ -133,17 +137,17 @@ void switch_shoot_mode(shoot_mode_e mode){
   shot.shoot_mode = mode;
   switch(shot.shoot_mode){
     case SEMI_ONE:
-      shot.shoot_spd = 10;
+      shot.shoot_spd = 15;
       shot.shoot_num = 1;
       shot.fric_wheel_spd = 2500;
       break;
     case SEMI_THREE:
-      shot.shoot_spd = 10;
+      shot.shoot_spd = 15;
       shot.shoot_num = 3;
       shot.fric_wheel_spd = 2500;
       break;
     case AUTO:
-      shot.shoot_spd = 10;
+      shot.shoot_spd = 15;
       shot.shoot_num = 0;
       shot.fric_wheel_spd = 1000;
       break;
@@ -152,7 +156,7 @@ void switch_shoot_mode(shoot_mode_e mode){
 
 static uint8_t stuck_detect(void){
   static uint32_t last_uptime;
-  if(ABS(pid_trigger_speed.out) < ABS(bupply.spd_ref)/3){
+  if(ABS(moto_trigger.speed_rpm) < ABS(bupply.spd_ref)/3){
     if(HAL_GetTick()-last_uptime > 500){
       //stuck confirm
       return 1;
@@ -165,7 +169,7 @@ static uint8_t stuck_detect(void){
 
 static uint8_t stuck_handle(void)
 {
-  if(HAL_GetTick()-shot.timestamp > 400){
+  if(HAL_GetTick()-shot.timestamp > 200000/ABS(bupply.spd_ref)){
     return 0;
   } else {
     return 1;

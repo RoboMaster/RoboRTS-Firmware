@@ -188,22 +188,44 @@ static void kb_fric_ctrl(uint8_t open_fric,  uint8_t close_fric)
     shot.fric_wheel_run = 0;
 }
 
-static void kb_shoot_cmd(uint8_t single_fir, uint8_t cont_fir)
-{
-  if (single_fir)
+//static void kb_shoot_cmd(uint8_t single_fir, uint8_t cont_fir)
+
+shoot_mode_e mode  = 1 ;
+static void kb_shoot_cmd(uint8_t shoot, uint8_t shoot_switch)
+{ // add more mode
+	if (shoot_switch ){   //switch shoot mode
+		mode++;
+		if (mode>3){
+			mode = 1;
+		}
+		switch_shoot_mode(mode);
+	}
+	if (mode == 3){
+		shot.shoot_cmd = rc.mouse.l;
+	}else{
+		if(shoot == 1){
+			shot.shoot_cmd = shoot;
+		}
+	}
+
+/*  if (single_fir)
   {
     shot.shoot_cmd   = 1;
-    shot.c_shoot_cmd = 0;
+  //  shot.c_shoot_cmd = 0;
   }
   
-  if (cont_fir)
+  if (three_fir)
   {
     shot.shoot_cmd   = 0;
-    shot.c_shoot_cmd = 1;
+    //shot.c_shoot_cmd = 1;
   }
+	if (auto_fir)
+	{
+		
+	}
   else
-    shot.c_shoot_cmd = 0;
-
+    shot.shoot_cmd = 0;
+	*/
 }
 static void gimbal_operation_func(int16_t pit_ref_spd, int16_t yaw_ref_spd,
                                   uint8_t shoot_buff,  uint8_t track_armor)
@@ -281,5 +303,7 @@ void keyboard_shoot_hook(void)
   //friction wheel control
   kb_fric_ctrl(KB_OPEN_FRIC_WHEEL, KB_CLOSE_FIRC_WHEEL);
   //single or continuous trigger bullet control
-  kb_shoot_cmd(KB_SINGLE_SHOOT, KB_CONTINUE_SHOOT);
+	//  kb_shoot_cmd(KB_SINGLE_SHOOT, KB_CONTINUE_SHOOT); //hf 20180428
+  kb_shoot_cmd( KB_SHOOT, KB_SHOOT_SWITCH);
+
 }

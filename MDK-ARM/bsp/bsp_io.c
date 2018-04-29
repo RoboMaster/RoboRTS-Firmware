@@ -49,7 +49,7 @@ uint8_t get_bbkey_state(void)
     if(HAL_GetTick()-last_change_time >= 3){
       //change keep 3ms
       //the purpose is to remove the jitter of key
-      last_change_time = state;
+      last_state = state;
     }
   }
   return last_state; //changed by Mr.bin 20180421
