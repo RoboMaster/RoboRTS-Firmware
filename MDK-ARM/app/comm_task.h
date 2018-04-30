@@ -66,6 +66,7 @@ void communicate_param_init(void);
 
 void data_packet_pack(uint16_t cmd_id, uint8_t *p_data, uint16_t len, uint8_t sof);
 
+static void send_client_show_data(void); //add by Mr.bin in 20180430
 static void get_upload_data(void);
 
 extern motor_current_t glb_cur;

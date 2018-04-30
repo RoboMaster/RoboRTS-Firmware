@@ -158,6 +158,7 @@ typedef __packed struct
   float data1;
   float data2;
   float data3;
+  uint8_t mask;
 } client_show_data_t;
 
 typedef __packed struct

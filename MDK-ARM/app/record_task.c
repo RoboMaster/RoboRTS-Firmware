@@ -27,6 +27,7 @@
 #include "record_task.h"
 #include "bsp_can.h"
 #include "bsp_uart.h"
+#include "bsp_io.h"
 #include "cmsis_os.h"
 #include "pid.h"
 #include "sys_config.h"

@@ -190,13 +190,14 @@ static void kb_fric_ctrl(uint8_t open_fric,  uint8_t close_fric)
 
 //static void kb_shoot_cmd(uint8_t single_fir, uint8_t cont_fir)
 
-shoot_mode_e mode  = 1 ;
+
 static void kb_shoot_cmd(uint8_t shoot, uint8_t shoot_switch)
 { // add more mode
+  shoot_mode_e mode  = shot.shoot_mode;
 	if (shoot_switch ){   //switch shoot mode
 		mode++;
 		if (mode>3){
-			mode = 1;
+			mode = SEMI_ONE;
 		}
 		switch_shoot_mode(mode);
 	}

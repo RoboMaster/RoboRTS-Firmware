@@ -34,8 +34,10 @@
 #include "bsp_uart.h"
 #include "pid.h"
 #include "led.h"
+#include "shoot_task.h"
 #include "cmsis_os.h"
 #include "string.h"
+#include "bin.h"
 
 UBaseType_t freq_info_surplus;
 UBaseType_t pc_comm_surplus;
@@ -186,6 +188,8 @@ void freq_info_task(void const *argu)
     
     osSignalSet(pc_unpack_task_t, PC_UART_TX_SIGNAL);
     
+    send_client_show_data();
+    
     freq_info_surplus = uxTaskGetStackHighWaterMark(NULL);
     
     osDelayUntil(&comm_wake_time, COMM_TASK_PERIOD);
@@ -267,6 +271,28 @@ void pc_unpack_task(void const *argu)
     
     pc_comm_surplus = uxTaskGetStackHighWaterMark(NULL);
   }
+}
+
+static void send_client_show_data(void){
+  client_show_data_t client_show_data;
+  extern TaskHandle_t judge_unpack_task_t;
+  extern shoot_t shot;
+  
+  //set data
+  //memset(&client_show_data, 0, sizeof(client_show_data_t));
+  client_show_data.data1 = (float)shot.shoot_mode;
+  client_show_data.data2 = -1;
+  client_show_data.data3 = 1.23;
+  client_show_data.mask = 0x00;
+  client_show_data.mask |= BIT0;
+  client_show_data.mask |= BIT2;
+  client_show_data.mask |= BIT4;
+  client_show_data.mask |= BIT7;
+  
+  //send
+  data_packet_pack(STU_CUSTOM_DATA_ID, (uint8_t *)&client_show_data,
+                     sizeof(client_show_data_t), DN_REG_ID);
+  osSignalSet(judge_unpack_task_t, JUDGE_UART_TX_SIGNAL);
 }
 
 void get_upload_data(void)

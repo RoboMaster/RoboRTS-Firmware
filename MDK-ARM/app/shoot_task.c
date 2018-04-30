@@ -50,8 +50,6 @@ UBaseType_t shoot_stack_surplus;
 /* shot task global parameter */
 shoot_t   shot;
 bullet_supply_t bupply;
-client_show_data_t client_show_data;
-//client_show_data.data1 = 100;
 
 void shot_task(void const *argu)
 {
@@ -65,8 +63,6 @@ void shot_task(void const *argu)
     {
       if (event.value.signals & SHOT_TASK_EXE_SIGNAL)
       {	
-				//data_packet_pack(STU_CUSTOM_DATA_ID, (uint8_t *)&pc_rece_mesg.show_in_client_data,
-          //           sizeof(client_show_data_t), 0xA5);
         fric_wheel_ctrl();
         bupply.bbkey_state = get_bbkey_state();
         
