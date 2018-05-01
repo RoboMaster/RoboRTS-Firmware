@@ -397,12 +397,14 @@ void gimbal_param_init(void)
   PID_struct_init(&pid_pit, POSITION_PID, 2000, 0,
                   30, 0, 0); 
                   //30, 0, 0); //
-  PID_struct_init(&pid_pit_speed, POSITION_PID, 7000, 3000,
+  PID_struct_init(&pid_pit_speed, POSITION_PID, 7000, 3000,	
 	                 15, 0, 0);
+	                 //15, 0, 0);
 
   /* yaw axis motor pid parameter */
   PID_struct_init(&pid_yaw, POSITION_PID, 7000, 0,
-                  50, 0, 0); //
+	                  50, 0, 0); //
+                  //50, 0, 0); //
 //  PID_struct_init(&pid_yaw_speed, POSITION_PID, 7000, 1000, chagned by H.F. 20180308
   PID_struct_init(&pid_yaw_speed, POSITION_PID, 7000, 1000,
                   13, 0, 0); // changed by H.F. 0308

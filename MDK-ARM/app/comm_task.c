@@ -281,7 +281,7 @@ static void send_client_show_data(void){
   //set data
   //memset(&client_show_data, 0, sizeof(client_show_data_t));
   client_show_data.data1 = (float)shot.shoot_mode;
-  client_show_data.data2 = -1;
+  client_show_data.data2 = (float) shot.shot_bullets;
   client_show_data.data3 = 1.23;
   client_show_data.mask = 0x00;
   client_show_data.mask |= BIT0;

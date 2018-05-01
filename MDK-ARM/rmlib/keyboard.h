@@ -42,11 +42,11 @@
 //      function   key or mouse operate
 #define TWIST_CTRL (rc.kb.bit.E)
 #define BUFF_CTRL  (rc.kb.bit.F)
-#define TRACK_CTRL (km.rk_sta == KEY_PRESS_LONG)
+#define TRACK_CTRL (km.rm.kb_sta == KEY_PRESS_LONG)
 //      shoot relevant       key or mouse operation
-//#define KB_CONTINUE_SHOOT   (km.lk_sta == KEY_PRESS_LONG)
-#define KB_SHOOT     (km.lk_sta == KEY_PRESS_ONCE)
-#define KB_SHOOT_SWITCH   (rc.kb.bit.R)
+#define KB_SHOOT     (km.lm.kb_sta == KEY_PRESS_ONCE)
+//#define KB_SHOOT_SWITCH   (rc.kb.bit.R) // hf 20180501
+#define KB_SHOOT_SWITCH   (km.rk.kb_sta == KEY_PRESS_ONCE)
 #define KB_OPEN_FRIC_WHEEL  (rc.kb.bit.Q)
 #define KB_CLOSE_FIRC_WHEEL (rc.kb.bit.Q && rc.kb.bit.SHIFT)
 
@@ -82,11 +82,15 @@ typedef enum
 typedef enum
 {
   KEY_RELEASE = 0,
-  KEY_WAIT_EFFECTIVE,
-  KEY_PRESS_ONCE,
-  KEY_PRESS_DOWN,
-  KEY_PRESS_LONG,
+  KEY_PRESS_ONCE = 1,
+  KEY_PRESS_DOWN = 2,
+	KEY_PRESS_LONG = 3,
 } kb_state_e;
+typedef struct
+{  
+  uint8_t last_release;
+  kb_state_e kb_sta;
+} kb_state_t;
 
 typedef struct
 {
@@ -103,18 +107,19 @@ typedef struct
   
   uint8_t kb_enable;
   
-  uint16_t lk_cnt;
-  uint16_t rk_cnt;
-  
-  kb_state_e lk_sta;
-  kb_state_e rk_sta;
-  
+	kb_state_t lm;
+	kb_state_t rm;
+	kb_state_t rk;
+
   kb_move_e move;
   
   uint16_t x_spd_limit;
   uint16_t y_spd_limit;
 
 } kb_ctrl_t;
+
+
+
 
 extern kb_ctrl_t km;
 

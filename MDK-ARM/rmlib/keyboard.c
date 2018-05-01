@@ -45,67 +45,38 @@ kb_ctrl_t km;
 ramp_t fb_ramp = RAMP_GEN_DAFAULT;
 ramp_t lr_ramp = RAMP_GEN_DAFAULT;
 
-
-void key_fsm(kb_state_e *sta, uint8_t key)
+void key_fsm(kb_state_e *sta, uint8_t *last_release, uint8_t key)
 {
   switch (*sta)
   {
     case KEY_RELEASE:
-    {
+    { 
       if (key)
-        *sta = KEY_WAIT_EFFECTIVE;
-      else
-        *sta = KEY_RELEASE;
+			{
+        *sta = KEY_PRESS_DOWN;
+			}
+      else if (!key)
+			{
+				*last_release = 1;
+				*sta = KEY_RELEASE;
+			}
+			
     }break;
     
-    case KEY_WAIT_EFFECTIVE:
-    {
-      if (key)
-        *sta = KEY_PRESS_ONCE;
-      else
-        *sta = KEY_RELEASE;
-    }break;
-    
+		case KEY_PRESS_DOWN: 
+    {		
+			if((*last_release == 1) & key )
+			{
+				*sta = KEY_PRESS_ONCE;
+			}
+			else
+				*sta = KEY_RELEASE;
+    }break;		
     
     case KEY_PRESS_ONCE:
-    {
-      if (key)
-      {
-        *sta = KEY_PRESS_DOWN;
-        if (sta == &km.lk_sta)
-          km.lk_cnt = 0;
-        else
-          km.rk_cnt = 0;
-      }
-      else
-        *sta = KEY_RELEASE;
-    }break;
-    
-    case KEY_PRESS_DOWN:
-    {
-      if (key)
-      {
-        if (sta == &km.lk_sta)
-        {
-          if (km.lk_cnt++ > LONG_PRESS_TIME/INFO_GET_PERIOD)
-            *sta = KEY_PRESS_LONG;
-        }
-        else
-        {
-          if (km.rk_cnt++ > LONG_PRESS_TIME/INFO_GET_PERIOD)
-            *sta = KEY_PRESS_LONG;
-        }
-      }
-      else
-        *sta = KEY_RELEASE;
-    }break;
-    
-    case KEY_PRESS_LONG:
-    {
-      if (!key)
-      {
-        *sta = KEY_RELEASE;
-      }
+    { 
+      *sta = KEY_PRESS_DOWN;
+			*last_release = 0;
     }break;
     
     default:
@@ -188,8 +159,6 @@ static void kb_fric_ctrl(uint8_t open_fric,  uint8_t close_fric)
     shot.fric_wheel_run = 0;
 }
 
-//static void kb_shoot_cmd(uint8_t single_fir, uint8_t cont_fir)
-
 
 static void kb_shoot_cmd(uint8_t shoot, uint8_t shoot_switch)
 { // add more mode
@@ -202,38 +171,19 @@ static void kb_shoot_cmd(uint8_t shoot, uint8_t shoot_switch)
 		switch_shoot_mode(mode);
 	}
 	if (mode == 3){
-		shot.shoot_cmd = rc.mouse.l;
+		shot.shoot_cmd = rc.mouse.l; //only fire when press donw the left key
 	}else{
 		if(shoot == 1){
 			shot.shoot_cmd = shoot;
 		}
 	}
-
-/*  if (single_fir)
-  {
-    shot.shoot_cmd   = 1;
-  //  shot.c_shoot_cmd = 0;
-  }
-  
-  if (three_fir)
-  {
-    shot.shoot_cmd   = 0;
-    //shot.c_shoot_cmd = 1;
-  }
-	if (auto_fir)
-	{
-		
-	}
-  else
-    shot.shoot_cmd = 0;
-	*/
 }
 static void gimbal_operation_func(int16_t pit_ref_spd, int16_t yaw_ref_spd,
                                   uint8_t shoot_buff,  uint8_t track_armor)
 {
   km.pit_v = -pit_ref_spd * 0.01f; //0.01f; changed by H.F. 20180405
   km.yaw_v = -yaw_ref_spd * 0.05f; //0.01f;
-	km.vw = -yaw_ref_spd; //0.01f; add by H.F.
+	km.vw = yaw_ref_spd; //0.01f; add by H.F.
  
   
   
@@ -258,8 +208,10 @@ void keyboard_global_hook(void)
 {
   if (km.kb_enable)
   {
-    key_fsm(&km.lk_sta, rc.mouse.l);
-    key_fsm(&km.rk_sta, rc.mouse.r);
+    key_fsm(&km.lm.kb_sta,&km.lm.last_release, rc.mouse.l);
+    key_fsm(&km.rm.kb_sta,&km.rm.last_release, rc.mouse.r);
+		key_fsm(&km.rk.kb_sta,&km.rk.last_release, rc.kb.bit.R); //20180501 hf
+
   }
 }
 
@@ -304,7 +256,6 @@ void keyboard_shoot_hook(void)
   //friction wheel control
   kb_fric_ctrl(KB_OPEN_FRIC_WHEEL, KB_CLOSE_FIRC_WHEEL);
   //single or continuous trigger bullet control
-	//  kb_shoot_cmd(KB_SINGLE_SHOOT, KB_CONTINUE_SHOOT); //hf 20180428
-  kb_shoot_cmd( KB_SHOOT, KB_SHOOT_SWITCH);
+  kb_shoot_cmd( KB_SHOOT, KB_SHOOT_SWITCH); //hf 20180428
 
 }
