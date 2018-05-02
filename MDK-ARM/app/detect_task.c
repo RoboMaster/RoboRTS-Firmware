@@ -109,7 +109,7 @@ void global_err_detector_init(void)
   
   g_err.list[PC_SYS_OFFLINE].err_exist    = 0;
   g_err.list[PC_SYS_OFFLINE].pri          = 1;
-  g_err.list[PC_SYS_OFFLINE].enable       = 1;
+  g_err.list[PC_SYS_OFFLINE].enable       = 0; //1;
 }
 
 /**

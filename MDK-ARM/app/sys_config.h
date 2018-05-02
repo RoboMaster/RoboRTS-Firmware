@@ -17,9 +17,8 @@
 
 #ifndef __SYS_H__
 #define __SYS_H__
-
+//#define hero
 #include "stm32f4xx_hal.h"
-
 /**********************remote control setting***************************/
 /* normalized remote controller proportion */
 #define RC_RESOLUTION     660.0f
@@ -40,12 +39,12 @@
 /* keyboard mode speed limit */
 /* left and right speed (mm/s) */
 #define CHASSIS_KB_MAX_SPEED_X  3300.0f 
-#define CHASSIS_KB_MOVE_RATIO_X 1.0f
-#define CHASSIS_KB_MOVE_RATIO_R 2.0f
+#define CHASSIS_KB_MOVE_RATIO_X 1.5f
+#define CHASSIS_KB_MOVE_RATIO_R 1.5f
 
 /* back and forward speed (mm/s) */
 #define CHASSIS_KB_MAX_SPEED_Y  3300.0f
-#define CHASSIS_KB_MOVE_RATIO_Y 1.0f
+#define CHASSIS_KB_MOVE_RATIO_Y 1.5f
 
 /**************************gimbal setting*******************************/
 /* remote mode gimbal speed limit */
@@ -53,7 +52,6 @@
 #define GIMBAL_RC_MOVE_RATIO_PIT 1.0f
 /* yaw axis speed */
 #define GIMBAL_RC_MOVE_RATIO_YAW 1.0f
-
 /* keyboard mode gimbal speed limit */
 /* pitch axis speed */
 #define GIMBAL_PC_MOVE_RATIO_PIT 1.0f
@@ -122,7 +120,11 @@
 /* the positive direction of pitch axis motor */
 #define PIT_MOTO_POSITIVE_DIR  1.0f
 /* the positive direction of yaw axis motor */
-#define YAW_MOTO_POSITIVE_DIR  1.0f
+#ifdef hero
+	#define YAW_MOTO_POSITIVE_DIR  -1.0f
+#else
+	#define YAW_MOTO_POSITIVE_DIR  1.0f
+#endif
 /* the positive direction of tirgger motor */
 #define TRI_MOTO_POSITIVE_DIR  -1.0f
 

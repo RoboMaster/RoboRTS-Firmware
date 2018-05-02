@@ -47,7 +47,7 @@
 /* twist period time (ms) */
 #define TWIST_PERIOD   1500
 /* warning surplus energy */
-#define WARNING_ENERGY 40.0f
+#define WARNING_ENERGY 50.0f //40.0f
 
 UBaseType_t chassis_stack_surplus;
 
@@ -136,7 +136,6 @@ void chassis_task(void const *argu)
     chassis.current[i] = pid_calc(&pid_spd[i], chassis.wheel_speed_fdb[i], chassis.wheel_speed_ref[i]);
   }*/
 	
-	float wheel_speed_ref_fix= 1.4;
 	chassis.current[0] = pid_calc(&pid_spd[0], chassis.wheel_speed_fdb[0], chassis.wheel_speed_ref[0]);
 	chassis.current[1] = pid_calc(&pid_spd[1], chassis.wheel_speed_fdb[1], chassis.wheel_speed_ref[1]);
 	chassis.current[2] = pid_calc(&pid_spd[2], chassis.wheel_speed_fdb[2], chassis.wheel_speed_ref[2]);
@@ -147,9 +146,8 @@ void chassis_task(void const *argu)
     memset(chassis.current, 0, sizeof(chassis.current));
   }
 	
-	if (judge_rece_mesg.game_information.remain_hp < WARNING_ENERGY)
-  {  
-  }
+	power_limit_handle();
+  
   memcpy(glb_cur.chassis_cur, chassis.current, sizeof(chassis.current));
   osSignalSet(can_msg_send_task_t, CHASSIS_MOTOR_MSG_SEND);
   
@@ -343,7 +341,6 @@ void chassis_param_init(void)
   memset(&pc_rece_mesg.structure_data, 0, sizeof(pc_rece_mesg.structure_data));
 }
 
-#if 0
 int32_t total_cur_limit;
 int32_t total_cur;
 void power_limit_handle(void)
@@ -351,14 +348,12 @@ void power_limit_handle(void)
   if (g_err.list[JUDGE_SYS_OFFLINE].err_exist)
   {
     //judge system offline, mandatory limit current
-    total_cur_limit = 8000;
+    total_cur_limit = 40000;
   }
   else 
   {
-    if (judge_rece_mesg.game_information.remain_hp < WARNING_ENERGY)
-      total_cur_limit = ((judge_rece_mesg.game_information.remain_hp * \
-                          judge_rece_mesg.game_information.remain_hp)/ \
-                          (WARNING_ENERGY*WARNING_ENERGY)) * 40000;
+    if (judge_rece_mesg.power_heat_data.chassis_pwr_buf < WARNING_ENERGY)
+      total_cur_limit = (judge_rece_mesg.power_heat_data.chassis_pwr_buf/60) * 40000;
     else
       total_cur_limit = 40000;
   }
@@ -375,6 +370,5 @@ void power_limit_handle(void)
   }
 
 }
-#endif
 
 

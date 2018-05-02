@@ -290,11 +290,11 @@ void pc_position_ctrl_handle(void)
   gim.pid.yaw_angle_fdb = gim.sensor.yaw_relative_angle;
   
   taskENTER_CRITICAL();
-  /*gim.pid.pit_angle_ref = pc_rece_mesg.gimbal_control_data.pit_ref;
-  gim.pid.yaw_angle_ref = pc_rece_mesg.gimbal_control_data.yaw_ref; */ //commit by H.F. 2080401
+  gim.pid.pit_angle_ref = pc_rece_mesg.gimbal_control_data.pit_ref;
+  gim.pid.yaw_angle_ref = pc_rece_mesg.gimbal_control_data.yaw_ref; //commit by H.F. 2080401
   
-	gim.pid.pit_angle_ref = 0;
-  gim.pid.yaw_angle_ref = 0;
+	//gim.pid.pit_angle_ref = 0;
+  //gim.pid.yaw_angle_ref = 0;
   //VAL_LIMIT(gim.pid.yaw_angle_ref, chassis_angle_tmp + YAW_ANGLE_MIN, chassis_angle_tmp + YAW_ANGLE_MAX);
 	VAL_LIMIT(gim.pid.yaw_angle_ref, YAW_ANGLE_MIN, YAW_ANGLE_MAX); // change by H.F. 20180326
   VAL_LIMIT(gim.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
