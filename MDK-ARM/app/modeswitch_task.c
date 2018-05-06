@@ -176,7 +176,7 @@ static void gimbal_mode_handle(void)
     case MANUAL_CTRL_MODE:
     {
       if (last_glb_ctrl_mode == SEMI_AUTO_MODE)
-        gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO;
+        gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO; // close loop
       
       /* no input control signal gimbal mode handle */
       if (gim.input.ac_mode == NO_ACTION)
