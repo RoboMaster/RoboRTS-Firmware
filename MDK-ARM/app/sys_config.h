@@ -164,7 +164,7 @@
 
 /* gimbal relevant */
 #define PIT_ANGLE_MAX        40
-#define PIT_ANGLE_MIN        -20
+#define PIT_ANGLE_MIN        -7
 #define YAW_ANGLE_MAX        50
 #define YAW_ANGLE_MIN        -50
 

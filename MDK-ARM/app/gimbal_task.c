@@ -42,6 +42,9 @@
 #include "math.h"
 #include "stdlib.h"
 #include "string.h"
+#include "bsp_io.h"
+#include "bsp_can.h"
+
 
 //#define OLD_TRIGGER
 /* gimbal patrol angle (degree)*/
@@ -49,6 +52,7 @@
 /* patrol period time (ms) */
 #define PATROL_PERIOD    1500
 /* gimbal back center time (ms) */
+#define BACK_CENTER_TIME 1000 //2500 // hf 20180507
 #define BACK_CENTER_TIME 1000 //2500 // hf 20180507
 
 /* stack usage monitor */
@@ -64,6 +68,8 @@ static big_buff_t cv_buff;
 /* control ramp parameter */
 static ramp_t     yaw_ramp = RAMP_GEN_DAFAULT;
 static ramp_t     pit_ramp = RAMP_GEN_DAFAULT;
+static ramp_t     yaw_ramp_pc = RAMP_GEN_DAFAULT;
+static ramp_t     pit_ramp_pc = RAMP_GEN_DAFAULT;
 
 uint32_t gimbal_time_last;
 int gimbal_time_ms;
@@ -120,13 +126,15 @@ void gimbal_task(void const *argu)
 		case GIMBAL_SENTRY_MODE: 			//added by ZJ 20180319
 			sentry_mode_handle();
 		break;
-
+		
+		case GIMBAL_RELAX:
+			gimbal_calikey_handle(); 		// added by HF 20180507
     default:
     break;
   }
 
   /* pitch axis limited angle */
-  //VAL_LIMIT(gim.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
+  VAL_LIMIT(gim.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
   
   //角度环做内环
   pid_calc(&pid_yaw, gim.pid.yaw_angle_fdb, gim.pid.yaw_angle_ref);
@@ -157,8 +165,8 @@ void gimbal_task(void const *argu)
     gim.ctrl_mode = GIMBAL_RELAX;
     //pid_trigger.iout = 0;
   }
-
-  
+	
+	
   osSignalSet(can_msg_send_task_t, GIMBAL_MOTOR_MSG_SEND);
   osSignalSet(shot_task_t, SHOT_TASK_EXE_SIGNAL);
 
@@ -178,7 +186,7 @@ void init_mode_handle(void)
   if(gim.pid.pit_angle_fdb >= -4.0f)
   {
     /* yaw back center after pitch arrive */
-    gim.pid.yaw_angle_ref = gim.sensor.yaw_relative_angle * ( 1 - ramp_calc(&yaw_ramp));
+    gim.pid.yaw_angle_ref = gim.sensor.yaw_relative_angle * ( 1 -ramp_calc(&yaw_ramp));
     
     if (gim.pid.yaw_angle_fdb >= -2.0f && gim.pid.yaw_angle_fdb <= 2.0f)
     {
@@ -221,7 +229,7 @@ void close_loop_handle(void)
   static float limit_angle_range = 2;
   
   gim.pid.pit_angle_fdb = gim.sensor.pit_relative_angle;
-  //gim.pid.yaw_angle_fdb = gim.sensor.gyro_angle - gim.yaw_offset_angle; // I don't know why
+  //gim.pid.yaw_angle_fdb = gim.sensor.gyro_angle - gim.yaw_offset_angle; // because yaw axis is wrong
   gim.pid.yaw_angle_fdb = gim.sensor.yaw_relative_angle; // I change to relative_angle H.F. 0314
 	
   /* chassis angle relative to gim.pid.yaw_angle_fdb */
@@ -272,8 +280,9 @@ void pc_position_ctrl_handle(void)
   gim.pid.yaw_angle_fdb = gim.sensor.yaw_relative_angle;
   
   taskENTER_CRITICAL();
-  gim.pid.pit_angle_ref = pc_rece_mesg.gimbal_control_data.pit_ref;
-  gim.pid.yaw_angle_ref = pc_rece_mesg.gimbal_control_data.yaw_ref; //commit by H.F. 2080401
+  gim.pid.pit_angle_ref = pc_rece_mesg.gimbal_control_data.pit_ref* (ramp_calc(&yaw_ramp));
+  gim.pid.yaw_angle_ref = pc_rece_mesg.gimbal_control_data.yaw_ref* (ramp_calc(&yaw_ramp)); //commit by H.F. 2080401
+	
   
 	//gim.pid.pit_angle_ref = 0;
   //gim.pid.yaw_angle_ref = 0;
@@ -361,6 +370,14 @@ static void gimbal_patrol_handle(void)
   gim.pid.pit_angle_ref = 0;
 }
 
+// Use key to cali gimbal
+static void gimbal_calikey_handle(void) // hf 20180507
+{
+	if ( get_calikey_cmd()) 
+	{
+		 cali_param.gim_cali_data[CALI_GIMBAL_CENTER].cali_cmd = 1;
+	}
+}
 
 /**
   * @brief initialize gimbal pid parameter
