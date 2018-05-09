@@ -34,3 +34,4 @@ JLinkLog.txt
 *.ini
 *.sct
 *.uvguix.*
+*.hex

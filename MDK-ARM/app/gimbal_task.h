@@ -140,6 +140,7 @@ static void track_aimor_handle(void);
 static void gimbal_patrol_handle(void);
 static void big_buff_handle(void);
 static void pc_position_ctrl_handle(void);
+static void gimbal_calikey_handle(void); // hf 20180507
 
 void gimbal_param_init(void);
 void gimbal_back_param(void);

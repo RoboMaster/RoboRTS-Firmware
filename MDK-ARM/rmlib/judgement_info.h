@@ -180,7 +180,7 @@ typedef struct
   robot_hurt_data_t  blood_changed_data;
   real_shoot_t       real_shoot_data;
   real_power_data_t  power_heat_data; //0x0004
-  field_rfid_t      rfid_data;
+  field_rfid_t       rfid_data;
   game_result_t      game_result_data;
   get_buff_t         get_buff_data;
   robot_position_t   robot_pos_data; //0x0008
