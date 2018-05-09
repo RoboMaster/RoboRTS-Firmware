@@ -64,69 +64,74 @@ void shot_task(void const *argu)
       if (event.value.signals & SHOT_TASK_EXE_SIGNAL)
       {	
         fric_wheel_ctrl();
-        bupply.bbkey_state = get_bbkey_state();
-        
-        if(shot.shoot_state == WAITING_CMD){
-          if(shot.shoot_cmd == 1){
-            /* ignore shoot command when friction wheel is disable */
-            if (shot.fric_wheel_run){
-              bupply.spd_ref = bupply.feed_bullet_spd;
-              shot.shooted_count = 0;
-              shot.timestamp = HAL_GetTick();
-              shot.shoot_state = SHOOTING;
-              if(shot.shoot_mode != AUTO){
-                //in AUTO, cmd reset by remote control
-                shot.shoot_cmd = 0;
-              }
-            } else{
-              shot.shoot_cmd = 0;
-            }
-        } else if(shot.shoot_cmd == 2){
-            bupply.spd_ref = bupply.feed_bullet_spd;
-            shot.timestamp = HAL_GetTick();
-            shot.shoot_state = RELOADING;
-            shot.shoot_cmd = 0;
-          }
-        } else if(shot.shoot_state == SHOOTING){
-          if(shoot_bullet_handle()){
-            ;
-          } else {
-            //no need to update timestamp 
-            //because shoot_bullet_handle() has made it
-            bupply.spd_ref = bupply.feed_bullet_spd;
-            shot.shoot_state = RELOADING;
-          }
-        } else if(shot.shoot_state == RELOADING){
-          if(bupply.bbkey_state == BBKEY_ON){
-            //reload complete
-            bupply.spd_ref = 0;
-            shot.shoot_state = WAITING_CMD;
-          } else if(HAL_GetTick()-shot.timestamp > RELOAD_TIMEOUT){
-            //timeout
-            bupply.spd_ref = 0;
-            shot.shoot_state = WAITING_CMD;
-          }
-        } else if(shot.shoot_state == STUCK_HANDLING){
-          if(stuck_handle()){
-            ;
-          } else {
-            bupply.spd_ref = bupply.feed_bullet_spd;
-            shot.timestamp = HAL_GetTick();
-            shot.shoot_state = RELOADING;
-          }
+        if(rc.sw1 == RC_DN || rc.mouse.l == 1){
+          shot.shoot_cmd = 1;
+        } else {
+          shot.shoot_cmd = 0;
         }
-        if(stuck_detect()){
-          bupply.spd_ref = -bupply.spd_ref;
-          shot.timestamp = HAL_GetTick();
-          shot.shoot_state = STUCK_HANDLING;
-        }
-        pid_calc(&pid_trigger_speed, moto_trigger.speed_rpm, bupply.spd_ref);
-        bupply.bbkey_state_last = bupply.bbkey_state;
+        gun_17_handle();
       }
     }
     
     shoot_stack_surplus = uxTaskGetStackHighWaterMark(NULL);
   }
+}
+
+static void gun_17_handle(void){
+  static uint8_t last_cmd = 0;
+  
+  bupply.bbkey_state = get_bbkey_state();
+        
+  if(shot.shoot_state == WAITING_CMD){
+    if(shot.shoot_cmd == 1 && last_cmd == 0){
+      /* ignore shoot command when friction wheel is disable */
+      if (shot.fric_wheel_run){
+        bupply.spd_ref = bupply.feed_bullet_spd;
+        shot.shooted_count = 0;
+        shot.timestamp = HAL_GetTick();
+        shot.shoot_state = SHOOTING;
+      }
+    } else if(shot.shoot_cmd == 2 && last_cmd == 0){
+      bupply.spd_ref = bupply.feed_bullet_spd;
+      shot.timestamp = HAL_GetTick();
+      shot.shoot_state = RELOADING;
+    }
+  } else if(shot.shoot_state == SHOOTING){
+    if(shoot_bullet_handle()){
+      ;
+    } else {
+      //no need to update timestamp 
+      //because shoot_bullet_handle() has made it
+      bupply.spd_ref = bupply.feed_bullet_spd;
+      shot.shoot_state = RELOADING;
+    }
+  } else if(shot.shoot_state == RELOADING){
+    if(bupply.bbkey_state == BBKEY_ON){
+      //reload complete
+      bupply.spd_ref = 0;
+      shot.shoot_state = WAITING_CMD;
+    } else if(HAL_GetTick()-shot.timestamp > RELOAD_TIMEOUT){
+      //timeout
+      bupply.spd_ref = 0;
+      shot.shoot_state = WAITING_CMD;
+    }
+  } else if(shot.shoot_state == STUCK_HANDLING){
+    if(stuck_handle()){
+      ;
+    } else {
+      bupply.spd_ref = bupply.feed_bullet_spd;
+      shot.timestamp = HAL_GetTick();
+      shot.shoot_state = RELOADING;
+    }
+  }
+  if(stuck_detect()){
+    bupply.spd_ref = -bupply.spd_ref;
+    shot.timestamp = HAL_GetTick();
+    shot.shoot_state = STUCK_HANDLING;
+  }
+  pid_calc(&pid_trigger_speed, moto_trigger.speed_rpm, bupply.spd_ref);
+  bupply.bbkey_state_last = bupply.bbkey_state;
+  last_cmd = shot.shoot_cmd;
 }
 
 void switch_shoot_mode(shoot_mode_e mode){
@@ -135,17 +140,17 @@ void switch_shoot_mode(shoot_mode_e mode){
     case SEMI_ONE:
       shot.shoot_spd = 15;
       shot.shoot_num = 1;
-      shot.fric_wheel_spd = 2500;
+      shot.fric_wheel_spd = 1600;
       break;
     case SEMI_THREE:
       shot.shoot_spd = 15;
       shot.shoot_num = 3;
-      shot.fric_wheel_spd = 2500;
+      shot.fric_wheel_spd = 1400;
       break;
     case AUTO:
       shot.shoot_spd = 15;
       shot.shoot_num = 0;
-      shot.fric_wheel_spd = 1000;
+      shot.fric_wheel_spd = 1200;
       break;
   }
 }
@@ -165,7 +170,7 @@ static uint8_t stuck_detect(void){
 
 static uint8_t stuck_handle(void)
 {
-  if(HAL_GetTick()-shot.timestamp > 200000/ABS(bupply.spd_ref)){
+  if(HAL_GetTick()-shot.timestamp > 100000/ABS(bupply.spd_ref)){
     return 0;
   } else {
     return 1;
@@ -193,7 +198,7 @@ static uint8_t shoot_bullet_handle(void)
   if(time_now-shot.timestamp > RELOAD_TIMEOUT){
     holding = 0;  //reset state
     return 0;
-  } else if(shot.shooted_count == shot.shoot_num || shot.shoot_cmd){
+  } else if((shot.shooted_count >= shot.shoot_num) && (shot.shoot_mode != AUTO || shot.shoot_cmd == 0)){
     holding = 0;  //reset state
     return 0;
   } else {
@@ -212,6 +217,17 @@ static uint8_t shoot_bullet_handle(void)
       }
     }
     return 1;
+  }
+}
+
+void fric_esc_cali(void){
+  uint8_t cali_done = 0;
+  turn_on_friction_wheel(2000);
+  while(!cali_done){
+    if(get_key_state() == 0){
+      turn_on_friction_wheel(1000);
+      cali_done = 0;
+    }
   }
 }
 

@@ -44,6 +44,9 @@ uint8_t get_bbkey_state(void)
   return HAL_GPIO_ReadPin(TRIG_GPIO_Port, TRIG_Pin);
 }
 
+uint8_t get_key_state(void){
+  return HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin);
+}
 
 void turn_on_friction_wheel(uint16_t spd)
 {

@@ -170,13 +170,7 @@ static void kb_shoot_cmd(uint8_t shoot, uint8_t shoot_switch)
 		}
 		switch_shoot_mode(mode);
 	}
-	if (mode == 3){
-		shot.shoot_cmd = rc.mouse.l; //only fire when press donw the left key
-	}else{
-		if(shoot == 1){
-			shot.shoot_cmd = shoot;
-		}
-	}
+  //shot.shoot_cmd = rc.mouse.l; //ctrl code is moved to shoot_task
 }
 static void gimbal_operation_func(int16_t pit_ref_spd, int16_t yaw_ref_spd,
                                   uint8_t shoot_buff,  uint8_t track_armor)

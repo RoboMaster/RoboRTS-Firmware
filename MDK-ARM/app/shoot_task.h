@@ -100,7 +100,9 @@ typedef __packed struct
 void shot_param_init(void);
 void shot_task(void const *argu);
 void switch_shoot_mode(shoot_mode_e mode);
+void fric_esc_cali(void);
 
+static void gun_17_handle(void);
 static uint8_t shoot_bullet_handle(void);
 static void fric_wheel_ctrl(void);
 static uint8_t stuck_detect(void);

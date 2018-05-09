@@ -39,6 +39,7 @@ void pwm_device_init(void);
 void mpu_heat_ctrl(uint16_t pwm_pulse);
 
 uint8_t get_bbkey_state(void);
+uint8_t get_key_state(void);
 uint8_t sd_insert(void);
 
 #endif

@@ -29,6 +29,8 @@
 #include "stdlib.h"
 #include "string.h"
 
+#define LONG_STAY 500 //ms
+
 sw_record_t glb_sw;
 rc_info_t   rc;
 rc_ctrl_t   rm;
@@ -95,9 +97,19 @@ void remote_ctrl_gimbal_hook(void)
 
 static void rc_fric_ctrl(uint8_t ctrl_fric)
 {
-  if (ctrl_fric)
-  {
-    shot.fric_wheel_run = !shot.fric_wheel_run;
+//  if (ctrl_fric)
+//  {
+//    shot.fric_wheel_run = !shot.fric_wheel_run;
+//  }
+  //change by mr 20180508
+  static uint32_t timestamp;
+  if((glb_sw.last_sw1 == RC_MI) && (rc.sw1 == RC_UP)){
+    timestamp = HAL_GetTick();
+  }
+  if((glb_sw.last_sw1 == RC_UP) && (rc.sw1 == RC_MI)){
+    if(HAL_GetTick()-timestamp > LONG_STAY){
+      shot.fric_wheel_run = !shot.fric_wheel_run;
+    }
   }
 }
 static void rc_shoot_cmd(uint8_t single_fir, uint8_t cont_fir)
@@ -105,19 +117,37 @@ static void rc_shoot_cmd(uint8_t single_fir, uint8_t cont_fir)
   if (single_fir)
   {
     //shot.c_shoot_time = HAL_GetTick() ;
-    shot.shoot_cmd   = 1;
-		switch_shoot_mode(SEMI_ONE); //shot.shoot_mode = 
+    //shot.shoot_cmd   = 1;
+		//switch_shoot_mode(SEMI_ONE); //shot.shoot_mode = 
     //shot.c_shoot_cmd = 0;
   }
   
 //  if (cont_fir && (HAL_GetTick() - shot.c_shoot_time >= 2000))
-  if (cont_fir){
+/*  if (cont_fir){
 
     shot.shoot_cmd   = 1;
 		switch_shoot_mode(AUTO); 
   }
   else
     shot.shoot_cmd = 0;
+  comment by mrbin 20180508 */
+}
+
+static void rc_shootmode_ctrl(void){
+  static uint32_t timestamp;
+  shoot_mode_e mode  = shot.shoot_mode;
+  if((glb_sw.last_sw1 == RC_MI) && (rc.sw1 == RC_UP)){
+    timestamp = HAL_GetTick();
+  }
+  if((glb_sw.last_sw1 == RC_UP) && (rc.sw1 == RC_MI)){
+    if(HAL_GetTick()-timestamp < LONG_STAY){
+      mode++;
+      if (mode>3){
+        mode = SEMI_ONE;
+      }
+      switch_shoot_mode(mode);
+    }
+  }
 }
 
 
@@ -125,6 +155,7 @@ void remote_ctrl_shoot_hook(void)
 {
   //friction wheel control
   rc_fric_ctrl(RC_CTRL_FRIC_WHEEL);
+  rc_shootmode_ctrl();
   //single or continuous trigger bullet control
   rc_shoot_cmd(RC_SINGLE_SHOOT, RC_CONTINUE_SHOOT);
 }

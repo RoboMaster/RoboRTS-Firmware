@@ -155,6 +155,7 @@ int main(void)
   can_receive_start();
   //open dbus uart receive it
   dbus_uart_init();
+  //fric_esc_cali();
 
   /* USER CODE END 2 */
 
