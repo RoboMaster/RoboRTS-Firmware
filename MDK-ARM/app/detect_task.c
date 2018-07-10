@@ -26,7 +26,8 @@
 
 #include "detect_task.h"
 #include "cmsis_os.h"
-#include "led.h"
+#include "bsp_led.h"
+#include "bsp_io.h"
 #include "sys_config.h"
 
 UBaseType_t detect_stack_surplus;
@@ -136,6 +137,11 @@ void detector_param_init(void)
   LED_INIT;
 }
 
+
+extern int8_t recv_pc_glb;
+extern int8_t glb_err_exit;
+int pc_glb_cnt;
+
 /**
   * @brief     according to the interval time
   * @param     err_id: module id
@@ -155,19 +161,32 @@ void detect_task(void const *argu)
     /* module offline detect */
     module_offline_detect();
 
-    if (g_err.err_now != NULL)
+    
+    if (glb_err_exit == 1)
     {
-      //LED_G_OFF;
-      module_offline_callback();
+      if (pc_glb_cnt++ > 50)
+        pc_glb_cnt = 0;
+      
+      if (pc_glb_cnt < 15)
+        g_err.beep_ctrl = g_err.beep_tune/2;
+      else
+        g_err.beep_ctrl = 0;
     }
     else
     {
-      g_err.beep_ctrl = 0;
-      //LED_G_ON;
+      if (g_err.err_now != NULL)
+      {
+        //LED_G_OFF;
+        module_offline_callback();
+      }
+      else
+      {
+        g_err.beep_ctrl = 0;
+        //LED_G_ON;
+      }
     }
     
-    BEEP_TUNE = g_err.beep_tune;
-    BEEP_CTRL = 0;//g_err.beep_ctrl;
+    beep_ctrl(g_err.beep_tune, g_err.beep_ctrl);
     
     detect_stack_surplus = uxTaskGetStackHighWaterMark(NULL);
     
@@ -208,8 +227,105 @@ static void module_offline_detect(void)
   }
 }
 
+static void module_offline_callback(void)
+{
+  g_err.err_count++;
+  if (g_err.err_count > 50)
+    g_err.err_count = 0;
 
+  switch (g_err.err_now_id)
+  {
+    case GIMBAL_PIT_OFFLINE:
+    {
+      if (g_err.err_count == 1)
+      {
+        LED_R_ON;
+        g_err.beep_ctrl = g_err.beep_tune/2;
+      }
+      else
+      {
+        LED_R_OFF;
+        g_err.beep_ctrl = 0;
+      }
+    }break;
+    
+    case GIMBAL_YAW_OFFLINE:
+    {
+      if (g_err.err_count == 1
+          || g_err.err_count == 7)
+      {
+        LED_R_ON;
+        g_err.beep_ctrl = g_err.beep_tune/2;
+      }
+      else
+      {
+        LED_R_OFF;
+        g_err.beep_ctrl = 0;
+      }
+    }break;
+    
+    case CHASSIS_GYRO_OFFLINE:
+    {
+      if (g_err.err_count == 1
+          || g_err.err_count == 7
+          || g_err.err_count == 13)
+      {
+        LED_R_ON;
+        g_err.beep_ctrl = g_err.beep_tune/2;
+      }
+      else
+      {
+        LED_R_OFF;
+        g_err.beep_ctrl = 0;
+      }
+    }break;
 
+    case TRIGGER_MOTO_OFFLINE:
+    {
+      if (g_err.err_count == 1
+          || g_err.err_count == 7
+          || g_err.err_count == 13
+          || g_err.err_count == 19)
+      {
+        LED_R_ON;
+        g_err.beep_ctrl = g_err.beep_tune/2;
+      }
+      else
+      {
+        LED_R_OFF;
+        g_err.beep_ctrl = 0;
+      }
+    }break;
+
+    case CHASSIS_M1_OFFLINE:
+    case CHASSIS_M2_OFFLINE:
+    case CHASSIS_M3_OFFLINE:
+    case CHASSIS_M4_OFFLINE:
+    {
+      if (g_err.err_count == 1
+          || g_err.err_count == 7
+          || g_err.err_count == 13
+          || g_err.err_count == 19
+          || g_err.err_count == 25)
+      {
+        LED_R_ON;
+        g_err.beep_ctrl = g_err.beep_tune/2;
+      }
+      else
+      {
+        LED_R_OFF;
+        g_err.beep_ctrl = 0;
+      }
+    }break;
+    
+    default:
+    {
+      LED_R_ON;
+      g_err.beep_ctrl = 0;
+    }break;
+  }
+}
+/*
 static void module_offline_callback(void)
 {
   g_err.err_count++;
@@ -309,5 +425,5 @@ static void module_offline_callback(void)
     }break;
   }
 }
-
+*/
 

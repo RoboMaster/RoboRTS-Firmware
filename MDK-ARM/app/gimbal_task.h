@@ -30,7 +30,14 @@
 #include "stm32f4xx_hal.h"
 
 /* gimbal control period time (ms) */
-#define GIMBAL_PERIOD 5
+#define GIMBAL_PERIOD 1
+
+#define INFANTRY_1  1
+#define INFANTRY_2  2
+#define INFANTRY_3  3
+#define INFANTRY_4  4
+#define INFANTRY_5  5
+#define INFANTRY_6  6
 
 typedef enum
 {
@@ -42,6 +49,7 @@ typedef enum
   GIMBAL_PATROL_MODE   = 5,
   GIMBAL_SHOOT_BUFF    = 6,
   GIMBAL_POSITION_MODE = 7,
+  GIMBAL_RELATIVE_MODE = 8,
 } gimbal_mode_e;
 
 typedef enum
@@ -76,7 +84,8 @@ typedef struct
   /* unit: degree */
   float pit_relative_angle;
   float yaw_relative_angle;
-  float gyro_angle;
+  float pit_gyro_angle;
+  float yaw_gyro_angle;
   /* uint: degree/s */
   float yaw_palstance;
   float pit_palstance;
@@ -112,15 +121,16 @@ typedef struct
   //gimbal_cmd_e  auto_ctrl_cmd;
 } gimbal_t;
 
+
 extern gimbal_t gim;
 
 static void no_action_handler(void);
 static void init_mode_handler(void);
 static void closed_loop_handler(void);
 
-static void track_aimor_handler(void);
 static void gimbal_patrol_handler(void);
 static void pc_position_ctrl_handler(void);
+static void pc_relative_ctrl_handler(void);
 
 void gimbal_param_init(void);
 void gimbal_back_param(void);

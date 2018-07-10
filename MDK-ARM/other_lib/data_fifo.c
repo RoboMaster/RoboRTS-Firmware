@@ -106,17 +106,6 @@ int32_t fifo_s_init(fifo_s_t* pfifo, void* base_addr, uint32_t unit_cnt, osMutex
 }
 
 
-
-/******************************************************************************************
-//
-//! \brief  Put an element into FIFO
-//!
-//! \param  [in]  pfifo is the pointer of valid FIFO.
-//! \param  [in]  element is the data element you want to put
-//!
-//! \retval 0 if operate successfully, otherwise return -1.
-//
-*******************************************************************************************/
 int32_t fifo_s_put(fifo_s_t* pfifo, uint8_t element)
 {
   //! Check input parameters.
@@ -138,16 +127,7 @@ int32_t fifo_s_put(fifo_s_t* pfifo, uint8_t element)
   return 0;
 }
 
-/******************************************************************************************
-//
-//! \brief  Put some elements into FIFO(in single mode).
-//!
-//! \param  [in]  pfifo is the pointer of valid FIFO.
-//! \param  [in]  element is the data element you want to put
-//! \param  [in]  the number of elements
-//! \retval 0 if operate successfully, otherwise return -1.
-//
-******************************************************************************************/
+
 int32_t fifo_s_puts(fifo_s_t *pfifo, uint8_t *psource, uint32_t number)
 {
   int puts_num = 0;
@@ -171,15 +151,6 @@ int32_t fifo_s_puts(fifo_s_t *pfifo, uint8_t *psource, uint32_t number)
   return puts_num;
 }
 
-/******************************************************************************************
-//
-//! \brief  Get an element from FIFO(in single mode).
-//!
-//! \param  [in]  pfifo is the pointer of valid FIFO.
-//!
-//! \retval the data element of FIFO.
-//
-******************************************************************************************/
 uint8_t fifo_s_get(fifo_s_t* pfifo)
 {
   uint8_t   retval = 0;
@@ -196,6 +167,7 @@ uint8_t fifo_s_get(fifo_s_t* pfifo)
 
   return retval;
 }
+
 
 uint16_t fifo_s_gets(fifo_s_t* pfifo, uint8_t* source, uint8_t len)
 {

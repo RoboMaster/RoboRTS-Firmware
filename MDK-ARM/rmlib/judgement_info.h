@@ -40,7 +40,7 @@ typedef enum
   REAL_BLOOD_DATA_ID = 0x0002,
   REAL_SHOOT_DATA_ID = 0x0003,
   REAL_POWER_DATA_ID = 0x0004,
-  FIELD_RFID_DATA_ID = 0x0005,
+  REAL_FIELD_DATA_ID = 0x0005,
   GAME_RESULT_ID     = 0x0006,
   GAIN_BUFF_ID       = 0x0007,
   ROBOT_POS_DATA_ID  = 0x0008,
@@ -53,6 +53,7 @@ typedef enum
 
 /** 
   * @brief  game information structures definition(0x0001)
+  *         this package send frequency is 50Hz
   */
 typedef __packed struct
 {
@@ -102,7 +103,6 @@ typedef __packed struct
 
 /** 
   * @brief  real chassis power and shoot heat data(0x0004)
-  *         icra need not this data
   */
 typedef __packed struct
 {
@@ -114,14 +114,16 @@ typedef __packed struct
   uint16_t shooter2_heat;
 } real_power_data_t;
 
+
+
 /** 
-  * @brief  field rfid data(0x0005)
+  * @brief  rfid detect data(0x0005)
   */
 typedef __packed struct
 {
   uint8_t card_type;
   uint8_t card_idx;
-} field_rfid_t;
+} rfid_detect_t;
 
 /** 
   * @brief  game result data(0x0006)
@@ -140,7 +142,7 @@ typedef __packed struct
 } get_buff_t;
 
 /** 
-  * @brief  field UWB data(0x0008)
+  * @brief  uwb data(0x0008)
   */
 typedef __packed struct
 {
@@ -152,7 +154,6 @@ typedef __packed struct
 
 /** 
   * @brief  student custom data
-  *         icra need not these data
   */
 typedef __packed struct
 {
@@ -180,15 +181,16 @@ typedef struct
   robot_hurt_data_t  blood_changed_data; //0x0002
   real_shoot_t       real_shoot_data;    //0x0003
   real_power_data_t  power_heat_data;    //0x0004
-  field_rfid_t       rfid_data;          //0x0005
+  rfid_detect_t      rfid_data;          //0x0005
   game_result_t      game_result_data;   //0x0006
   get_buff_t         get_buff_data;      //0x0007
   robot_position_t   robot_pos_data;     //0x0008
+  server_to_user_t   student_download_data;
 } receive_judge_t;
 
 /* data send (forward) */
 /* data receive */
-extern receive_judge_t judge_rece_mesg;
+extern receive_judge_t judge_recv_mesg;
 
 void  judgement_data_handler(uint8_t *p_frame);
 

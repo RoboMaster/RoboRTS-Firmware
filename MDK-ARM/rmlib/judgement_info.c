@@ -32,9 +32,15 @@
 #include "data_fifo.h"
 #include "string.h"
 
+#include "shoot_task.h"
+
 /* data send (forward) */
 /* data receive */
-receive_judge_t judge_rece_mesg;
+receive_judge_t judge_recv_mesg;
+
+
+extern int8_t recv_pc_glb;
+extern int8_t glb_err_exit;
 
 /**
   * @brief    get judgement system message
@@ -48,45 +54,72 @@ void judgement_data_handler(uint8_t *p_frame)
   uint16_t data_length = p_header->data_length;
   uint16_t cmd_id      = *(uint16_t *)(p_frame + HEADER_LEN);
   uint8_t *data_addr   = p_frame + HEADER_LEN + CMD_LEN;
-  uint8_t  invalid_cmd = 0;
+  
+  uint8_t forward_flag = 1;
   
   switch (cmd_id)
   {
     case GAME_INFO_ID:
-      memcpy(&judge_rece_mesg.game_information, data_addr, data_length);
+    {
+      memcpy(&judge_recv_mesg.game_information, data_addr, data_length);
+      if (judge_recv_mesg.game_information.game_process == 3)  //5 seconds count down
+      {
+        shoot.shoot_bullets = 0;
+      }
+      
+      if (judge_recv_mesg.game_information.game_process == 1)
+      {
+        if (judge_recv_mesg.game_information.stage_remain_time < 240)
+        {
+          if (recv_pc_glb == 0)
+          {
+            glb_err_exit = 1;
+          }
+        }
+      }
+      else
+      {
+        recv_pc_glb  = 0;
+        glb_err_exit = 0;
+      }
+    }
     break;
 
     case REAL_BLOOD_DATA_ID:
-      memcpy(&judge_rece_mesg.blood_changed_data, data_addr, data_length);
+      memcpy(&judge_recv_mesg.blood_changed_data, data_addr, data_length);
     break;
 
     case REAL_SHOOT_DATA_ID:
-      memcpy(&judge_rece_mesg.real_shoot_data, data_addr, data_length);
+      memcpy(&judge_recv_mesg.real_shoot_data, data_addr, data_length);
     break;
-
-    case FIELD_RFID_DATA_ID:
-      memcpy(&judge_rece_mesg.rfid_data, data_addr, data_length);
+    
+//    case REAL_POWER_DATA_ID:
+//      memcpy(&judge_recv_mesg.power_heat_data, data_addr, data_length);
+//    break;
+    
+    case REAL_FIELD_DATA_ID:
+      memcpy(&judge_recv_mesg.rfid_data, data_addr, data_length);
     break;
 
     case GAME_RESULT_ID:
-      memcpy(&judge_rece_mesg.game_result_data, data_addr, data_length);
+      memcpy(&judge_recv_mesg.game_result_data, data_addr, data_length);
     break;
 
     case GAIN_BUFF_ID:
-      memcpy(&judge_rece_mesg.get_buff_data, data_addr, data_length);
+      memcpy(&judge_recv_mesg.get_buff_data, data_addr, data_length);
     break;
     
     case ROBOT_POS_DATA_ID:
-      memcpy(&judge_rece_mesg.robot_pos_data, data_addr, data_length);
+      memcpy(&judge_recv_mesg.robot_pos_data, data_addr, data_length);
     break;
     
     default:
-      invalid_cmd = 1;
+      forward_flag = 0;
     break;
   }
   
-  /* valid forward data */
-  if (!invalid_cmd)
+  /* forward data */
+  if (forward_flag)
   {
     data_packet_pack(cmd_id, data_addr, data_length, UP_REG_ID);
     osSignalSet(pc_unpack_task_t, PC_UART_TX_SIGNAL);

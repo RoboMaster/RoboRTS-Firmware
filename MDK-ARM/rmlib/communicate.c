@@ -212,15 +212,27 @@ void dma_buffer_to_unpack_buffer(uart_dma_rxdata_t *dma_obj, uart_it_type_e it_t
 uint8_t* protocol_packet_pack(uint16_t cmd_id, uint8_t *p_data, uint16_t len, uint8_t sof, uint8_t *tx_buf)
 {
   //memset(tx_buf, 0, 100);
-  //static uint8_t seq;
+  static uint8_t seq;
   
   uint16_t frame_length = HEADER_LEN + CMD_LEN + len + CRC_LEN;
   frame_header_t *p_header = (frame_header_t*)tx_buf;
   
   p_header->sof          = sof;
   p_header->data_length  = len;
-  p_header->seq          = 0;
-  //p_header->seq          = seq++;
+  
+  
+  if (sof == UP_REG_ID)
+  {
+    if (seq++ >= 255)
+      seq = 0;
+    
+    p_header->seq = seq;
+  }
+  else
+  {
+    p_header->seq = 0;
+  }
+  
   
   memcpy(&tx_buf[HEADER_LEN], (uint8_t*)&cmd_id, CMD_LEN);
   append_crc8_check_sum(tx_buf, HEADER_LEN);
@@ -230,17 +242,6 @@ uint8_t* protocol_packet_pack(uint16_t cmd_id, uint8_t *p_data, uint16_t len, ui
   return tx_buf;
 }
 
-void data_upload_handler(uint16_t cmd_id, uint8_t *p_data, uint16_t len, uint8_t sof, uint8_t *tx_buf)
-{
-  uint16_t frame_length = HEADER_LEN + CMD_LEN + len + CRC_LEN;
-  
-  protocol_packet_pack(cmd_id, p_data, len, sof, tx_buf);
-  
-  if (sof == UP_REG_ID)
-    write_uart_blocking(&COMPUTER_HUART, tx_buf, frame_length);
-  else if (sof == DN_REG_ID)
-    write_uart_blocking(&JUDGE_HUART, tx_buf, frame_length);
-}
 
 uint32_t send_packed_fifo_data(fifo_s_t *pfifo, uint8_t sof)
 {

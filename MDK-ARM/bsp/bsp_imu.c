@@ -219,9 +219,9 @@ void mpu_get_data(void)
 
   memcpy(&imu.ax, &mpu_data.ax, 6 * sizeof(int16_t));
   imu.temp = 21 + mpu_data.temp / 333.87f;
-  imu.wx   = mpu_data.gx / 16.384f / 57.3f; //2000dps -> rad/s
-  imu.wy   = mpu_data.gy / 16.384f / 57.3f; //2000dps -> rad/s
-  imu.wz   = mpu_data.gz / 16.384f / 57.3f; //2000dps -> rad/s
+  imu.wx   = mpu_data.gx / 32.768f / 57.3f; //1000dps -> rad/s
+  imu.wy   = mpu_data.gy / 32.768f / 57.3f; //1000dps -> rad/s
+  imu.wz   = mpu_data.gz / 32.768f / 57.3f; //1000dps -> rad/s
 
   imu_cali_hook(CALI_GYRO, &mpu_data.gx);
   imu_cali_hook(CALI_ACC, &mpu_data.ax);
@@ -244,10 +244,10 @@ uint8_t mpu_device_init(void)
   uint8_t MPU6500_Init_Data[7][2] = {
     { MPU6500_PWR_MGMT_1,     0x03 }, // Auto selects Clock Source
     { MPU6500_PWR_MGMT_2,     0x00 }, // all enable
-    { MPU6500_CONFIG,         0x04 }, // gyro bandwidth 184Hz 01
-    { MPU6500_GYRO_CONFIG,    0x18 }, // +-2000dps
-    { MPU6500_ACCEL_CONFIG,   0x10 }, // +-8G
-    { MPU6500_ACCEL_CONFIG_2, 0x04 }, // acc bandwidth 20Hz
+    { MPU6500_CONFIG,         0x00 }, // gyro bandwidth 0x00:250Hz 0x04:20Hz
+    { MPU6500_GYRO_CONFIG,    0x10 }, // gyro range 0x10:+-1000dps 0x18:+-2000dps
+    { MPU6500_ACCEL_CONFIG,   0x10 }, // acc range 0x10:+-8G
+    { MPU6500_ACCEL_CONFIG_2, 0x00 }, // acc bandwidth 0x00:250Hz 0x04:20Hz
     { MPU6500_USER_CTRL,      0x20 }, // Enable the I2C Master I/F module
                                       // pins ES_DA and ES_SCL are isolated from 
                                       // pins SDA/SDI and SCL/SCLK.
@@ -264,10 +264,11 @@ uint8_t mpu_device_init(void)
   return 0;
 }
 
+#define ZERO_LEN  1000
 void mpu_offset_cal(void)
 {
   int i;
-  for (i = 0; i < 300; i++)
+  for (i = 0; i < ZERO_LEN; i++)
   {
     mpu_read_regs(MPU6500_ACCEL_XOUT_H, mpu_buff, 14);
 
@@ -279,13 +280,13 @@ void mpu_offset_cal(void)
     mpu_data.gy_offset += mpu_buff[10] << 8 | mpu_buff[11];
     mpu_data.gz_offset += mpu_buff[12] << 8 | mpu_buff[13];
 
-    MPU_INIT_DELAY(5);
+    MPU_INIT_DELAY(2);
   }
-  mpu_data.ax_offset=mpu_data.ax_offset / 300;
-  mpu_data.ay_offset=mpu_data.ay_offset / 300;
-  mpu_data.az_offset=mpu_data.az_offset / 300;
-  mpu_data.gx_offset=mpu_data.gx_offset / 300;
-  mpu_data.gy_offset=mpu_data.gx_offset / 300;
-  mpu_data.gz_offset=mpu_data.gz_offset / 300;
+  mpu_data.ax_offset=mpu_data.ax_offset / ZERO_LEN;
+  mpu_data.ay_offset=mpu_data.ay_offset / ZERO_LEN;
+  mpu_data.az_offset=mpu_data.az_offset / ZERO_LEN;
+  mpu_data.gx_offset=mpu_data.gx_offset / ZERO_LEN;
+  mpu_data.gy_offset=mpu_data.gx_offset / ZERO_LEN;
+  mpu_data.gz_offset=mpu_data.gz_offset / ZERO_LEN;
 }
 

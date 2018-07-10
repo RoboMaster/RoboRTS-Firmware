@@ -40,6 +40,13 @@
 #include "cmsis_os.h"
 #include "string.h"
 
+#define INFANTRY_NUM INFANTRY_3
+#define CAMERA_ON_GIMBAL
+
+#ifndef INFANTRY_NUM
+  #error "INFANTRY_NUM must be define!"
+#endif
+
 /* stack usage monitor */
 UBaseType_t shoot_stack_surplus;
 
@@ -123,14 +130,13 @@ void shoot_task(void const *argu)
 }
 
 
-
 void block_bullet_handler(void)
 {
-  uint32_t stall_count = 0;
-  uint32_t stall_inv_count = 0;
-  uint8_t  stall_f = 0;
+  static uint32_t stall_count = 0;
+  static uint32_t stall_inv_count = 0;
+  static uint8_t  stall_f = 0;
   
-  if (pid_trigger_spd.out <= -4000)
+  if (pid_trigger_spd.out >= 5000)
   {
     if (stall_f == 0)
       stall_count ++;
@@ -138,7 +144,7 @@ void block_bullet_handler(void)
   else
     stall_count = 0;
   
-  if (stall_count >= 50)         //0.25s
+  if (stall_count >= 250)         //0.25s
   {
     stall_f = 1;
     stall_count = 0;
@@ -148,13 +154,13 @@ void block_bullet_handler(void)
   {
     stall_inv_count++;
     
-    if (stall_inv_count >= 100)  //0.5s
+    if (stall_inv_count >= 250)  //0.25s
     {
       stall_f = 0;
       stall_inv_count = 0;
     }
     else
-      trig.spd_ref = 2000;
+      trig.spd_ref = -2000;
   }
 }
 
@@ -172,7 +178,33 @@ static void fric_wheel_ctrl(void)
   }
 }
 
+
+#if (INFANTRY_NUM == INFANTRY_1)
+  int speed_debug = 1130;
+
+#elif (INFANTRY_NUM == INFANTRY_2)
+  int speed_debug = 1130;
+
+#elif (INFANTRY_NUM == INFANTRY_3)
+  int speed_debug = 1130; //17.5
+
+#elif (INFANTRY_NUM == INFANTRY_4)
+  int speed_debug = 1130;//16.5
+  
+#elif (INFANTRY_NUM == INFANTRY_5)
+  int speed_debug = 1130;//16.5
+  
+#elif (INFANTRY_NUM == INFANTRY_6)
+  int speed_debug = 1130;//15.5
+  
+#else
+  #error "INFANTRY_NUM define error!"
+  
+#endif
+
 int debug_tri_spd = 1500;
+int debug_c_spd   = 600;//2300;//2300//10
+
 int shoot_cmd;
 static void shoot_bullet_handler(void)
 {
@@ -231,12 +263,12 @@ static void shoot_bullet_handler(void)
   else if (shoot.c_shoot_cmd)
   {
     trig.one_sta = TRIG_INIT;
-    trig.spd_ref = trig.c_shoot_spd;
+    trig.spd_ref = debug_c_spd;//trig.c_shoot_spd;
     
     if ((trig.key_last == 0) && (trig.key == 1))
       shoot.shoot_bullets++;
     
-    //block_bullet_handler();
+    block_bullet_handler();
   }
   else
   {
@@ -261,7 +293,7 @@ void shoot_param_init(void)
   
   trig.dir             = 1;
   trig.feed_bullet_spd = 2000;
-  trig.c_shoot_spd      = 4000;
+  trig.c_shoot_spd     = 4000;
   trig.one_sta         = TRIG_INIT;
   
 }

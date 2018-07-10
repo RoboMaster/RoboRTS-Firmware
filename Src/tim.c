@@ -402,7 +402,7 @@ void MX_TIM12_Init(void)
   }
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 1000;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim12, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
@@ -566,7 +566,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     PB5     ------> TIM3_CH2
     PB4     ------> TIM3_CH1 
     */
-    GPIO_InitStruct.Pin = IMU_TEMP_Pin|BEEP_Pin;
+    GPIO_InitStruct.Pin = IMU_TEMP_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

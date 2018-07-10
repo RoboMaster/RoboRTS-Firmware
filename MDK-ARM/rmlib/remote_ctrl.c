@@ -94,8 +94,8 @@ void remote_ctrl_chassis_hook(void)
 static void gimbal_operation_func(int16_t pit_ctrl, int16_t yaw_ctrl)
 {
   /* gimbal coordinate system is right hand coordinate system */
-  rm.pit_v = -pit_ctrl * 0.002f;
-  rm.yaw_v = -yaw_ctrl * 0.002f;
+  rm.pit_v = -pit_ctrl * 0.0005f;
+  rm.yaw_v = -yaw_ctrl * 0.0005f;
 }
 
 void remote_ctrl_gimbal_hook(void)

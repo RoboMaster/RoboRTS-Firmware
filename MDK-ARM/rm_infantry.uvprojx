@@ -10,7 +10,8 @@
       <TargetName>rm_infantry</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
+      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F427IIHx</Device>
@@ -323,6 +324,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <uC99>0</uC99>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>1</v6Lang>
             <v6LangP>1</v6LangP>
@@ -333,9 +335,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--C99</MiscControls>
-              <Define>USE_HAL_DRIVER,STM32F427xx</Define>
+              <Define>USE_HAL_DRIVER,STM32F427xx,ARM_MATH_CM4,__FPU_PRESENT</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;     ../Drivers/STM32F4xx_HAL_Driver/Inc;     ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;     ../Middlewares/Third_Party/FatFs/src/drivers;     ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;     ../Drivers/CMSIS/Device/ST/STM32F4xx/Include;     ../Middlewares/Third_Party/FatFs/src;     ../Middlewares/Third_Party/FreeRTOS/Source/include;     ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;     ../Drivers/CMSIS/Include;     .\app;     .\bsp;     .\rmlib;     .\other_lib</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FatFs/src/drivers;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Middlewares/Third_Party/FatFs/src;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Drivers/CMSIS/Include;.\app;.\bsp;.\rmlib;.\other_lib;..\Drivers\CMSIS\Device</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -418,6 +420,46 @@
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/system_stm32f4xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_add_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\CMSIS\Device\arm_mat_add_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_init_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\CMSIS\Device\arm_mat_init_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_inverse_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\CMSIS\Device\arm_mat_inverse_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_inverse_f64.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\CMSIS\Device\arm_mat_inverse_f64.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_mult_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\CMSIS\Device\arm_mat_mult_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_scale_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\CMSIS\Device\arm_mat_scale_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_sub_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\CMSIS\Device\arm_mat_sub_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_trans_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\CMSIS\Device\arm_mat_trans_f32.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -695,6 +737,11 @@
               <FilePath>.\bsp\bsp_flash.c</FilePath>
             </File>
             <File>
+              <FileName>bsp_io.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\bsp\bsp_io.c</FilePath>
+            </File>
+            <File>
               <FileName>cpu_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\app\cpu_utils.c</FilePath>
@@ -709,11 +756,6 @@
               <FileType>1</FileType>
               <FilePath>.\app\info_interactive.c</FilePath>
             </File>
-            <File>
-              <FileName>bsp_io.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\bsp\bsp_io.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -725,14 +767,14 @@
               <FilePath>.\app\gimbal_task.c</FilePath>
             </File>
             <File>
-              <FileName>shoot_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\app\shoot_task.c</FilePath>
-            </File>
-            <File>
               <FileName>chassis_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\app\chassis_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>shoot_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\app\shoot_task.c</FilePath>
             </File>
             <File>
               <FileName>sys_config.h</FileName>
@@ -843,6 +885,11 @@
               <FileName>data_fifo.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\other_lib\data_fifo.c</FilePath>
+            </File>
+            <File>
+              <FileName>kalman_filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\rmlib\kalman_filter.c</FilePath>
             </File>
           </Files>
         </Group>

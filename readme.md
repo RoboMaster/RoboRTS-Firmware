@@ -1,103 +1,110 @@
 
-## Summary
+## 概述
 
-RoboRTS infantry control firmware
+### 软件环境
 
-### Software Environment
+ - Toolchain/IDE : MDK-ARM V5
+ - package version: STM32Cube FW_F4 V1.16.0
+ - FreeRTOS version: 9.0.0
+ - CMSIS-RTOS version: 1.02
 
-- Toolchain/IDE : MDK-ARM V5
-- cube version:  STM32CubeMX 4.22.1
-- package version: STM32Cube FW_F4 V1.16.0
-- FreeRTOS version: 9.0.0
-- CMSIS-RTOS version: 1.02
+### 编程规范
 
-### Programme Specification
+- 变量和函数命名方式遵循 Unix/Linux 风格
+- 在 Application/AppCtrl 中都为强实时的控制任务，禁止使用任何阻塞操作
+- 在其他任务中使用的阻塞操作要设置合理的超时时间，优先级、频率不同的任务谨慎使用互斥锁等阻塞操作，防止优先级翻转，如频率较低的 detect_task 和频率较高的 info_get_task
 
-- Names of user-defined variables and function should follow Unix/Linux style.
-- Due to real time control task executes in Application/AppCtrl, it is prohibited to use any blocking operation.
-- When blocking is operated in other tasks, time-out period should be set rationally. Be careful of using mutex or other blocking operation in different priority level and frequency. For example, *detect_task* has lower frequency and *info_get_task*  has higher frequency.
+### 注意事项
 
-### Attention
+- 为了防止出现中文字符乱码，所有新建文件请使用 UTF-8 格式
 
-- All new document should be written in UTF-8 format in case Chinese characters gibberish generated.
-- Document *sys_config.h* includes all configuration parameters of the whole infantry system and user can change those parameters as needed.
 
-### Module Off-line Description
+- sys_config.h 文件包含了整个步兵车系统的配置参数，可以按照需求更改相应参数
 
-When one of the modules is off-line, user can find out which module is out of work based on indicated light and buzzer in board.
 
-In this project, error warns depend on the priority of off-line modules. 
+### 模块离线说明
 
-Corresponding states of each module off-line are shown as following while the number corresponds the number of times of the red light flashes. 
+当车辆的某个模块离线时，可以根据开发板指示灯和蜂鸣器的不同状态判断哪个模块出现了问题，并进行错误定位
 
-1. Remote controller off-line
-2. Gimbal motor off-line
-3. Trigger motor or single gyroscope off-line
-4. Chassis motor off-line
-5. Single gyroscope sensor of chassis off-line
-6. Referee system or PC serial port off-line and the red light keeps on
+目前按照离线模块的优先级进行错误指示，例如云台电机优先级高于拨弹电机，如果同时发生离线，先指示当前离线设备是云台电机
 
-### Documentation
+模块离线对应的状态如下，数字对应红灯每次连续闪的次数，按照优先级排序：
 
-- Communication protocol [document](Doc/protocol/readme.md)
-- 涓枃璇存槑 [鏂囨。](Doc/ch/readme.md)
+1. 云台 pitch 轴电机离线
+2. 云台 yaw 轴电机离线
+3. 底盘单轴陀螺仪传感器离线
+4. 拨弹电机离线
+5. 底盘电机存在离线
+6. 遥控器离线，裁判系统或者 PC 端串口没有连接，此时红灯常亮
 
-## Quick Start
+### 文档
 
-### Hardware Interface
+- 协议文档  [protocol](Doc/protocol/ch/readme.md)
+- en doc [document](Doc/en/readme.md)
 
-The following is the location of each interface of the main control board.
+## 快速开始
 
-![](Doc/image/main_board_interface.PNG)
+### 硬件接口
 
-### Function Module
+主控板使用 RM 开发板 A 型，各个功能接口的位置如下：
 
-#### Manual Mode:
+![](Doc/ch/image/main_board_interface.PNG)
 
-Basic control command including remote control and key-mouse control is executed in manual mode. 
+### 功能模块
 
-ATTENTION: If the `AUTO_NAVIGATION` macro is defined in the `sys_config.h` file, the Debug Mode and Full-auto Mode will be turned on.
+#### 手动模式：
 
-#### Full Auto Mode:
+提供遥控器、鼠标键盘模式的基础控制。
 
-Upper layer PC takes the whole control of chassis, gimbal and shooting module in bottom layer in full auto mode.
+注意：如果在 `sys_config.h` 文件中定义了 `AUTO_NAVIGATION` 宏，将开启 debug 和 全自动模式。
 
-#### Operating Instructions:
+#### 全自动模式：
 
-##### Manual Mode
+这种模式下底盘、云台、发射机构受到上层 PC 的完全控制，完全控制包含对这些执行机构以具体物理单位的控制，也包含对这些执行机构的模式切换。
 
-Remote control: (Right switcher state: UP.)
+#### 操作档位说明：
 
-- open or close friction wheel
-- single shot or burst
+##### 手动档
 
-Key-mouse control: (Right switcher state: UP. Left switcher state: MIDDLE.)
+遥控器控制：拨杆右上
 
-- open (Q) or close (Q + shift) friction wheel
-- single shot (Click the left mouse button) or burst (Long press the left mouse button)
-- twist to dodge bullets (E)
+- 开、关摩擦轮
+- 单发、连发射击
 
-##### Debug Mode
+鼠标键盘控制：（拨杆左中、右上）
 
-Debugging robot part (Right switcher state: MIDDLE.)
+- 开（Q）、关摩擦轮（Q + shift）
+- 单发（单击左键）、连发射击（长按左键）
+- 扭腰躲避（E）
 
-- twist to dodge bullets (Right switcher state: MIDDLE. Left switcher state: UP)
-- Gimbal tracks strikers but chassis doesn't follow gimbal (Right switcher state: MIDDLE. Left switcher state: MIDDLE.)
-- Gimbal tracks strikers and chassis follows gimbal (Right switcher state: MIDDLE. Left switcher state: DOWN.)
+##### Debug 档
 
-##### Full-auto Mode
+机器人在调试击打装甲、自身躲避时使用（拨杆右中），此模式下摩擦轮继承手动时的开关状态
 
-Normal competition part (Right switcher state: Down)
+左拨杆位置对应功能：
 
-- Full-auto control from upper layer.
+- 上：底盘躲避，云台受遥控器手动控制
+- 中：底盘躲避，云台跟随装甲板，此时云台和底盘都不受手动控制
+- 下：底盘受遥控器手动控制，云台跟随装甲板
 
-## Working state instructions
+##### 自动档
 
-*comment:*
+正常比赛时使用（拨杆右下）
 
-Bold parts shown following are the different modules working states in full-auto mode. User should notice initial value of each mode when upper layer PC transmit control signal.
+左拨杆位置对应功能：
 
-### Gimbal
+- 上：摩擦轮打开，其他全接管
+- 中：摩擦轮关闭，其他全接管
+- 下：失能模式，底盘云台断电
+
+
+## 工作模式说明
+
+*备注：*
+
+只有黑体部分为自动模式下能用到的各模块工作模式，其他工作模式不能在自动模式下切换。
+
+### 云台
 
 ```c
 typedef enum
@@ -110,21 +117,23 @@ typedef enum
   GIMBAL_PATROL_MODE   = 5,
   GIMBAL_SHOOT_BUFF    = 6,
   GIMBAL_POSITION_MODE = 7,
+  GIMBAL_RELATIVE_MODE = 8,
 } gimbal_mode_e;
 ```
 
-| Gimbal Mode              | Function                                 |
-| ------------------------ | ---------------------------------------- |
-| GIMBAL_RELAX             | Gimbal powers off                        |
-| GIMBAL_INIT              | Gimbal is being restored from the power off status |
-| GIMBAL_NO_ARTI_INPUT     | No manual control data input mode available |
-| GIMBAL_FOLLOW_ZGYRO      | The mode in which the gimbal follows the chassis |
-| GIMBAL_TRACK_ARMOR       | Gimbal tracks armor, Use GIMBAL_POSITION_MODE instead |
-| **GIMBAL_PATROL_MODE**   | Patrol mode, the gimbal yaws periodically, pitch uncontrolled |
-| GIMBAL_SHOOT_BUFF        | Shooting buff mode, icra not use         |
-| **GIMBAL_POSITION_MODE** | Gimbal position mode, angle between two axes controlled on an upper layer |
+| 云台模式                 | 对应功能                        |
+| ------------------------ | ------------------------------- |
+| GIMBAL_RELAX             | 云台断电                        |
+| GIMBAL_INIT              | 云台由断电状态回中              |
+| GIMBAL_NO_ARTI_INPUT     | 无手动控制信息输入模式          |
+| GIMBAL_FOLLOW_ZGYRO      | 云台正常的手动控制              |
+| GIMBAL_TRACK_ARMOR       | 追踪装甲，保留                  |
+| **GIMBAL_PATROL_MODE**   | 巡逻模式，云台 yaw 保持周期运动 |
+| GIMBAL_SHOOT_BUFF        | 打大符模式，保留                |
+| **GIMBAL_POSITION_MODE** | 相机在底盘上时使用              |
+| **GIMBAL_RELATIVE_MODE** | 相机在云台  yaw 轴上时使用      |
 
-### Chassis
+### 底盘
 
 ```c
 typedef enum
@@ -139,17 +148,17 @@ typedef enum
 } chassis_mode_e;
 ```
 
-| Chassis mode             | Function                                 |
-| ------------------------ | ---------------------------------------- |
-| CHASSIS_RELAX            | Power off chassis                        |
-| CHASSIS_STOP             | Stop chassis                             |
-| MANUAL_SEPARATE_GIMBAL   | Control chassis and gimbal separately in manual mode |
-| MANUAL_FOLLOW_GIMBAL     | Chassis follows gimbal in manual mode    |
-| **DODGE_MODE**           | **Chassis dodge bullets mode**           |
-| **AUTO_SEPARATE_GIMBAL** | **Control chassis and gimbal separately in full-auto mode** |
-| **AUTO_FOLLOW_GIMBAL**   | **Chassis follows gimbal in full-auto mode** |
+| 底盘模式                     | 对应功能                 |
+| ------------------------ | -------------------- |
+| CHASSIS_RELAX            | 底盘断电                 |
+| CHASSIS_STOP             | 底盘停止/刹车              |
+| MANUAL_SEPARATE_GIMBAL   | 手动模式底盘云台分离           |
+| MANUAL_FOLLOW_GIMBAL     | 手动模式底盘跟随云台           |
+| **DODGE_MODE**           | 底盘躲避模式，底盘固定旋转，平移不受控制 |
+| **AUTO_SEPARATE_GIMBAL** | 底盘和云台分离模式，旋转、平移受上层控制 |
+| **AUTO_FOLLOW_GIMBAL**   | 底盘跟随云台，平移受上层控制       |
 
-### Shooting Module
+### 发射机构
 
 ```c
 typedef enum
@@ -162,77 +171,79 @@ typedef enum
 } shoot_mode_e;
 ```
 
-| Shooting module mode | Function                               |
-| -------------------- | -------------------------------------- |
-| SHOT_DISABLE         | Power off shooting module              |
-| REMOTE_CTRL_SHOT     | Remote control                         |
-| KEYBOARD_CTRL_SHOT   | Key-mouse control                      |
-| SEMIAUTO_CTRL_SHOT   | Single shot or burst in semi-auto mode |
-| **AUTO_CTRL_SHOT**   | **Full-auto control**                  |
+| 发射机构模式             | 对应功能                 |
+| ------------------ | -------------------- |
+| SHOT_DISABLE       | 发射机构断电               |
+| REMOTE_CTRL_SHOT   | 遥控器控制发射机构            |
+| KEYBOARD_CTRL_SHOT | 键盘控制发射机构             |
+| SEMIAUTO_CTRL_SHOT | 单发、连发上层控制            |
+| **AUTO_CTRL_SHOT** | 摩擦轮开关、速度、单发、连发全部上层控制 |
 
+为了击打装甲时响应更及时，在这个版本的程序中，自动模式时的发弹还是由底层触发。
 
-## Program Description
+## 程序说明
 
-### Program System Architecture
+### 程序体系结构
 
-#### System Framework
+#### 体系框架
 
-1. This program uses free  open source called freertos operating system, which is compatible with other open source protocol license.
-2. This program uses standard CMSIS-ROTS ports, which is convenient to transplant between different operating system and platform.
-3. This program can be executed and modified in different compiling environment, such as TrueSTUDIO, SW4STM32 and makefile.
+1. 使用免费及开源的 freertos 操作系统，兼容其他开源协议 license；
+2. 使用标准 CMSIS-RTOS 接口，方便不同操作系统或平台间程序移植；
 
-#### Internal Framework
+#### 内部结构
 
-1. Compared to the traditional infantry program framework, this program has multiple running tasks  which can implement multi-threaded logic as well as blocking tasks.
-2. There is complete communication protocol between bottom layer and upper layer, which can receive feedback information from different modules of infantry and transmit control signal to corresponding modules.
-3. Each task, such as mode switch, data exchange and module control, is proceeded independently in internal program in order to add or remove task and function easily.
-4. Chassis, gimbal, shooting module is coupling based on the internal control task, which is easy to switch mode for different needs.
+1. 多任务环境，相比传统步兵控制框架，可以直接实现多线程逻辑，以及阻塞任务；
+2. 较为完备的底层上层通信协议，实现上层对步兵各个机构模块的反馈信息获取和控制；
+3. 内部程序模式切换、数据、控制各个任务隔离处理，方便添加和裁剪功能；
+4. 底盘、云台、发射等机构，内部的控制模式去耦合，便于不同需求控制时的模式切换；
 
-#### Program Structure
+#### 程序框架
 
-1. The board support package layer (BSP) is based on the HAL library, which mainly offers communication ports and configuration of  can, uart, spi, flash and io. 
-2. Data exchange layer is the only place which calls the BSP layer program and exchanges data between applied program and hardware equipment.
-3. Communication layer is responsible for receiving and transmitting data and control information. Additionally, this layer is capable of packaging and unpacking data including protocol part.
-4. Data receiving layer transforms the direct data from exchange layer or  parsed data from communication layer to feedback and control information.
-5. Without changing the software framework, mode switch task can implement different user-defined modes based on existing functional module. 
-6. Control task, control of the three structures including the cloud platform, the chassis, and the shooting.
+1. 基于 HAL 库的 BSP 层，主要提供can、uart、spi、flash、io等板级的配置和通信接口；
+2. 数据交互层，这里是程序中会调用 BSP 层函数唯一的地方，主要为应用程序和硬件设备的数据交互；
+3. 通信层，负责数据和 uart 硬件间发送和接收，以及这些数据的打包、解析，包含协议部分；
+4. 信息获取，交互层可以直接使用的数据、通信层解析好的数据，在这个任务中获取后转化为反馈和控制信息；
+5. 模式切换，在不修改控制架构的情况下，实现现有机构功能模式的自定义组合唯一需要修改的地方；
+6. 控制任务，云台、底盘、射击这三个机构的控制，包含这些机构的示例模式。
 
-### Software System
+### 软件体系
 
-#### Start-up Sequence
+#### 程序启动时序
 
-The following is the start sequence diagram for every task.
+各个任务的启动时序图
 
-![](Doc/image/startup_sequence.PNG)
+![](Doc/ch/image/startup_sequence.PNG)
 
-### Hardware System
+### 硬件体系
 
-1. Micro Controller Unit (MCU) is STM32F427IIHx and  operating frequency is 180 MHz.
-2. Module communication method is CAN communication and the related equipments are electronic speed controller and gyroscope.
-3. Universal Asynchronous Receiver/Transmitter (UART) is used to communicated between bottom and upper layer.
-4. The method of installing Mecanum Wheels is X type.
+1. 主控 MCU：STM32F427IIHx，配置运行频率180MHz
+2. 模块通信方式：CAN；CAN设备：电机电调、陀螺仪模块
+3. 上下层通信方式：uart
+4. 麦轮安装方式，X型
 
-#### Hardware Structure
+#### 硬件连接框图
 
-![](Doc/image/hardware_structure.PNG)
+![](Doc/ch/image/hardware_structure.PNG)
 
-### Protocol Data
+### 协议数据
 
-#### Data Classification
+#### 数据分类
 
-Data transmitted to upper layer from bottom layer:
+协议数据按照通信方向可以分为两大类：
 
-1. Feedback information part consists of feedback information coming from each module sensors and calculated data from bottom layer.
-2. Bottom layer status information part consists of running state of all bottom layer equipments and response of bottom layer to corresponding upper layer data.
-3. Forward data information part consists of all the referee system information and the server user-defined information.
+底层发送给上层的数据：
 
-Data received from upper layer to bottom layer:
+1. 反馈信息：包含各个机构传感器反馈信息、底层计算出来的一些反馈信息；
+2. 底层状态信息：包含底层设备运行状态、底层对上层数据的一些响应等；
+3. 转发数据：包含裁判系统的全部信息、服务器端的自定义信息；
 
-1. Control information part is used to control the three executed mechanism in the bottom layer which are gimbal, chassis and shooting module respectively.
-2. Configuration information part includes main information to set up structural of the robot such as tread, wheelbase and initial gimbal position and running state of upper layer. 
-3. Forward data information part consists of the data that forwards to referee system through bottom layer and the user-defined information that should be shown in  server. 
+底层接收的上层数据：
 
-#### Data Flow Diagram
+1. 控制信息：上层对底层 3 个执行机构的控制信息；
+2. 配置信息：上层对机器人如轮距、轴距、云台位置等结构配置信息，以及上层程序运行状态，底层响应级别等；
+3. 转发数据：需要底层转发给裁判系统，并最终在客户端上显示出来的用户自定义信息；
 
-![](Doc/image/data_flow.PNG)
+#### 数据流图
+
+![](Doc/ch/image/data_flow.PNG)
 

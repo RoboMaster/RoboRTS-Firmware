@@ -58,14 +58,14 @@
 
 #define IST_SET_Pin GPIO_PIN_2
 #define IST_SET_GPIO_Port GPIOE
-#define MPU_INT_Pin GPIO_PIN_1
-#define MPU_INT_GPIO_Port GPIOE
+#define MPU_INT_Pin GPIO_PIN_8
+#define MPU_INT_GPIO_Port GPIOB
 #define IMU_TEMP_Pin GPIO_PIN_5
 #define IMU_TEMP_GPIO_Port GPIOB
 #define LASER_Pin GPIO_PIN_13
 #define LASER_GPIO_Port GPIOG
-#define BEEP_Pin GPIO_PIN_4
-#define BEEP_GPIO_Port GPIOB
+#define BEEP_Pin GPIO_PIN_6
+#define BEEP_GPIO_Port GPIOH
 #define TRIG_Pin GPIO_PIN_9
 #define TRIG_GPIO_Port GPIOI
 #define SPI5_NSS_Pin GPIO_PIN_6
@@ -74,7 +74,7 @@
 #define KEY_GPIO_Port GPIOD
 #define LED1_Pin GPIO_PIN_14
 #define LED1_GPIO_Port GPIOF
-#define LED2_Pin GPIO_PIN_7
+#define LED2_Pin GPIO_PIN_11
 #define LED2_GPIO_Port GPIOE
 #define SD_EXTI_Pin GPIO_PIN_15
 #define SD_EXTI_GPIO_Port GPIOE

@@ -34,7 +34,7 @@
 #define CHASSIS_RC_MOVE_RATIO_Y 1.0f
 /* chassis rotation speed (deg/s) */
 /* used only chassis open loop mode */
-#define CHASSIS_RC_MAX_SPEED_R 300.0f
+#define CHASSIS_RC_MAX_SPEED_R  300.0f
 #define CHASSIS_RC_MOVE_RATIO_R 1.0f
 
 /* keyboard mode speed limit */
@@ -60,7 +60,7 @@
 
 /**************************shoot  setting********************************/
 /* shoot speed */
-#define DEFAULT_FRIC_WHEEL_SPEED 1150 //maximum value is 2500
+#define DEFAULT_FRIC_WHEEL_SPEED 1220 //maximum value is 2500
 /* shoot frequence */
 #define TRIGGER_MOTOR_SPEED      2000 
 
@@ -68,23 +68,23 @@
 
 /************************ chassis parameter ****************************/
 /* the radius of wheel(mm) */
-#define RADIUS     76
+#define RADIUS                 76
 /* the perimeter of wheel(mm) */
-#define PERIMETER  478
+#define PERIMETER              478
 
 /* wheel track distance(mm) */
-#define WHEELTRACK 403
+#define WHEELTRACK             415
 /* wheelbase distance(mm) */
-#define WHEELBASE  385
+#define WHEELBASE              406
 
 /* gimbal is relative to chassis center x axis offset(mm) */
-#define GIMBAL_X_OFFSET 150
+#define GIMBAL_X_OFFSET        130
 /* gimbal is relative to chassis center y axis offset(mm) */
-#define GIMBAL_Y_OFFSET 0
+#define GIMBAL_Y_OFFSET        0
 
 /* chassis motor use 3508 default */
 /* define CHASSIS_EC60 to use EC60 */
-#define CHASSIS_EC60
+//#define CHASSIS_EC60
 
 #ifdef CHASSIS_EC60
   /* chassis motor use EC60 */
@@ -150,35 +150,23 @@
 #define JUDGE_HUART        huart3 //connected to judge system
 #define COMPUTER_HUART     huart6 //connected to manifold/TXone
 
-
 /* gimbal relevant */
-#define PIT_ANGLE_MAX        15
-#define PIT_ANGLE_MIN        -20
-#define YAW_ANGLE_MAX        50
-#define YAW_ANGLE_MIN        -50
-
-#define LEFT_FRICTION        TIM1->CCR1
-#define RIGHT_FIRCTION       TIM1->CCR4
+#define PIT_ANGLE_MAX      16
+#define PIT_ANGLE_MIN      -14
+#define YAW_ANGLE_MAX      50
+#define YAW_ANGLE_MIN      -50
 
 /* detect task relevant */
-#define BEEP_ERR
-#ifdef BEEP_ERR
-  #define BEEP_TUNE TIM3->ARR
-  #define BEEP_CTRL TIM3->CCR1
-#endif
-
-#define DEFAULT_TUNE  300
+#define DEFAULT_TUNE       300
 
 /* imu temperature control */
-#define IMU_PWM_PULSE      TIM3->CCR2
 #define DEFAULT_IMU_TEMP   50
 
 /* math relevant */
-
 /* radian coefficient */
-#define RADIAN_COEF 57.3f
+#define RADIAN_COEF        57.3f
 /* circumference ratio */
-#define PI          3.142f
+#define PI                 3.142f
 
 #define VAL_LIMIT(val, min, max) \
 do {\

@@ -69,16 +69,33 @@ void chassis_task(void const *argu)
   {
     case DODGE_MODE:
     {
-      chassis.vx = 0;
-      chassis.vy = 0;
-      chassis_twist_handler();
+      if ((gim.ctrl_mode == GIMBAL_RELATIVE_MODE) || (gim.ctrl_mode == GIMBAL_FOLLOW_ZGYRO))
+      {
+        chassis.vx = 0;
+        chassis.vy = 0;
+        chassis_twist_handler();
+      }
+      else
+      {
+        chassis.vx = 0;
+        chassis.vy = 0;
+        chassis.vw = 0;
+      }
     }break;
     
     case AUTO_FOLLOW_GIMBAL:
     {
       taskENTER_CRITICAL();
-      chassis.vx = (float)pc_recv_mesg.chassis_control_data.x_spd;
-      chassis.vy = (float)pc_recv_mesg.chassis_control_data.y_spd;
+      if (pc_recv_mesg.chassis_control_data.ctrl_mode == AUTO_FOLLOW_GIMBAL)
+      {
+        chassis.vx = (float)pc_recv_mesg.chassis_control_data.x_spd;
+        chassis.vy = (float)pc_recv_mesg.chassis_control_data.y_spd;
+      }
+      else
+      {
+        chassis.vx = 0;
+        chassis.vy = 0;
+      }
       chassis.position_ref = 0;
       taskEXIT_CRITICAL();
       
@@ -88,10 +105,19 @@ void chassis_task(void const *argu)
     case AUTO_SEPARATE_GIMBAL:
     {
       taskENTER_CRITICAL();
-      chassis.vx = (float)pc_recv_mesg.chassis_control_data.x_spd;
-      chassis.vy = (float)pc_recv_mesg.chassis_control_data.y_spd;
+      if (pc_recv_mesg.chassis_control_data.ctrl_mode == AUTO_SEPARATE_GIMBAL)
+      {
+        chassis.vx = (float)pc_recv_mesg.chassis_control_data.x_spd;
+        chassis.vy = (float)pc_recv_mesg.chassis_control_data.y_spd;
+        chassis.vw = pc_recv_mesg.chassis_control_data.w_info.w_spd;
+      }
+      else
+      {
+        chassis.vx = 0;
+        chassis.vy = 0;
+        chassis.vw = 0;
+      }
       chassis.position_ref = 0;
-      chassis.vw = pc_recv_mesg.chassis_control_data.w_info.w_spd;
       taskEXIT_CRITICAL();
       
     }break;
@@ -143,14 +169,50 @@ void chassis_stop_handler(void)
   chassis.vw = 0;
 }
 
+int8_t   twist_side = 1;
+int8_t   twist_sign = 1;
 uint32_t twist_count;
+
+int16_t twist_period = TWIST_PERIOD/CHASSIS_PERIOD;
+int16_t twist_angle  = TWIST_ANGLE;
 static void chassis_twist_handler(void)
 {
-  static int16_t twist_period = TWIST_PERIOD/CHASSIS_PERIOD;
-  static int16_t twist_angle  = TWIST_ANGLE;
   twist_count++;
-  chassis.position_ref = twist_angle*sin(2*PI/twist_period*twist_count);
+  
+  if (twist_side > 0)
+  {
+    if (gim.sensor.yaw_relative_angle >= 2*twist_angle)
+    {
+      twist_count = 0;
+      twist_sign  = -1;
+    }
+    
+    if(gim.sensor.yaw_relative_angle <= 0)
+    {
+      twist_count = 0;
+      twist_sign  = 1;
+    }
+    
+  }
+  else
+  {
+    if (gim.sensor.yaw_relative_angle >= 0)
+    {
+      twist_count = 0;
+      twist_sign  = -1;
+    }
+    
+    if(gim.sensor.yaw_relative_angle <= -2*twist_angle)
+    {
+      twist_count = 0;
+      twist_sign  = 1;
+    }
+    
+  }
+  chassis.position_ref = -twist_sign*twist_angle*cos(2*PI/twist_period*twist_count) + twist_side*twist_angle;
+  
   chassis.vw = -pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, chassis.position_ref);
+  
 }
 void separate_gimbal_handler(void)
 {
@@ -263,12 +325,12 @@ void chassis_param_init(void)
 #ifdef CHASSIS_EC60
   for (int k = 0; k < 4; k++)
   {
-    PID_struct_init(&pid_spd[k], POSITION_PID, 10000, 2500, 25, 1.2, 0);
+    PID_struct_init(&pid_spd[k], POSITION_PID, 10000, 2500, 55, 1.0, 0);
   }
 #else
   for (int k = 0; k < 4; k++)
   {
-    PID_struct_init(&pid_spd[k], POSITION_PID, 10000, 1000, 3.0f, 0, 0);
+    PID_struct_init(&pid_spd[k], POSITION_PID, 10000, 500, 4.5f, 0.05, 0);
   }
 #endif
   
@@ -292,9 +354,9 @@ void power_limit_handler(void)
   }
   else
   {
-    if (judge_rece_mesg.game_information.remain_power < WARNING_ENERGY)
-      total_cur_limit = ((judge_rece_mesg.game_information.remain_power * \
-                          judge_rece_mesg.game_information.remain_power)/ \
+    if (judge_recv_mesg.game_information.remain_power < WARNING_ENERGY)
+      total_cur_limit = ((judge_recv_mesg.game_information.remain_power * \
+                          judge_recv_mesg.game_information.remain_power)/ \
                           (WARNING_ENERGY*WARNING_ENERGY)) * 40000;
     else
       total_cur_limit = 40000;

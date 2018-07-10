@@ -234,7 +234,7 @@ typedef __packed struct
 {
   int16_t x_offset;   /* offset(mm) relative to the x-axis of the chassis center */
   int16_t y_offset;   /* offset(mm) relative to the y-axis of the chassis center */
-  float   w_spd;    /* rotation speed(degree/s) of chassis */
+  float   w_spd;      /* rotation speed(degree/s) of chassis */
 } chassis_rotate_t;
 
 /** 
@@ -243,8 +243,8 @@ typedef __packed struct
 typedef __packed struct
 {
   uint8_t          ctrl_mode; /* chassis control mode */
-  int16_t          x_spd;   /* x-axis move speed(mm/s) of chassis */
-  int16_t          y_spd;   /* y-axis move speed(mm/s) of chassis */
+  int16_t          x_spd;     /* x-axis move speed(mm/s) of chassis */
+  int16_t          y_spd;     /* y-axis move speed(mm/s) of chassis */
   chassis_rotate_t w_info;    /* rotation control of chassis */
 } chassis_ctrl_t;
 
@@ -253,10 +253,15 @@ typedef __packed struct
   */
 typedef __packed struct
 {
-  uint8_t ctrl_mode;    /* gimbal control mode */
-  float   pit_ref;      /* gimbal pitch reference angle(degree) */
-  float   yaw_ref;      /* gimbal yaw reference angle(degree) */
-  uint8_t visual_valid; /* visual information valid or not */
+  uint32_t time;
+  uint8_t  ctrl_mode;    /* gimbal control mode */
+  float    pit_ref;      /* gimbal pitch reference angle(degree) */
+  float    yaw_ref;      /* gimbal yaw reference angle(degree) */
+  float    tgt_dist;     /* visual target distance */
+  float    x;
+  float    y;
+  float    z;
+  uint8_t  visual_valid; /* visual information valid or not */
 } gimbal_ctrl_t;
 
 /** 

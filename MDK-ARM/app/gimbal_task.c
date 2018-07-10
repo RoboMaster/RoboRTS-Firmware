@@ -40,30 +40,20 @@
 #include "ramp.h"
 #include "cmsis_os.h"
 #include "math.h"
-#include "stdlib.h"
+#include "stdlib.h" 
 #include "string.h"
+
+#include "kalman_filter.h"
 
 //#define OLD_TRIGGER
 /* gimbal patrol angle (degree)*/
-#define PATROL_ANGLE     40
+#define PATROL_ANGLE     15
 /* patrol period time (ms) */
-#define PATROL_PERIOD    1500
+#define PATROL_PERIOD    3000
 /* gimbal back center time (ms) */
 #define BACK_CENTER_TIME 2500
-
 /* stack usage monitor */
 UBaseType_t gimbal_stack_surplus;
-
-/* for debug */
-//int yaw_a_fdb;
-//int yaw_a_ref;
-//int yaw_s_fdb;
-//int yaw_s_ref;
-
-//int pit_a_fdb;
-//int pit_a_ref;
-//int pit_s_fdb;
-//int pit_s_ref;
 
 /* gimbal task global parameter */
 gimbal_t gim;
@@ -74,8 +64,91 @@ static ramp_t     yaw_ramp = RAMP_GEN_DAFAULT;
 static ramp_t     pit_ramp = RAMP_GEN_DAFAULT;
 
 uint32_t gimbal_time_last;
-int gimbal_time_ms;
-uint32_t patrol_count;
+uint32_t gimbal_time_ms;
+
+
+/* for debug */
+int yaw_angle_fdb_js;
+int yaw_angle_ref_js;
+int yaw_speed_fdb_js;
+int yaw_speed_ref_js;
+
+int pit_angle_fdb_js;
+int pit_angle_ref_js;
+int pit_speed_fdb_js;
+int pit_speed_ref_js;
+
+
+typedef struct  // speed_calc_data_t
+{
+  int delay_cnt;
+  int freq;
+  int last_time;
+  float last_position;
+  float speed;
+  float last_speed;
+  float processed_speed;
+} speed_calc_data_t;
+
+
+/* kalman param */
+#ifdef CAMERA_ON_GIMBAL
+kalman_filter_init_t yaw_kalman_filter_para = {
+  .P_data = {2, 0, 0, 2},
+  .A_data = {1, 0.001, 0, 1},
+  .H_data = {1, 0, 0, 1},
+  .Q_data = {1, 0, 0, 1},
+  .R_data = {1000, 0, 0, 2000}
+};
+#else
+kalman_filter_init_t yaw_kalman_filter_para = {
+  .P_data = {2, 0, 0, 2},
+  .A_data = {1, 0.001, 0, 1},
+  .H_data = {1, 0, 0, 1},
+  .Q_data = {1, 0, 0, 1},
+  .R_data = {1000, 0, 0, 2000}
+};
+#endif
+
+kalman_filter_init_t pitch_kalman_filter_para = 
+{
+  .P_data = {2, 0, 0, 2},
+  .A_data = {1, 0.001, 0, 1},
+  .H_data = {1, 0, 0, 1},
+  .Q_data = {1, 0, 0, 1},
+  .R_data = {2000, 0, 0, 5000}
+};
+
+kalman_filter_init_t dist_kalman_filter_para = 
+{
+  .P_data = {2, 0, 0, 0},
+  .A_data = {1, 0, 0, 0},
+  .H_data = {1, 0, 0, 0},
+  .Q_data = {1, 0, 0, 0},
+  .R_data = {10000, 0, 0, 0}
+};
+
+
+kalman_filter_t yaw_kalman_filter;
+kalman_filter_t pitch_kalman_filter;
+kalman_filter_t dist_kalman_filter;
+
+speed_calc_data_t yaw_speed_struct;
+speed_calc_data_t pitch_speed_struct;
+speed_calc_data_t dist_speed_struct;
+
+static float yaw_speed_raw;
+static float pitch_speed_raw;
+static float dist_speed_raw;
+
+// yaw pitch yaw_v pitch_v
+float gimbal_attitude_archive[120][4];
+uint8_t archive_index = 0;
+uint8_t get_index = 0;
+
+float target_speed_calc(speed_calc_data_t *S, uint32_t time, float position);
+//float target_speed_calc(speed_calc_data_t *S, float position);
+
 
 void gimbal_self_check(void)
 {
@@ -93,6 +166,23 @@ void gimbal_task(void const *argu)
   gimbal_time_ms = HAL_GetTick() - gimbal_time_last;
   gimbal_time_last = HAL_GetTick();
   
+//---------------------------------------------------
+  archive_index++;
+  if (archive_index > 99) //system delay ms
+    archive_index = 0;
+  gimbal_attitude_archive[archive_index][0] = gim.sensor.yaw_gyro_angle;//gim.pid.yaw_angle_fdb;
+  gimbal_attitude_archive[archive_index][1] = gim.pid.pit_angle_fdb;
+  gimbal_attitude_archive[archive_index][2] = gim.pid.yaw_spd_fdb;
+  gimbal_attitude_archive[archive_index][3] = gim.pid.pit_spd_fdb;
+  get_index = archive_index + 50;
+  if( get_index > 99)
+    get_index -= 100;
+//----------------------------------------------------
+  
+  mat_init(&yaw_kalman_filter.Q,2,2, yaw_kalman_filter_para.Q_data);
+  mat_init(&yaw_kalman_filter.R,2,2, yaw_kalman_filter_para.R_data);
+  
+  
   switch (gim.ctrl_mode)
   {
     case GIMBAL_INIT:
@@ -107,23 +197,23 @@ void gimbal_task(void const *argu)
       closed_loop_handler();
     break;
 
-    case GIMBAL_TRACK_ARMOR:
-      track_aimor_handler();
-    break;
-
     case GIMBAL_PATROL_MODE:
+      shoot.c_shoot_cmd = 0;
       gimbal_patrol_handler();
     break;
 
     case GIMBAL_POSITION_MODE:
       pc_position_ctrl_handler();
+    break;
 
+    case GIMBAL_RELATIVE_MODE:
+      pc_relative_ctrl_handler();
     break;
 
     default:
     break;
   }
-  
+
   pid_calc(&pid_yaw, gim.pid.yaw_angle_fdb, gim.pid.yaw_angle_ref);
   pid_calc(&pid_pit, gim.pid.pit_angle_fdb, gim.pid.pit_angle_ref);
   
@@ -149,16 +239,17 @@ void gimbal_task(void const *argu)
     gim.ctrl_mode = GIMBAL_RELAX;
     //pid_trigger.iout = 0;
   }
-//    yaw_a_ref = gim.pid.yaw_angle_ref*100;
-//    yaw_a_fdb = gim.pid.yaw_angle_fdb*100;
-//    yaw_s_ref = km.yaw_v*100;
-//    yaw_s_fdb = (int)mpu_data.gz;
-
-//    pit_a_ref = gim.pid.pit_angle_ref*100;
-//    pit_a_fdb = gim.pid.pit_angle_fdb*100;
-//    pit_s_ref = (int)pid_pit.out;
-//    pit_s_fdb = (int)mpu_data.gx;
   
+  yaw_angle_ref_js = gim.pid.yaw_angle_ref*1000;
+  yaw_angle_fdb_js = gim.pid.yaw_angle_fdb*1000;
+  yaw_speed_ref_js = pid_yaw.out*1000;
+  yaw_speed_fdb_js = gim.sensor.yaw_palstance*1000;
+
+  pit_angle_ref_js = gim.pid.pit_angle_ref*1000;
+  pit_angle_fdb_js = gim.pid.pit_angle_fdb*1000;
+  pit_speed_ref_js = pid_pit.out*1000;
+  pit_speed_fdb_js = gim.sensor.pit_palstance*1000;
+
   osSignalSet(can_msg_send_task_t, GIMBAL_MOTOR_MSG_SEND);
   osSignalSet(shoot_task_t, SHOT_TASK_EXE_SIGNAL);
 
@@ -185,7 +276,7 @@ void init_mode_handler(void)
       /* yaw arrive and switch gimbal state */
       gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO;
       
-      gim.yaw_offset_angle = gim.sensor.gyro_angle;
+      gim.yaw_offset_angle = gim.sensor.yaw_gyro_angle;
       gim.pid.pit_angle_ref = 0;
       gim.pid.yaw_angle_ref = 0;
     }
@@ -221,18 +312,34 @@ void closed_loop_handler(void)
   static float limit_angle_range = 2;
   
   gim.pid.pit_angle_fdb = gim.sensor.pit_relative_angle;
-  gim.pid.yaw_angle_fdb = gim.sensor.gyro_angle - gim.yaw_offset_angle;
+  gim.pid.yaw_angle_fdb = gim.sensor.yaw_gyro_angle - gim.yaw_offset_angle;
   
   /* chassis angle relative to gim.pid.yaw_angle_fdb */
   chassis_angle_tmp = gim.pid.yaw_angle_fdb - gim.sensor.yaw_relative_angle;
   /* limit gimbal yaw axis angle */
-  if ((gim.sensor.yaw_relative_angle >= YAW_ANGLE_MIN - limit_angle_range) && \
-      (gim.sensor.yaw_relative_angle <= YAW_ANGLE_MAX + limit_angle_range))
+  if (chassis.ctrl_mode == DODGE_MODE)
   {
-    gim.pid.yaw_angle_ref += rm.yaw_v * GIMBAL_RC_MOVE_RATIO_YAW
-                       + km.yaw_v * GIMBAL_PC_MOVE_RATIO_YAW;
-    VAL_LIMIT(gim.pid.yaw_angle_ref, chassis_angle_tmp + YAW_ANGLE_MIN, chassis_angle_tmp + YAW_ANGLE_MAX);
+    if ((gim.sensor.yaw_relative_angle >= YAW_ANGLE_MIN - limit_angle_range - 35) && \
+        (gim.sensor.yaw_relative_angle <= YAW_ANGLE_MAX + limit_angle_range + 35))
+    {
+      gim.pid.yaw_angle_ref += rm.yaw_v * GIMBAL_RC_MOVE_RATIO_YAW
+                             + km.yaw_v * GIMBAL_PC_MOVE_RATIO_YAW;
+      
+      VAL_LIMIT(gim.pid.yaw_angle_ref, chassis_angle_tmp + YAW_ANGLE_MIN - 35, chassis_angle_tmp + YAW_ANGLE_MAX + 35);
+    }
   }
+  else
+  {
+    if ((gim.sensor.yaw_relative_angle >= YAW_ANGLE_MIN - limit_angle_range) && \
+        (gim.sensor.yaw_relative_angle <= YAW_ANGLE_MAX + limit_angle_range))
+    {
+      gim.pid.yaw_angle_ref += rm.yaw_v * GIMBAL_RC_MOVE_RATIO_YAW
+                             + km.yaw_v * GIMBAL_PC_MOVE_RATIO_YAW;
+      
+      VAL_LIMIT(gim.pid.yaw_angle_ref, chassis_angle_tmp + YAW_ANGLE_MIN, chassis_angle_tmp + YAW_ANGLE_MAX);
+    }
+  }
+  
   /* limit gimbal pitch axis angle */
   if ((gim.sensor.pit_relative_angle >= PIT_ANGLE_MIN - limit_angle_range) && \
       (gim.sensor.pit_relative_angle <= PIT_ANGLE_MAX + limit_angle_range))
@@ -243,6 +350,8 @@ void closed_loop_handler(void)
   }
 }
 
+
+/* camera on chassis */
 void pc_position_ctrl_handler(void)
 {
   static float chassis_angle_tmp;
@@ -251,90 +360,114 @@ void pc_position_ctrl_handler(void)
   gim.pid.pit_angle_fdb = gim.sensor.pit_relative_angle;
   gim.pid.yaw_angle_fdb = gim.sensor.yaw_relative_angle;
   
-  taskENTER_CRITICAL();
-  gim.pid.pit_angle_ref = pc_recv_mesg.gimbal_control_data.pit_ref;
   gim.pid.yaw_angle_ref = pc_recv_mesg.gimbal_control_data.yaw_ref;
+  gim.pid.pit_angle_ref = pc_recv_mesg.gimbal_control_data.pit_ref;
   
-  VAL_LIMIT(gim.pid.yaw_angle_ref, chassis_angle_tmp + YAW_ANGLE_MIN, chassis_angle_tmp + YAW_ANGLE_MAX);
+  VAL_LIMIT(gim.pid.yaw_angle_ref, chassis_angle_tmp + YAW_ANGLE_MIN - 35, chassis_angle_tmp + YAW_ANGLE_MAX + 35);
   VAL_LIMIT(gim.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
-  taskEXIT_CRITICAL();
-    
 }
 
-//int dynamic_bias_yaw = 0;//-60;
-//int dynamic_bias_pit = -15;
-static void track_aimor_handler(void)
+
+
+
+
+
+/* camera on gimbal */
+extern uint32_t pc_yaw_time;
+uint32_t time_raw;
+uint32_t time_raw_last;
+float position_threshold = 100;
+float shoot_delta        = 1.0;
+
+void pc_relative_ctrl_handler(void)
 {
-//  //static float    pnp_dis;
-//  static uint8_t  last_vision_status;
-//  static uint32_t no_vision_time;
-//  static int32_t  yaw_vision_bias;
-//  static int32_t  pit_vision_bias;
-//  
-//  gim.pid.pit_angle_fdb = gim.sensor.pit_relative_angle;
-//  gim.pid.yaw_angle_fdb = gim.sensor.yaw_relative_angle;
-//  
-//  if (pc_recv_mesg.gimbal_control_data.visual_valid == 1)
-//  {
-//    /* pitch target */
-//    //calculate pitch elevation
-//    //pnp_dis = pc_recv_mesg.gimbal_control_data.distance / 1000.0;
-//    //dynamic_bias_pit = pnp_dis*5.0f - 20;
-//    
-//    pit_vision_bias = pc_recv_mesg.gimbal_control_data.vision_x + dynamic_bias_pit;
-//    gim.pid.pit_angle_ref = gim.sensor.pit_relative_angle - 0.1*pit_vision_bias;
-////    pid_calc(&pid_vision_pit, pit_vision_bias, 0);
-////    gim.pid.pit_angle_ref = gim.sensor.pit_relative_angle+ pid_vision_pit.out;
+  static float yaw_angle_raw;
+  static float pitch_angle_raw;
+  static float dist_mm_raw;
+  
+  static float chassis_angle_tmp;
+  
+  if ((HAL_GetTick() - pc_yaw_time) > 2000)
+    gim.pid.yaw_angle_fdb = gim.sensor.yaw_relative_angle;
+  else
+    gim.pid.yaw_angle_fdb = gim.sensor.yaw_gyro_angle;
 
-//    /* yaw target */
-//    yaw_vision_bias = pc_recv_mesg.gimbal_control_data.vision_y + dynamic_bias_yaw;
-//    gim.pid.yaw_angle_ref = gim.sensor.yaw_relative_angle - 0.3*yaw_vision_bias;
-////    pid_calc(&pid_vision_yaw, yaw_vision_bias, 0);
-////    gim.pid.yaw_angle_ref = gim.sensor.yaw_relative_angle + pid_vision_yaw.out;
-//    VAL_LIMIT(gim.pid.yaw_angle_ref, -50, 50);
+  gim.pid.pit_angle_fdb = gim.sensor.pit_relative_angle;
+  
+  //get raw control command
+  time_raw = pc_recv_mesg.gimbal_control_data.time;
+  if ((time_raw != time_raw_last) && (pc_recv_mesg.gimbal_control_data.ctrl_mode == GIMBAL_RELATIVE_MODE))
+  {
+    yaw_angle_raw   = pc_recv_mesg.gimbal_control_data.yaw_ref + gimbal_attitude_archive[get_index][0];
+    pitch_angle_raw = pc_recv_mesg.gimbal_control_data.pit_ref;
+    dist_mm_raw     = pc_recv_mesg.gimbal_control_data.tgt_dist;
+    
+    time_raw_last = time_raw;
+  }
+  
+  //calc speed and limit speed change rate
+  yaw_speed_raw   = target_speed_calc(&yaw_speed_struct,   time_raw, yaw_angle_raw);
+  pitch_speed_raw = target_speed_calc(&pitch_speed_struct, time_raw, pitch_angle_raw);
+  dist_speed_raw  = target_speed_calc(&dist_speed_struct,  time_raw, dist_mm_raw);
 
-//    if ((yaw_vision_bias > -15) && (yaw_vision_bias < 15)) // && (rece_data.vision_dis <= 5000))
-//      shoot.c_shoot_cmd = 1;
-//    else
-//      shoot.c_shoot_cmd = 0;
+  //kalman output  0:angle  1:speed
+  float *yaw_kf_result   = kalman_filter_calc(&yaw_kalman_filter,   yaw_angle_raw,   yaw_speed_raw);
+  float *pitch_kf_result = kalman_filter_calc(&pitch_kalman_filter, pitch_angle_raw, pitch_speed_raw);
+  float *dist_kf_result  = kalman_filter_calc(&dist_kalman_filter,  dist_mm_raw,     dist_speed_raw);
 
-//  }
-//  else if (pc_recv_mesg.gimbal_control_data.visual_valid == 0)
-//  {
-//    /* when auto shooting lost vision,
-//       yaw and pitch return center after 2s */
-//    if (last_vision_status == 1)
-//    {
-//      no_vision_time = HAL_GetTick();
-//    }
-//    if (HAL_GetTick() - no_vision_time > 2000)
-//    {
-//      gim.pid.yaw_angle_ref = 0;
-//      gim.pid.pit_angle_ref = 0;
-//    }
-//    
-//    /* if chassis follow gimbal when auto shooting lost vision
-//       yaw return center immediately */
-////    if (chassis.follow_gimbal)
-////    {
-////      gim.pid.yaw_angle_ref = 0;
-////    }
-//    shoot.c_shoot_cmd = 0;
-//  }
-
+  
+  if ((gim.sensor.yaw_relative_angle >= YAW_ANGLE_MIN-35) && \
+      (gim.sensor.yaw_relative_angle <= YAW_ANGLE_MAX+35))
+  {
+    gim.pid.yaw_angle_ref = yaw_kf_result[0];// + yaw_kf_result[1]*(0.10f + dist_kf_result[0]/18000);
+  }
+  chassis_angle_tmp = gim.sensor.yaw_gyro_angle - gim.sensor.yaw_relative_angle;
+  VAL_LIMIT(gim.pid.yaw_angle_ref, chassis_angle_tmp + YAW_ANGLE_MIN - 35, chassis_angle_tmp + YAW_ANGLE_MAX + 35);
+  
+  gim.pid.pit_angle_ref = pitch_angle_raw;//pitch_kf_result[0] + pit_deg;
+  VAL_LIMIT(gim.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
+  
+  
+  if ((HAL_GetTick() - pc_yaw_time) > 2000)
+  {
+    gim.pid.pit_angle_ref = 0;
+    gim.pid.yaw_angle_ref = 0;
+    
+    shoot.c_shoot_cmd = 0;
+  }
+  else
+  {
+    if (fabs(pc_recv_mesg.gimbal_control_data.yaw_ref) < shoot_delta)
+      shoot.c_shoot_cmd = 1;
+    else
+      shoot.c_shoot_cmd = 0;
+    
+    if (((HAL_GetTick() - pc_yaw_time) > 500) || (dist_mm_raw > 3000))
+      shoot.c_shoot_cmd = 0;
+  }
+  
+  //************taskEXIT_CRITICAL();****************
 }
 
+
+int8_t count_sign = 1;
 static void gimbal_patrol_handler(void)
 {
-  static int16_t patrol_period = PATROL_PERIOD/GIMBAL_PERIOD;
-  static int16_t patrol_angle  = PATROL_ANGLE;
+  static float patrol_once_angle = PATROL_ANGLE*4.0/(PATROL_PERIOD/GIMBAL_PERIOD);
+  
+  if (gim.sensor.yaw_relative_angle >= PATROL_ANGLE)
+    count_sign = -1;
+  
+  if(gim.sensor.yaw_relative_angle <= -PATROL_ANGLE)
+    count_sign = 1;
+  
+  gim.pid.pit_angle_ref = 0;
+  gim.pid.yaw_angle_ref += count_sign*patrol_once_angle;
   
   gim.pid.pit_angle_fdb = gim.sensor.pit_relative_angle;
   gim.pid.yaw_angle_fdb = gim.sensor.yaw_relative_angle;
   
-  patrol_count++;
-  gim.pid.yaw_angle_ref = patrol_angle*sin(2*PI/patrol_period*patrol_count);
-  gim.pid.pit_angle_ref = 0;
+  VAL_LIMIT(gim.pid.yaw_angle_ref, YAW_ANGLE_MIN - 35, YAW_ANGLE_MAX + 35);
 }
 
 
@@ -352,28 +485,69 @@ void gimbal_param_init(void)
   gim.input.action_angle   = 5.0f;
   
   /* pitch axis motor pid parameter */
-  PID_struct_init(&pid_pit, POSITION_PID, 2000, 0,
+  PID_struct_init(&pid_pit, POSITION_PID, 1000, 0,
                   30, 0, 0); //
-  PID_struct_init(&pid_pit_spd, POSITION_PID, 7000, 3000,
-                  15, 0.2, 0);
+  PID_struct_init(&pid_pit_spd, POSITION_PID, 6000, 3000,
+                  12, 0.1, 0);  //16
 
   /* yaw axis motor pid parameter */
-  PID_struct_init(&pid_yaw, POSITION_PID, 2000, 0,
-                  30, 0, 0); //
-  PID_struct_init(&pid_yaw_spd, POSITION_PID, 7000, 1000,
-                  13, 0, 0);
+  PID_struct_init(&pid_yaw, POSITION_PID, 1000, 0,
+                  60, 0, 0); //
+  PID_struct_init(&pid_yaw_spd, POSITION_PID, 6000, 3000,
+                  20 , 0.2, 0);  //30
   
   /* bullet trigger motor pid parameter */
   PID_struct_init(&pid_trigger, POSITION_PID, 10000, 2000,
                   15, 0, 10);
-  PID_struct_init(&pid_trigger_spd, POSITION_PID, 7000, 3000,
+  PID_struct_init(&pid_trigger_spd, POSITION_PID, 8000, 3000,
                   1.5, 0.1, 5);
-
+                  
+  kalman_filter_init(&yaw_kalman_filter, &yaw_kalman_filter_para);
+  kalman_filter_init(&pitch_kalman_filter, &pitch_kalman_filter_para);
+  kalman_filter_init(&dist_kalman_filter, &dist_kalman_filter_para);
 }
 
 void gimbal_back_param(void)
-{ 
+{
   ramp_init(&pit_ramp, BACK_CENTER_TIME/GIMBAL_PERIOD);
   ramp_init(&yaw_ramp, BACK_CENTER_TIME/GIMBAL_PERIOD);
 }
+
+
+
+float speed_threshold = 10.0f;
+float target_speed_calc(speed_calc_data_t *S, uint32_t time, float position)
+{
+  S->delay_cnt++;
+
+  if (time != S->last_time)
+  {
+    S->speed = (position - S->last_position) / (time - S->last_time) * 1000;
+#if 1
+    if ((S->speed - S->processed_speed) < -speed_threshold)
+    {
+        S->processed_speed = S->processed_speed - speed_threshold;
+    }
+    else if ((S->speed - S->processed_speed) > speed_threshold)
+    {
+        S->processed_speed = S->processed_speed + speed_threshold;
+    }
+    else 
+#endif
+      S->processed_speed = S->speed;
+    
+    S->last_time = time;
+    S->last_position = position;
+    S->last_speed = S->speed;
+    S->delay_cnt = 0;
+  }
+  
+  if(S->delay_cnt > 200) // delay 200ms speed = 0
+  {
+    S->processed_speed = 0;
+  }
+
+  return S->processed_speed;
+}
+
 

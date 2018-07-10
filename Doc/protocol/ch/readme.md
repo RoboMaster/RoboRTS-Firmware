@@ -39,6 +39,7 @@ typedef enum
   GIMBAL_PATROL_MODE   = 5,
   GIMBAL_SHOOT_BUFF    = 6,
   GIMBAL_POSITION_MODE = 7,
+  GIMBAL_RELATIVE_MODE = 8,
 } gimbal_mode_e;
 ```
 
@@ -51,7 +52,8 @@ typedef enum
 | GIMBAL_TRACK_ARMOR       | 云台追踪装甲，icra 不使用             |
 | **GIMBAL_PATROL_MODE**   | 巡逻模式，云台 yaw 周期运动，pitch 不受控制 |
 | GIMBAL_SHOOT_BUFF        | 打大符模式，icra 不使用              |
-| **GIMBAL_POSITION_MODE** | 云台位置模式，上层控制角度两轴角度           |
+| **GIMBAL_POSITION_MODE** | 绝对位置模式，上层控制角度两轴角度，相机在底盘上使用  |
+| **GIMBAL_RELATIVE_MODE** | 云台相对位置控制，相机在云台上使用           |
 
 ### 底盘
 
@@ -722,19 +724,29 @@ typedef __packed struct
 ```c
 typedef __packed struct
 {
-  uint8_t ctrl_mode;    /* gimbal control mode */
-  float   pit_ref;      /* gimbal pitch reference angle(degree) */
-  float   yaw_ref;      /* gimbal yaw reference angle(degree) */
-  uint8_t visual_valid; /* visual information valid or not */
+  uint32_t time;
+  uint8_t  ctrl_mode;    /* gimbal control mode */
+  float    pit_ref;      /* gimbal pitch reference angle(degree) */
+  float    yaw_ref;      /* gimbal yaw reference angle(degree) */
+  float    tgt_dist;     /* visual target distance */
+  float    x;
+  float    y;
+  float    z;
+  uint8_t  visual_valid; /* visual information valid or not */
 } gimbal_ctrl_t;
 ```
 
-| 数据           | 说明                        |
-| ------------ | ------------------------- |
-| ctrl_mode    | 控制云台的工作模式                 |
-| pit_ref      | pitch 轴相对于中点的目标角度         |
-| yaw_ref      | yaw 轴相对于中点的目标角度           |
-| visual_valid | 视觉信息有效位，用来判断此时的云台控制数据是否可信 |
+| 数据         | 说明                                       |
+| ------------ | ------------------------------------------ |
+| time         | 上层数据时间                               |
+| ctrl_mode    | 控制云台的工作模式                         |
+| pit_ref      | pitch 轴相对于中点的目标角度               |
+| yaw_ref      | yaw 轴相对于中点的目标角度                 |
+| tgt_dist     | 目标距离                                   |
+| x            | 保留                                       |
+| y            | 保留                                       |
+| z            | 保留                                       |
+| visual_valid | 视觉信息有效位，用来判断这帧的数据是否可信 |
 
 ##### 0x00A2 发射机构控制 
 
@@ -1080,6 +1092,4 @@ void data_handle(uint8_t *p_frame)
 
 ## 协议版本
 
-v1.4：
-
-1、更新裁判系统学生端口数据协议；
+NULL

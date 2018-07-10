@@ -40,7 +40,7 @@ moto_measure_t moto_chassis[4];
 //float yaw_zgyro_angle;
 
 
-void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* _hcan)
+void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef *_hcan)
 {
   switch (_hcan->pRxMsg->StdId)
   {
@@ -100,7 +100,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* _hcan)
 
     case CAN_GIMBAL_ZGYRO_ID:
     {
-//      gim.sensor.gyro_angle = 0.001f * ((int32_t)(_hcan->pRxMsg->Data[0] << 24) |
+//      gim.sensor.yaw_gyro_angle = 0.001f * ((int32_t)(_hcan->pRxMsg->Data[0] << 24) |
 //                                          (_hcan->pRxMsg->Data[1] << 16) |
 //                                          (_hcan->pRxMsg->Data[2] << 8) |
 //                                          (_hcan->pRxMsg->Data[3]));
@@ -120,7 +120,10 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* _hcan)
   __HAL_CAN_ENABLE_IT(&hcan2, CAN_IT_FMP0);
 }
 
-
+void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
+{
+  __HAL_CAN_ENABLE_IT(hcan, CAN_IT_FMP0);
+}
 
 /**
   * @brief     get motor rpm and calculate motor round_count/total_encoder/total_angle
@@ -231,7 +234,7 @@ void can_receive_start(void)
   */
 void gyro_device_init(void)
 {
-  while (ZGYRO_CAN.State == HAL_CAN_STATE_BUSY_TX);
+//  while (ZGYRO_CAN.State == HAL_CAN_STATE_BUSY_TX);
   ZGYRO_CAN.pTxMsg->StdId   = CAN_ZGYRO_RST_ID;
   ZGYRO_CAN.pTxMsg->IDE     = CAN_ID_STD;
   ZGYRO_CAN.pTxMsg->RTR     = CAN_RTR_DATA;

@@ -91,7 +91,7 @@ static void kb_enable_hook(void)
 void get_main_ctrl_mode(void)
 {
   //host PC has been connected
-  if (!g_err.list[PC_SYS_OFFLINE].err_exist)
+  if (1) //(!g_err.list[PC_SYS_OFFLINE].err_exist)
   {
     switch (rc.sw2)
     {
@@ -162,7 +162,6 @@ static action_mode_e remote_is_action(void)
 }
 
 
-
 static void gimbal_mode_handler(void)
 {
   switch (glb_ctrl_mode)
@@ -197,7 +196,7 @@ static void gimbal_mode_handler(void)
           gim.input.no_action_flag = 0;
           
           gim.pid.yaw_angle_ref = 0;
-          gim.yaw_offset_angle = gim.sensor.gyro_angle;
+          gim.yaw_offset_angle = gim.sensor.yaw_gyro_angle;
         }
       }
       
@@ -240,12 +239,12 @@ static void gimbal_mode_handler(void)
         
         case RC_MI:
         {
-          gim.ctrl_mode = GIMBAL_POSITION_MODE;
+          gim.ctrl_mode = GIMBAL_RELATIVE_MODE;
         }break;
         
         default:
         {
-          gim.ctrl_mode = GIMBAL_POSITION_MODE;
+          gim.ctrl_mode = GIMBAL_RELATIVE_MODE;
         }break;
       }
     }break;
@@ -257,7 +256,14 @@ static void gimbal_mode_handler(void)
         case RC_UP:
         case RC_MI:
         {
-          gim.ctrl_mode = (gimbal_mode_e)pc_recv_mesg.gimbal_control_data.ctrl_mode;
+//          //patrol and relative mode
+//          gim.ctrl_mode = (gimbal_mode_e)pc_recv_mesg.gimbal_control_data.ctrl_mode;
+//          
+//          /* gimbal first enter patrol mode */
+//          /* patrol valid only in gimbal auto mode */
+//          if (gim.last_ctrl_mode != GIMBAL_PATROL_MODE && gim.ctrl_mode == GIMBAL_PATROL_MODE)
+//            gim.pid.yaw_angle_ref = gim.sensor.yaw_relative_angle;
+  
         }break;
         
         default:
@@ -274,7 +280,6 @@ static void gimbal_mode_handler(void)
   }
 }
 
-extern uint32_t patrol_count;
 void get_gimbal_mode(void)
 {
   gim.input.ac_mode = remote_is_action();
@@ -283,12 +288,9 @@ void get_gimbal_mode(void)
   {
     gimbal_mode_handler();
   }
-
-  if (gim.ctrl_mode != GIMBAL_PATROL_MODE)
-    patrol_count = 0;
   
   /* gimbal back to center */
-  if (gim.last_ctrl_mode == GIMBAL_RELAX && gim.ctrl_mode != GIMBAL_RELAX)
+  if (gim.last_ctrl_mode == GIMBAL_RELAX && gim.ctrl_mode != GIMBAL_RELAX && glb_ctrl_mode != AUTO_CTRL_MODE)
   {
     /* set gimbal init mode */
     gim.ctrl_mode = GIMBAL_INIT;
@@ -332,13 +334,14 @@ static void chassis_mode_handler(void)
         
         case RC_MI:
         {
-          chassis.ctrl_mode = MANUAL_SEPARATE_GIMBAL;
+          chassis.ctrl_mode = DODGE_MODE;//MANUAL_SEPARATE_GIMBAL;
         }break;
         
         case RC_DN:
         {
-          chassis.follow_gimbal = 1;
-          chassis.ctrl_mode = MANUAL_FOLLOW_GIMBAL;
+          chassis.ctrl_mode = MANUAL_SEPARATE_GIMBAL;
+          //chassis.follow_gimbal = 1;
+          //chassis.ctrl_mode = MANUAL_FOLLOW_GIMBAL;
         }break;
         
       }
@@ -351,7 +354,7 @@ static void chassis_mode_handler(void)
         case RC_UP:
         case RC_MI:
         {
-          chassis.ctrl_mode = (chassis_mode_e)pc_recv_mesg.chassis_control_data.ctrl_mode;
+//          chassis.ctrl_mode = (chassis_mode_e)pc_recv_mesg.chassis_control_data.ctrl_mode;
         }break;
         
         case RC_DN:
@@ -370,13 +373,14 @@ static void chassis_mode_handler(void)
   }
   
 }
+extern int8_t   twist_side;
+extern int8_t   twist_sign;
 extern uint32_t twist_count;
+
+extern int16_t twist_period;
+extern int16_t twist_angle;
 void get_chassis_mode(void)
 {
-
-  if (chassis.ctrl_mode != DODGE_MODE)
-    twist_count = 0;
-  
   if (gim.ctrl_mode == GIMBAL_INIT)
   {
     chassis.ctrl_mode = CHASSIS_STOP;
@@ -384,6 +388,19 @@ void get_chassis_mode(void)
   else
   {
     chassis_mode_handler();
+  }
+  
+  /* chassis first enter dodge mode */
+  if (chassis.last_ctrl_mode != DODGE_MODE && chassis.ctrl_mode == DODGE_MODE)
+  {
+    if (gim.sensor.yaw_relative_angle > 0)
+      twist_side = 1;
+    else
+      twist_side = -1;
+    
+    if ((gim.sensor.yaw_relative_angle < twist_angle) && (gim.sensor.yaw_relative_angle > -twist_angle))
+      twist_count = acos((gim.sensor.yaw_relative_angle - twist_side*twist_angle)/(-twist_sign*40.0)) * twist_period / (2*PI);
+      
   }
   
 }
@@ -423,6 +440,7 @@ void get_shoot_mode(void)
     case SEMI_AUTO_MODE:
     {
       shoot.ctrl_mode = SEMIAUTO_CTRL_SHOT;
+      //shoot.ctrl_mode = SHOT_DISABLE;
     }break;
     
     case AUTO_CTRL_MODE:

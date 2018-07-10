@@ -29,12 +29,20 @@
 
 #include "stm32f4xx_hal.h"
 
+#define LEFT_FRICTION    TIM1->CCR1
+#define RIGHT_FIRCTION   TIM1->CCR4
 
+#define IMU_PWM_PULSE    TIM3->CCR2
+
+#define BEEP_TUNE        TIM12->ARR
+#define BEEP_CTRL        TIM12->CCR1
+  
+  
 void turn_on_laser(void);
 void turn_off_laser(void);
 void turn_on_friction_wheel(uint16_t spd);
 void turn_off_friction_wheel(void);
-
+void beep_ctrl(uint16_t tune, uint16_t ctrl);
 void pwm_device_init(void);
 void mpu_heat_ctrl(uint16_t pwm_pulse);
 

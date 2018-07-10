@@ -100,7 +100,7 @@ static void get_structure_param(void)
   }
 }
 
-int speed_debug = 1230;
+extern int speed_debug;
 void get_shoot_info(void)
 {
   switch (shoot.ctrl_mode)
@@ -122,16 +122,26 @@ void get_shoot_info(void)
     {
       //shoot.fric_wheel_run = pc_recv_mesg.shoot_control_data.fric_wheel_run;
       //shoot.fric_wheel_spd = pc_recv_mesg.shoot_control_data.fric_wheel_spd;
-      shoot.shoot_cmd      = pc_recv_mesg.shoot_control_data.shoot_cmd;
-      shoot.c_shoot_cmd    = pc_recv_mesg.shoot_control_data.c_shoot_cmd;
+      
+      //remote_ctrl_shoot_hook();
+      //shoot.shoot_cmd      = pc_recv_mesg.shoot_control_data.shoot_cmd;
+      //shoot.c_shoot_cmd    = pc_recv_mesg.shoot_control_data.c_shoot_cmd;
     }break;
     
     case AUTO_CTRL_SHOT:
     {
-      shoot.fric_wheel_run = pc_recv_mesg.shoot_control_data.fric_wheel_run;
-      shoot.fric_wheel_spd = pc_recv_mesg.shoot_control_data.fric_wheel_spd;
-      shoot.shoot_cmd      = pc_recv_mesg.shoot_control_data.shoot_cmd;
-      shoot.c_shoot_cmd    = pc_recv_mesg.shoot_control_data.c_shoot_cmd;
+      //shoot.fric_wheel_run = 1;//pc_recv_mesg.shoot_control_data.fric_wheel_run;
+      shoot.fric_wheel_spd = speed_debug;//pc_recv_mesg.shoot_control_data.fric_wheel_spd;
+      //shoot.shoot_cmd      = pc_recv_mesg.shoot_control_data.shoot_cmd;
+      //shoot.c_shoot_cmd    = pc_recv_mesg.shoot_control_data.c_shoot_cmd;
+      
+      if (rc.sw1 == RC_UP)
+        shoot.fric_wheel_run = 1;
+      else
+        shoot.fric_wheel_run = 0;
+      
+      
+      
     }break;
     
     default:
@@ -232,13 +242,13 @@ void get_infantry_info(void)
   pc_send_mesg.gimbal_information.pit_relative_angle = gim.sensor.pit_relative_angle;
   pc_send_mesg.gimbal_information.yaw_relative_angle = gim.sensor.yaw_relative_angle;
   pc_send_mesg.gimbal_information.pit_absolute_angle = atti.pitch;
-  pc_send_mesg.gimbal_information.yaw_absolute_angle = gim.sensor.gyro_angle;
+  pc_send_mesg.gimbal_information.yaw_absolute_angle = gim.sensor.yaw_gyro_angle;
   pc_send_mesg.gimbal_information.pit_palstance      = gim.sensor.pit_palstance; //dps
   pc_send_mesg.gimbal_information.yaw_palstance      = gim.sensor.yaw_palstance; //dps
   
   /* shoot */
   pc_send_mesg.shoot_task_information.remain_bullets  = shoot.remain_bullets;
-  pc_send_mesg.shoot_task_information.shoot_bullets    = shoot.shoot_bullets;
+  pc_send_mesg.shoot_task_information.shoot_bullets   = shoot.shoot_bullets;
   pc_send_mesg.shoot_task_information.fric_wheel_run  = shoot.fric_wheel_run;
 
   /* infantry error */

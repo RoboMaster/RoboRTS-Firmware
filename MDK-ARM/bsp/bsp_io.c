@@ -56,6 +56,12 @@ void turn_off_friction_wheel(void)
   RIGHT_FIRCTION = 1000;
 }
 
+void beep_ctrl(uint16_t tune, uint16_t ctrl)
+{
+  BEEP_TUNE = tune;
+  BEEP_CTRL = ctrl;//0
+}
+
 void mpu_heat_ctrl(uint16_t pwm_pulse)
 {
   IMU_PWM_PULSE = pwm_pulse;
@@ -63,10 +69,10 @@ void mpu_heat_ctrl(uint16_t pwm_pulse)
 
 void pwm_device_init(void)
 {
-  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2); // ctrl imu temperature
-  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1); // beep
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1); // friction wheel
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+  HAL_TIM_PWM_Start(&htim3,  TIM_CHANNEL_2); // ctrl imu temperature
+  HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_1); // beep
+  HAL_TIM_PWM_Start(&htim1,  TIM_CHANNEL_1); // friction wheel
+  HAL_TIM_PWM_Start(&htim1,  TIM_CHANNEL_4);
 }
 
 uint8_t sd_insert(void)
