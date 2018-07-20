@@ -14,13 +14,6 @@
 - 在 Application/AppCtrl 中都为强实时的控制任务，禁止使用任何阻塞操作
 - 在其他任务中使用的阻塞操作要设置合理的超时时间，优先级、频率不同的任务谨慎使用互斥锁等阻塞操作，防止优先级翻转，如频率较低的 detect_task 和频率较高的 info_get_task
 
-### 注意事项
-
-- 为了防止出现中文字符乱码，所有新建文件请使用 UTF-8 格式
-
-
-- sys_config.h 文件包含了整个步兵车系统的配置参数，可以按照需求更改相应参数
-
 
 ### 模块离线说明
 
@@ -48,7 +41,7 @@
 
 主控板使用 RM 开发板 A 型，各个功能接口的位置如下：
 
-![](Doc/ch/image/main_board_interface.PNG)
+![](Doc/ch/image/main_board_interface.png)
 
 ### 功能模块
 
@@ -56,7 +49,7 @@
 
 提供遥控器、鼠标键盘模式的基础控制。
 
-注意：如果在 `sys_config.h` 文件中定义了 `AUTO_NAVIGATION` 宏，将开启 debug 和 全自动模式。
+注意：如果在 `sys_config.h` 文件中定义了 `AUTO_NAVIGATION` 宏，将开启 debug 和 全自动模式。同时这个文件还包含了整个步兵车系统的配置参数，可以按照需求更改相应参数
 
 #### 全自动模式：
 
@@ -212,7 +205,7 @@ typedef enum
 
 各个任务的启动时序图
 
-![](Doc/ch/image/startup_sequence.PNG)
+![](Doc/ch/image/startup_sequence.png)
 
 ### 硬件体系
 
@@ -223,7 +216,7 @@ typedef enum
 
 #### 硬件连接框图
 
-![](Doc/ch/image/hardware_structure.PNG)
+![](Doc/ch/image/hardware_structure.png)
 
 ### 协议数据
 

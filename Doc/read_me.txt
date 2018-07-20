@@ -1,4 +1,4 @@
-/****************************************** ATTENTION ****************************************
+﻿/****************************************** ATTENTION ****************************************
  *
  * 1. In order to support Chinese characters and comments, please use the UTF-8 format
  *    for all newly created files
@@ -27,34 +27,9 @@
 * Method 2:
 * 1. Connect j-link to the development board and the computer
 * 2. Into debug mode, find this variable cali_param
-* 3. Handle the gimbal to the midpoint, then set the variable cali_param.gim_cali_data[].cali_cmd to 1
+* 3. Handle the gimbal to the midpoint, then set the variable cali_param.gim_cali_data[0].cali_cmd to 1
 *
 *********************************************************************************************/
-
-/******************************** Module Off-line Description *******************************
-*
-* When one of the modules is off-line, user can find out which module is out of work based on 
-*    indicated light and buzzer in board.
-*
-* Corresponding states of each module off-line are shown as following while the number corresponds 
-* the number of times of the red light flashes. 
-*   
-
-1. Remote controller off-line
-
-*   2. Gimbal motor off-line
-*   
-3. Trigger motor or single gyroscope off-line
-*   
-4. Chassis motor off-line
-*   
-5. Single gyroscope sensor of chassis off-line
-
-*   6. Referee system or PC serial port off-line and the red light keeps on
-
-*
-*********************************************************************************************/
-
 
 
 /***********************************注意事项************************************
@@ -80,25 +55,6 @@
 * 方法二：
 * 1、将 jlink 连接开发板和电脑
 * 2、进入 debug 模式，找到 cali_param 这个变量
-* 3、用手将云台扶正，云台在正中间时将变量cali_param.gim_cali_data[].cali_cmd设为1即可
+* 3、用手将云台扶正，云台在正中间时将变量cali_param.gim_cali_data[0].cali_cmd设为1即可
 *
 *******************************************************************************/
-
-/********************************模块离线检测说明*******************************
-*
-* 1、当车辆的某个模块离线时，可以根据开发板指示灯和蜂鸣器的不同状态判断哪个模块
-*    出现了问题，并进行错误定位
-*
-* 注意：
-* 按照优先级进行错误指示，例如遥控器优先级高于云台电机，如果同时发生离线，
-* 先指示当前离线设备是遥控器
-* 
-* 模块离线对应的状态如下，数字对应红灯每次连续闪的次数，按照优先级排序：
-* 1、遥控器离线
-* 2、云台电机离线，包括pitch和yaw轴
-* 3、拨弹电机离线
-* 4、底盘电机存在离线
-* 5、底盘单轴陀螺仪传感器离线
-* 6、裁判系统或者pc端串口没有连接，此时红灯常亮
-*
-********************************************************************************/
