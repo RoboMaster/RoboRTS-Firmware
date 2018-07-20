@@ -405,7 +405,7 @@ void pc_relative_ctrl_handler(void)
     time_raw_last = time_raw;
   }
   
-  //calc speed and limit speed change rate
+  //calc speed
   yaw_speed_raw   = target_speed_calc(&yaw_speed_struct,   time_raw, yaw_angle_raw);
   pitch_speed_raw = target_speed_calc(&pitch_speed_struct, time_raw, pitch_angle_raw);
   dist_speed_raw  = target_speed_calc(&dist_speed_struct,  time_raw, dist_mm_raw);
