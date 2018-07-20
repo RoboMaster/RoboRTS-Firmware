@@ -41,7 +41,7 @@
 
 主控板使用 RM 开发板 A 型，各个功能接口的位置如下：
 
-![](Doc/ch/image/main_board_interface.png)
+![](Doc/ch/image/main_board.png)
 
 ### 功能模块
 
@@ -205,7 +205,7 @@ typedef enum
 
 各个任务的启动时序图
 
-![](Doc/ch/image/startup_sequence.png)
+![](Doc/ch/image/task_sequence.png)
 
 ### 硬件体系
 
@@ -216,7 +216,7 @@ typedef enum
 
 #### 硬件连接框图
 
-![](Doc/ch/image/hardware_structure.png)
+![](Doc/ch/image/mcu_hardware.png)
 
 ### 协议数据
 
@@ -238,5 +238,5 @@ typedef enum
 
 #### 数据流图
 
-![](Doc/ch/image/data_flow.png)
+![](Doc/ch/image/data_handle.png)
 
