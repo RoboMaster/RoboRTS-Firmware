@@ -1,0 +1,42 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}",
+                "${workspaceFolder}/components/object",
+                "C:/Keil_v5/ARM/ARMCC/include",
+                "${workspaceFolder}/bsp/cubemx/Drivers/STM32F4xx_HAL_Driver/Inc",
+                "${workspaceFolder}/bsp/cubemx/Core/Inc",
+                "${workspaceFolder}/bsp/cubemx/Drivers/CMSIS/Device/ST/STM32F4xx/Include",
+                "${workspaceFolder}/bsp/cubemx/Middlewares/Third_Party/FreeRTOS/Source/include",
+                "${workspaceFolder}/bsp/cubemx/Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F",
+                "${workspaceFolder}/bsp/boards",
+                "${workspaceFolder}/components/support",
+                "${workspaceFolder}/components/devices",
+                "${workspaceFolder}/components/algorithm",
+                "${workspaceFolder}/components/controller",
+                "${workspaceFolder}/components/modules",
+                "${workspaceFolder}/application",
+                "${workspaceFolder}/utilities",
+                "${workspaceFolder}/test",
+                "${workspaceFolder}/utilities/ulog",
+                "${workspaceFolder}/bsp/cubemx/Middlewares/Third_Party/FreeRTOS-Plus-CLI",
+                "${workspaceFolder}/bsp/cubemx/Drivers/CMSIS/RTOS/Template",
+                "${workspaceFolder}/application/protocol",
+                "${workspaceFolder}/bsp/cubemx/USB_DEVICE/App",
+                "${workspaceFolder}/bsp/cubemx/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc",
+                "${workspaceFolder}/bsp/cubemx/Middlewares/ST/STM32_USB_Device_Library/Core/Inc",
+                "${workspaceFolder}/bsp/cubemx/USB_DEVICE/Target",
+                "${workspaceFolder}/config"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "intelliSenseMode": "msvc-x64"
+        }
+    ],
+    "version": 4
+}
