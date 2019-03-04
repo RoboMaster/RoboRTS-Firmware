@@ -273,7 +273,16 @@ static int32_t shoot_cmd_ctrl(struct shoot *shoot)
       shoot_state_update(shoot);
     }
   }
-
+ 
+	if ((shoot->fric_spd[0] > FRIC_MIN_SPEED) && (shoot->fric_spd[1] > FRIC_MIN_SPEED))
+	{
+		controller_enable(&(shoot->ctrl));
+	}
+	else
+	{
+		controller_disable(&(shoot->ctrl));
+	}
+	
   return RM_OK;
 }
 
