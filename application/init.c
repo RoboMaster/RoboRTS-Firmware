@@ -69,6 +69,8 @@ void hw_init(void)
   ulog_console_backend_init();
   
   referee_param_init();
+  usart3_rx_callback_register(referee_uart_rx_data_handle);
+  referee_send_data_register(usart3_transmit);
 
   if(glb_sys_cfg == CHASSIS_APP)
   {

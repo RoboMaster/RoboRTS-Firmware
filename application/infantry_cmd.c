@@ -27,6 +27,7 @@
 #include "gimbal_task.h"
 
 #include "protocol.h"
+#include "referee_system.h"
 
 #define MANIFOLD2_CHASSIS_SIGNAL (1 << 0)
 #define MANIFOLD2_GIMBAL_SIGNAL (1 << 1)
@@ -51,6 +52,7 @@ int32_t chassis_spd_acc_ctrl(uint8_t *buff, uint16_t len);
 int32_t shoot_firction_ctrl(uint8_t *buff, uint16_t len);
 int32_t gimbal_angle_ctrl(uint8_t *buff, uint16_t len);
 int32_t shoot_ctrl(uint8_t *buff, uint16_t len);
+int32_t student_data_transmit(uint8_t *buff, uint16_t len);
 
 int32_t rc_data_forword_by_can(uint8_t *buff, uint16_t len)
 {
@@ -82,6 +84,7 @@ void infantry_cmd_task(void const *argument)
   if (app == CHASSIS_APP)
   {
     prc_dev = rc_device_find("uart_rc");
+    protocol_rcv_cmd_register(CMD_STUDENT_DATA, student_data_transmit);
     protocol_rcv_cmd_register(CMD_PUSH_GIMBAL_INFO, gimbal_info_rcv);
     protocol_rcv_cmd_register(CMD_SET_CHASSIS_SPEED, chassis_speed_ctrl);
     protocol_rcv_cmd_register(CMD_SET_CHASSIS_SPD_ACC, chassis_spd_acc_ctrl);
@@ -173,6 +176,13 @@ void infantry_cmd_task(void const *argument)
       }
     }
   }
+}
+
+int32_t student_data_transmit(uint8_t *buff, uint16_t len)
+{
+  uint16_t cmd_id = *(uint16_t *)buff;
+  referee_protocol_tansmit(cmd_id, buff + 2, len);
+  return 0;
 }
 
 int32_t chassis_speed_ctrl(uint8_t *buff, uint16_t len)

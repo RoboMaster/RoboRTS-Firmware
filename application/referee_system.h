@@ -26,30 +26,21 @@
 
 #include "sys.h"
 
-#define REFEREE_SOF    0xA5
+typedef void (*ref_send_handler_t)(uint8_t* buf, uint16_t len);
 
-#define HEADER_LEN   sizeof(frame_header_t)
-#define CMD_LEN      2    //cmdid bytes
-#define CRC_LEN      2    //crc16 bytes
+#define REF_PROTOCOL_HEADER                 0xA5
+#define REF_PROTOCOL_HEADER_SIZE            sizeof(frame_header_t)
+#define REF_PROTOCOL_CMD_SIZE               2
+#define REF_PROTOCOL_CRC16_SIZE             2
+#define REF_HEADER_CRC_LEN                  (REF_PROTOCOL_HEADER_SIZE + REF_PROTOCOL_CRC16_SIZE)
+#define REF_HEADER_CRC_CMDID_LEN            (REF_PROTOCOL_HEADER_SIZE + REF_PROTOCOL_CRC16_SIZE + sizeof(uint16_t))
+#define REF_HEADER_CMDID_LEN                (REF_PROTOCOL_HEADER_SIZE + sizeof(uint16_t))
 
-/** 
-  * @brief  judgement data command id
-  */
-typedef enum
-{
-  GAME_INFO_ID       = 0x0001,
-  REAL_BLOOD_DATA_ID = 0x0002,
-  REAL_SHOOT_DATA_ID = 0x0003,
-  REAL_POWER_DATA_ID = 0x0004,
-  REAL_FIELD_DATA_ID = 0x0005,
-  GAME_RESULT_ID     = 0x0006,
-  GAIN_BUFF_ID       = 0x0007,
-  ROBOT_POS_DATA_ID  = 0x0008,
-  
-  STU_CUSTOM_DATA_ID = 0x0100,
-  ROBOT_TO_CLIENT_ID = 0x0101,
-  CLIENT_TO_ROBOT_ID = 0x0102,
-} referee_data_id_e;
+#define REF_PROTOCOL_FRAME_MAX_SIZE         128
+#define REF_PROTOCOL_CMD_MAX_NUM            20
+
+#define REF_USER_TO_SERVER_MAX_DATA_LEN     64
+#define REF_SERVER_TO_USER_MAX_DATA_LEN     32
 
 #pragma pack(push,1)
 
@@ -62,8 +53,6 @@ typedef struct
 } frame_header_t;
 
 #pragma pack(pop)
-
-#define PROTOCAL_FRAME_MAX_SIZE  200
 
 typedef enum
 {
@@ -80,18 +69,21 @@ typedef struct
   fifo_s_t       *data_fifo;
   frame_header_t *p_header;
   uint16_t       data_len;
-  uint8_t        protocol_packet[PROTOCAL_FRAME_MAX_SIZE];
+  uint8_t        protocol_packet[REF_PROTOCOL_FRAME_MAX_SIZE];
   unpack_step_e  unpack_step;
   uint16_t       index;
 } unpack_data_t;
 
 void referee_param_init(void);
 void referee_unpack_fifo_data(void);
-
-uint8_t     ext_get_crc8(uint8_t *p_msg, uint32_t len, uint8_t crc8) ;
-uint32_t    ext_verify_crc8(uint8_t *p_msg, uint32_t len);
-void        ext_append_crc8(uint8_t *p_msg, uint32_t len);
-uint16_t    ext_get_crc16(uint8_t *p_msg, uint16_t len, uint16_t crc16);
-uint32_t    ext_verify_crc16(uint8_t *p_msg, uint16_t len);
-void        ext_append_crc16(uint8_t* p_msg, uint32_t len) ;
+uint32_t referee_uart_rx_data_handle(uint8_t *data, uint32_t len);
+uint32_t referee_send_data_register(ref_send_handler_t send_t);
+void referee_protocol_tansmit(uint16_t cmd_id, void* p_buf, uint16_t len);
+	
+uint8_t     ref_get_crc8(uint8_t *p_msg, uint32_t len, uint8_t crc8) ;
+uint32_t    ref_verify_crc8(uint8_t *p_msg, uint32_t len);
+void        ref_append_crc8(uint8_t *p_msg, uint32_t len);
+uint16_t    ref_get_crc16(uint8_t *p_msg, uint16_t len, uint16_t crc16);
+uint32_t    ref_verify_crc16(uint8_t *p_msg, uint16_t len);
+void        ref_append_crc16(uint8_t* p_msg, uint32_t len) ;
 #endif // __REFEREE_SYSTEM_H__

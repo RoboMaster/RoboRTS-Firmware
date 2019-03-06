@@ -147,6 +147,7 @@ void board_config(void)
   soft_timer_init();
 
   usart6_manage_init();
+	usart3_manage_init();
   can_manage_init();
   pwm_device_init();
   mpu_device_init();
