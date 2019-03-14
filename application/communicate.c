@@ -86,6 +86,11 @@ int32_t gimbal_adjust(void)
   return 0;
 }
 
+int32_t manifold2_heart_package(uint8_t *buff, uint16_t len)
+{
+  return 0;
+}
+
 int32_t report_firmware_version(uint8_t *buff, uint16_t len)
 {
   return FIRMWARE_VERSION;
@@ -112,6 +117,7 @@ void communicate_task(void const *argument)
     protocol_rcv_cmd_register(CMD_RC_DATA_FORWORD, dr16_rx_data_by_can);
   }
   
+	protocol_rcv_cmd_register(CMD_MANIFOLD2_HEART, manifold2_heart_package);
   protocol_rcv_cmd_register(CMD_REPORT_VERSION, report_firmware_version);
 
   usb_vcp_rx_callback_register(usb_rcv_callback);

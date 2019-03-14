@@ -37,7 +37,8 @@
 #define CHASSIS_ADDRESS        0x01
 #define GIMBAL_ADDRESS         0x02
 
-#define CMD_REPORT_VERSION                  (0x0001u)
+#define CMD_MANIFOLD2_HEART                 (0x0001u)
+#define CMD_REPORT_VERSION                  (0x0002u)
 
 #define CMD_STUDENT_DATA                    (0x0101u)
 

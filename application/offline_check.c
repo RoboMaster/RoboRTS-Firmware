@@ -92,6 +92,8 @@ int32_t offline_check(void *argc)
     gimbal_pitch_enable(pgimbal);
     shoot_enable(pshoot);
     chassis_enable(pchassis);
+		
+		LED_R_OFF();
   }
   else
   {
@@ -111,6 +113,7 @@ int32_t get_offline_state(void)
 int32_t rc_offline_callback(void *argc)
 {
   beep_set_times(0);
+	LED_R_ON();
   gimbal_init_state_reset();
   return 0;
 }
