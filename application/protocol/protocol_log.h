@@ -25,7 +25,7 @@
 #endif
 
 #define LOG_TAG "protocol"
-#define LOG_LVL LOG_LVL_ERROR
+#define LOG_LVL 0
 #include "ulog.h"
 
 #define protocol_log_d(...)  log_d(__VA_ARGS__);
