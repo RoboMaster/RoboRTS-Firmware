@@ -200,12 +200,12 @@ uint32_t protocol_s_add_sendnode(uint8_t reciver, uint8_t session, uint8_t pack_
 
   if (pack_type == PROTOCOL_PACK_NOR)
   {
-      PROTOCOL_SEND_DBG_PRINTF("Send pack, Reciver:0x%02X, Cmd:0x%04X, Session: %d Normal pack.",
+      PROTOCOL_SEND_DBG_PRINTF("Send pack, Address:0x%02X, Cmd:0x%04X, Session: %d Normal pack.",
                               reciver, cmd, session);
   }
   else
   {
-    PROTOCOL_SEND_DBG_PRINTF("Send pack, Reciver:0x%02X, Session: %d Ack pack.",
+    PROTOCOL_SEND_DBG_PRINTF("Send pack, Address:0x%02X, Session: %d Ack pack.",
                               reciver, session);
   }
 

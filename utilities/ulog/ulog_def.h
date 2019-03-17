@@ -52,7 +52,7 @@ typedef uint32_t ulog_size_t;
 #define dbg_log(level, ...)                                \
     if ((level) <= DBG_LEVEL)                              \
     {                                                      \
-        ulog_output(level, LOG_TAG, RT_FALSE, __VA_ARGS__);\
+        ulog_output(level, LOG_TAG, 0, __VA_ARGS__);\
     }
 
 #if !defined(LOG_TAG)

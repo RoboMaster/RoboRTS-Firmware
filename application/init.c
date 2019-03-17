@@ -109,7 +109,7 @@ void task_init(void)
   osThreadDef(TIMER_1MS, timer_task, osPriorityHigh, 0, 512);
   timer_task_t = osThreadCreate(osThread(TIMER_1MS), NULL);
 
-  osThreadDef(COMMUNICATE_TASK, communicate_task, osPriorityNormal, 0, 4096);
+  osThreadDef(COMMUNICATE_TASK, communicate_task, osPriorityRealtime, 0, 4096);
   communicate_task_t = osThreadCreate(osThread(COMMUNICATE_TASK), NULL);
 
   osThreadDef(CMD_TASK, infantry_cmd_task, osPriorityNormal, 0, 4096);

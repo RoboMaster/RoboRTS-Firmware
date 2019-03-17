@@ -338,14 +338,21 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
   return result;
 }
 
-uint8_t usb_tx_buff[2048];
+uint8_t usb_tx_buff[4096];
 
 void usb_tx_interrupt(void)
 {
-	if(usb_tx_fifo.used_num)
+	//usb is disconnect
+	if(fifo_s_isfull(&usb_tx_fifo))
 	{
-		fifo_s_gets(&usb_tx_fifo, (char*)usb_tx_buff, usb_tx_fifo.used_num);
-		CDC_Transmit_FS(usb_tx_buff, usb_tx_fifo.used_num);
+		fifo_s_flush(&usb_tx_fifo);
+	}
+	else if(usb_tx_fifo.used_num)
+	{
+		uint32_t send_num;
+		send_num = usb_tx_fifo.used_num;
+		fifo_s_gets(&usb_tx_fifo, (char*)usb_tx_buff, send_num);
+		CDC_Transmit_FS(usb_tx_buff, send_num);
 	}
 }
 
