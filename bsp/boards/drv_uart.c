@@ -102,6 +102,7 @@ void usart3_idle_callback(void)
 {
   if (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_IDLE))
   {
+		__HAL_UART_CLEAR_IDLEFLAG(&huart3);
     usart_rec_to_buff(&usart3_manage_obj, INTERRUPT_TYPE_UART);
   }
 }
@@ -110,6 +111,7 @@ void usart6_idle_callback(void)
 {
   if (__HAL_UART_GET_FLAG(&huart6, UART_FLAG_IDLE))
   {
+		__HAL_UART_CLEAR_IDLEFLAG(&huart6);
     usart_rec_to_buff(&usart6_manage_obj, INTERRUPT_TYPE_UART);
   }
 }

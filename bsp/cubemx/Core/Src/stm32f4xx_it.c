@@ -272,11 +272,7 @@ void USART1_IRQHandler(void)
 void USART3_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
-	if(__HAL_UART_GET_FLAG(&huart3, UART_FLAG_IDLE))
-	{
-		__HAL_UART_CLEAR_IDLEFLAG(&huart3);
-    usart3_idle_callback();
-	}
+  usart3_idle_callback();
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart3);
   /* USER CODE BEGIN USART1_IRQn 1 */
@@ -417,11 +413,7 @@ void DMA2_Stream6_IRQHandler(void)
 void USART6_IRQHandler(void)
 {
   /* USER CODE BEGIN USART6_IRQn 0 */
-  if(__HAL_UART_GET_FLAG(&huart6, UART_FLAG_IDLE))
-	{
-		__HAL_UART_CLEAR_IDLEFLAG(&huart6);
-    usart3_idle_callback();
-	}
+  usart3_idle_callback();
   /* USER CODE END USART6_IRQn 0 */
   HAL_UART_IRQHandler(&huart6);
   /* USER CODE BEGIN USART6_IRQn 1 */
