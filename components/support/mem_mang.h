@@ -19,7 +19,7 @@
 //     }
 // }
 
-#define TOTAL_HEAP_SIZE (1024 * 50)
+#define TOTAL_HEAP_SIZE (1024 * 60)
 
 /* must be power of 2, at least 8 */
 #define BYTE_ALIGNMENT (8)

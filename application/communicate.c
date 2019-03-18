@@ -114,6 +114,7 @@ void communicate_task(void const *argument)
     protocol_local_init(GIMBAL_ADDRESS);
     protocol_can_interface_register("chassis_can2", 4096, 1, PROTOCOL_CAN_PORT2, CHASSIS_CAN_ID, GIMBAL_CAN_ID, can2_send_data);
     protocol_set_route(CHASSIS_ADDRESS, "chassis_can2");
+		protocol_set_route(MANIFOLD2_ADDRESS, "chassis_can2");
     protocol_rcv_cmd_register(CMD_RC_DATA_FORWORD, dr16_rx_data_by_can);
   }
   

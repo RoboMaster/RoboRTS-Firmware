@@ -120,12 +120,13 @@
   */
 
 /* Memory management macros */
+#include "mem_mang.h"
 
 /** Alias for memory allocation. */
-#define USBD_malloc         malloc
+#define USBD_malloc         heap_malloc
 
 /** Alias for memory release. */
-#define USBD_free           free
+#define USBD_free           heap_free
 
 /** Alias for memory set. */
 #define USBD_memset         memset
