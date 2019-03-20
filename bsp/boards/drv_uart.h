@@ -26,6 +26,10 @@
 
 #include "sys.h"
 
+#define USART3_RX_BUFFER_SIZE (512)
+#define USART3_TX_BUFFER_SIZE (512)
+#define USART3_TX_FIFO_SIZE (1024)
+
 #define USART6_RX_BUFFER_SIZE (512)
 #define USART6_TX_BUFFER_SIZE (512)
 #define USART6_TX_FIFO_SIZE (1024)
@@ -64,14 +68,15 @@ typedef enum
   ERR_NORAML = 0
 } UART_Err;
 
+void usart3_manage_init(void);
 void usart6_manage_init(void);
 void usart_rx_callback_register(usart_manage_obj_t *m_obj, usart_call_back fun);
 UART_Err usart_transmit(usart_manage_obj_t *m_obj, uint8_t *buf, uint16_t len);
 int usart6_printf(char *fmt, ...);
 void usart6_transmit(uint8_t *buff, uint16_t len);
-void usart1_idle_callback(void);
+void usart3_transmit(uint8_t *buff, uint16_t len);
 void usart6_idle_callback(void);
-
+void usart3_idle_callback(void);
 uint32_t uart6_rx_data_handle(uint8_t *buff, uint32_t len);
-
+void usart3_rx_callback_register(usart_call_back fun);
 #endif // __DRV_UART_H__

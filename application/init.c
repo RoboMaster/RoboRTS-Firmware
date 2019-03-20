@@ -69,6 +69,8 @@ void hw_init(void)
   ulog_console_backend_init();
   
   referee_param_init();
+  usart3_rx_callback_register(referee_uart_rx_data_handle);
+  referee_send_data_register(usart3_transmit);
 
   if(glb_sys_cfg == CHASSIS_APP)
   {
@@ -104,10 +106,10 @@ void task_init(void)
   uint8_t app;
   app = get_sys_cfg();
 
-  osThreadDef(TIMER_1MS, timer_task, osPriorityNormal, 0, 512);
+  osThreadDef(TIMER_1MS, timer_task, osPriorityHigh, 0, 512);
   timer_task_t = osThreadCreate(osThread(TIMER_1MS), NULL);
 
-  osThreadDef(COMMUNICATE_TASK, communicate_task, osPriorityNormal, 0, 4096);
+  osThreadDef(COMMUNICATE_TASK, communicate_task, osPriorityRealtime, 0, 4096);
   communicate_task_t = osThreadCreate(osThread(COMMUNICATE_TASK), NULL);
 
   osThreadDef(CMD_TASK, infantry_cmd_task, osPriorityNormal, 0, 4096);

@@ -9,7 +9,6 @@
 
 /* config */
 
-#define ULOG_OUTPUT_LVL_D
 #define ULOG_OUTPUT_LVL 7
 #define ULOG_OUTPUT_FLOAT
 #define ULOG_USING_COLOR

@@ -26,22 +26,34 @@
 
 #include "sys.h"
 
+#define FIRMWARE_VERSION_0 0u
+#define FIRMWARE_VERSION_1 1u
+#define FIRMWARE_VERSION_2 0u
+#define FIRMWARE_VERSION_3 1u
+
+#define FIRMWARE_VERSION ((FIRMWARE_VERSION_3 << 24) | (FIRMWARE_VERSION_2 << 16) | (FIRMWARE_VERSION_1 << 8) | FIRMWARE_VERSION_0)
+
 #define MANIFOLD2_ADDRESS      0x00
 #define CHASSIS_ADDRESS        0x01
 #define GIMBAL_ADDRESS         0x02
 
-#define CMD_PUSH_CHASSIS_INFO               (0x0204u)
-#define CMD_SET_CHASSIS_MODE                (0x0205u)
-#define CMD_SET_CHASSIS_SPEED               (0x0206u)
-#define CMD_GET_CHASSIS_PARAM               (0x0207u)
-#define CMD_SET_CHASSIS_SPD_ACC             (0x0208u)
+#define CMD_MANIFOLD2_HEART                 (0x0001u)
+#define CMD_REPORT_VERSION                  (0x0002u)
 
-#define CMD_PUSH_GIMBAL_INFO                (0x0304u)
-#define CMD_SET_GIMBAL_MODE                 (0x0306u)
-#define CMD_SET_GIMBAL_ANGLE                (0x0308u)
+#define CMD_STUDENT_DATA                    (0x0101u)
 
-#define CMD_SET_FRICTION_SPEED              (0x0309u)
-#define CMD_SET_SHOOT_FREQUENTCY            (0x030Au)
+#define CMD_PUSH_CHASSIS_INFO               (0x0201u)
+#define CMD_SET_CHASSIS_MODE                (0x0202u)
+#define CMD_SET_CHASSIS_SPEED               (0x0203u)
+#define CMD_GET_CHASSIS_PARAM               (0x0204u)
+#define CMD_SET_CHASSIS_SPD_ACC             (0x0205u)
+
+#define CMD_PUSH_GIMBAL_INFO                (0x0301u)
+#define CMD_SET_GIMBAL_MODE                 (0x0302u)
+#define CMD_SET_GIMBAL_ANGLE                (0x0303u)
+
+#define CMD_SET_FRICTION_SPEED              (0x0304u)
+#define CMD_SET_SHOOT_FREQUENTCY            (0x0305u)
 
 #define CMD_RC_DATA_FORWORD                 (0x0401u)
 #define CMD_PUSH_UWB_INFO                   (0x0402u)

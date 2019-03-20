@@ -19,14 +19,23 @@
 #include "dma.h"
 #include "drv_uart.h"
 
+extern UART_HandleTypeDef huart6;
 extern DMA_HandleTypeDef hdma_usart6_rx;
 extern DMA_HandleTypeDef hdma_usart6_tx;
-
-extern UART_HandleTypeDef huart6;
-
 static uint8_t usart6_rx_buff[USART6_RX_BUFFER_SIZE];
 static uint8_t usart6_tx_buff[USART6_TX_BUFFER_SIZE];
 static uint8_t usart6_tx_fifo_buff[USART6_TX_FIFO_SIZE];
+
+extern UART_HandleTypeDef huart3;
+extern DMA_HandleTypeDef hdma_usart3_rx;
+extern DMA_HandleTypeDef hdma_usart3_tx;
+static uint8_t usart3_rx_buff[USART3_RX_BUFFER_SIZE];
+static uint8_t usart3_tx_buff[USART3_TX_BUFFER_SIZE];
+static uint8_t usart3_tx_fifo_buff[USART3_TX_FIFO_SIZE];
+
+usart_manage_obj_t usart3_manage_obj =
+    {
+        .call_back_f = NULL};
 
 usart_manage_obj_t usart6_manage_obj =
     {
@@ -35,9 +44,25 @@ usart_manage_obj_t usart6_manage_obj =
 static void usart_rec_to_buff(usart_manage_obj_t *m_obj, interrput_type int_type);
 static void usart_transmit_hook(usart_manage_obj_t *m_obj);
 
+void usart_rx_callback_register(usart_manage_obj_t *m_obj, usart_call_back fun)
+{
+  m_obj->call_back_f = fun;
+  return;
+}
+
+void usart3_rx_callback_register(usart_call_back fun)
+{
+  usart_rx_callback_register(&usart3_manage_obj, fun);
+  return;
+}
+
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
-  if (huart == &huart6)
+  if (huart == &huart3)
+  {
+    usart_rec_to_buff(&usart3_manage_obj, INTERRUPT_TYPE_DMA_HALF);
+  }
+  else if (huart == &huart6)
   {
     usart_rec_to_buff(&usart6_manage_obj, INTERRUPT_TYPE_DMA_HALF);
   }
@@ -47,7 +72,11 @@ void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  if (huart == &huart6)
+  if (huart == &huart3)
+  {
+    usart_rec_to_buff(&usart3_manage_obj, INTERRUPT_TYPE_DMA_ALL);
+  }
+  else if (huart == &huart6)
   {
     usart_rec_to_buff(&usart6_manage_obj, INTERRUPT_TYPE_DMA_ALL);
   }
@@ -57,7 +86,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-  if (huart == &huart6)
+  if (huart == &huart3)
+  {
+    usart_transmit_hook(&usart3_manage_obj);
+  }
+  else if (huart == &huart6)
   {
     usart_transmit_hook(&usart6_manage_obj);
   }
@@ -65,12 +98,40 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
   return;
 }
 
+void usart3_idle_callback(void)
+{
+  if (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_IDLE))
+  {
+    __HAL_UART_CLEAR_IDLEFLAG(&huart3);
+    usart_rec_to_buff(&usart3_manage_obj, INTERRUPT_TYPE_UART);
+  }
+}
+
 void usart6_idle_callback(void)
 {
   if (__HAL_UART_GET_FLAG(&huart6, UART_FLAG_IDLE))
   {
+    __HAL_UART_CLEAR_IDLEFLAG(&huart6);
     usart_rec_to_buff(&usart6_manage_obj, INTERRUPT_TYPE_UART);
   }
+}
+
+void usart3_manage_init(void)
+{
+  usart3_manage_obj.rx_buffer = usart3_rx_buff;
+  usart3_manage_obj.rx_buffer_size = USART3_RX_BUFFER_SIZE;
+  usart3_manage_obj.dma_h = &hdma_usart3_rx;
+  usart3_manage_obj.uart_h = &huart3;
+  usart3_manage_obj.tx_fifo_buffer = usart3_tx_fifo_buff;
+  usart3_manage_obj.tx_fifo_size = USART3_TX_FIFO_SIZE;
+  usart3_manage_obj.tx_buffer_size = USART3_TX_BUFFER_SIZE;
+  usart3_manage_obj.tx_buffer = usart3_tx_buff;
+  usart3_manage_obj.is_sending = 0;
+
+  fifo_s_init(&(usart3_manage_obj.tx_fifo), usart3_tx_fifo_buff, USART3_TX_FIFO_SIZE);
+
+  HAL_UART_Receive_DMA(&huart3, usart3_rx_buff, USART3_RX_BUFFER_SIZE);
+  __HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);
 }
 
 void usart6_manage_init(void)
@@ -91,10 +152,35 @@ void usart6_manage_init(void)
   __HAL_UART_ENABLE_IT(&huart6, UART_IT_IDLE);
 }
 
-void usart_rx_callback_register(usart_manage_obj_t *m_obj, usart_call_back fun)
+int usart6_printf(char *fmt, ...)
 {
-  m_obj->call_back_f = fun;
-  return;
+
+  va_list arg;
+  uint8_t buff[USART6_PRINTF_BUFF_SIZE];
+  uint8_t printf_len;
+
+  va_start(arg, fmt);
+  printf_len = vsnprintf((char *)buff, USART6_PRINTF_BUFF_SIZE, fmt, arg);
+  va_end(arg);
+
+  if (printf_len > USART6_PRINTF_BUFF_SIZE)
+  {
+    printf_len = USART6_PRINTF_BUFF_SIZE;
+  }
+
+  usart_transmit(&usart6_manage_obj, buff, printf_len);
+
+  return 0;
+}
+
+void usart3_transmit(uint8_t *buff, uint16_t len)
+{
+  usart_transmit(&usart3_manage_obj, buff, len);
+}
+
+void usart6_transmit(uint8_t *buff, uint16_t len)
+{
+  usart_transmit(&usart6_manage_obj, buff, len);
 }
 
 UART_Err usart_transmit(usart_manage_obj_t *m_obj, uint8_t *buf, uint16_t len)
@@ -214,30 +300,4 @@ static void usart_rec_to_buff(usart_manage_obj_t *m_obj, interrput_type int_type
   m_obj->read_start_index = (m_obj->read_start_index + read_length) % (m_obj->rx_buffer_size);
 
   return;
-}
-
-int usart6_printf(char *fmt, ...)
-{
-
-  va_list arg;
-  uint8_t buff[USART6_PRINTF_BUFF_SIZE];
-  uint8_t printf_len;
-
-  va_start(arg, fmt);
-  printf_len = vsnprintf((char *)buff, USART6_PRINTF_BUFF_SIZE, fmt, arg);
-  va_end(arg);
-
-  if (printf_len > USART6_PRINTF_BUFF_SIZE)
-  {
-    printf_len = USART6_PRINTF_BUFF_SIZE;
-  }
-
-  usart_transmit(&usart6_manage_obj, buff, printf_len);
-
-  return 0;
-}
-
-void usart6_transmit(uint8_t *buff, uint16_t len)
-{
-  usart_transmit(&usart6_manage_obj, buff, len);
 }

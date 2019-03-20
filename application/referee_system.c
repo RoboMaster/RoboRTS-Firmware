@@ -15,35 +15,21 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "usart.h"
 #include "protocol.h"
 #include "communicate.h"
 #include "infantry_cmd.h"
 #include "referee_system.h"
 
+#define REFEREE_FIFO_BUFLEN 500
+
 extern osThreadId communicate_task_t;
 
-extern int UART_Receive_DMA_No_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint32_t Size);
-
-void referee_data_handler(uint8_t *p_frame)
-{
-  frame_header_t *p_header = (frame_header_t*)p_frame;
-  memcpy(p_header, p_frame, HEADER_LEN);
-
-  uint16_t data_length = p_header->data_length;
-  uint16_t cmd_id      = *(uint16_t *)(p_frame + HEADER_LEN);
-  uint8_t *data_addr   = p_frame + HEADER_LEN + CMD_LEN;
-  
-  protocol_send(MANIFOLD2_ADDRESS, cmd_id, data_addr, data_length);
-}
-
-#define REFEREE_FIFO_BUFLEN 500
 static unpack_data_t referee_unpack_obj;
 static fifo_s_t  referee_rxdata_fifo;
 static uint8_t   referee_rxdata_buf[REFEREE_FIFO_BUFLEN];
 
-#define REFEREE_RX_BUFFER_SIZE 200
-static uint8_t referee_uart_rx_buff[REFEREE_RX_BUFFER_SIZE];
+static ref_send_handler_t ref_protocol_send;
+static uint8_t ref_seq_num;
 
 void referee_param_init(void)
 {
@@ -55,33 +41,74 @@ void referee_param_init(void)
   referee_unpack_obj.index = 0;
   referee_unpack_obj.data_len = 0;
   referee_unpack_obj.unpack_step = STEP_HEADER_SOF;
-
-  UART_Receive_DMA_No_IT(&huart3, referee_uart_rx_buff, REFEREE_RX_BUFFER_SIZE);
-  __HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);
 }
 
-uint32_t referee_uart_rx_data_handle(UART_HandleTypeDef *huart)
+static uint16_t referee_protocol_pack(uint8_t *p_out, uint8_t *p_in, uint16_t len, uint16_t cmd_id)
 {
-  if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE))
-  {
-    __HAL_UART_CLEAR_IDLEFLAG(huart);
+	uint16_t headSize = REF_PROTOCOL_HEADER_SIZE;
+	uint16_t frameSize = len + REF_HEADER_CRC_CMDID_LEN;
 
-    __HAL_DMA_DISABLE(huart->hdmarx);
+	memcpy(p_out + headSize, &cmd_id, sizeof(cmd_id));
+	ref_append_crc8(p_out, headSize);
+	memcpy(p_out + headSize + sizeof(cmd_id), p_in, len);
+	ref_append_crc16(p_out, frameSize);
 
-    fifo_s_puts(&referee_rxdata_fifo, (char *)referee_uart_rx_buff, REFEREE_RX_BUFFER_SIZE - huart->hdmarx->Instance->NDTR);
+	return frameSize;
+}
 
-    __HAL_DMA_SET_COUNTER(huart->hdmarx, REFEREE_RX_BUFFER_SIZE);
-    __HAL_DMA_ENABLE(huart->hdmarx);
+/**
+*@func:     ExtProtocolTransmit
+*@brief:    pc send protocol to main control
+*@param:    cmd_id: the protocol cmd id
+*           pdata: the point about data buffer
+*           len: the length of the data buffer
+*/
+void referee_protocol_tansmit(uint16_t cmd_id, void* p_buf, uint16_t len)
+{
+	uint8_t txBuf[REF_PROTOCOL_FRAME_MAX_SIZE]={0};
+	frame_header_t *pHeader = (frame_header_t *)txBuf;
+	uint16_t frameSize;
 
-    osSignalSet(communicate_task_t, REFEREE_SIGNAL);
-  }
-  return 0;
+	pHeader->sof                    = REF_PROTOCOL_HEADER;
+	pHeader->data_length            = len;
+	pHeader->seq                    = ref_seq_num++;
+
+	frameSize = referee_protocol_pack(txBuf, p_buf, len, cmd_id);
+	if(ref_protocol_send != NULL)
+	{
+		ref_protocol_send(txBuf, frameSize);
+	}
+}
+
+uint32_t referee_send_data_register(ref_send_handler_t send_t)
+{
+	ref_protocol_send = send_t;
+	return 0;
+}
+
+uint32_t referee_uart_rx_data_handle(uint8_t *data, uint32_t len)
+{
+  fifo_s_puts(&referee_rxdata_fifo, (char *)data, len);
+  osSignalSet(communicate_task_t, REFEREE_SIGNAL);
+	return 0;
+}
+
+void referee_data_handler(uint8_t *p_frame)
+{
+  frame_header_t *p_header = (frame_header_t*)p_frame;
+  memcpy(p_header, p_frame, REF_PROTOCOL_HEADER_SIZE);
+
+  uint16_t data_length = p_header->data_length;
+  uint16_t cmd_id      = *(uint16_t *)(p_frame + REF_PROTOCOL_HEADER_SIZE);
+  uint8_t *data_addr   = p_frame + REF_PROTOCOL_HEADER_SIZE + REF_PROTOCOL_CMD_SIZE;
+  
+  protocol_send(MANIFOLD2_ADDRESS, cmd_id + 0x4000, data_addr, data_length);
 }
 
 void referee_unpack_fifo_data(void)
 {
   uint8_t byte = 0;
-  uint8_t sof = REFEREE_SOF;
+  uint8_t sof = REF_PROTOCOL_HEADER;
   unpack_data_t *p_obj = &referee_unpack_obj;
 
   while ( fifo_s_used(p_obj->data_fifo) )
@@ -114,7 +141,7 @@ void referee_unpack_fifo_data(void)
         p_obj->data_len |= (byte << 8);
         p_obj->protocol_packet[p_obj->index++] = byte;
 
-        if(p_obj->data_len < (PROTOCAL_FRAME_MAX_SIZE - HEADER_LEN - CRC_LEN))
+        if(p_obj->data_len < (REF_PROTOCOL_FRAME_MAX_SIZE - REF_HEADER_CRC_CMDID_LEN))
         {
           p_obj->unpack_step = STEP_FRAME_SEQ;
         }
@@ -135,9 +162,9 @@ void referee_unpack_fifo_data(void)
       {
         p_obj->protocol_packet[p_obj->index++] = byte;
 
-        if (p_obj->index == HEADER_LEN)
+        if (p_obj->index == REF_PROTOCOL_HEADER_SIZE)
         {
-          if ( ext_verify_crc8(p_obj->protocol_packet, HEADER_LEN) )
+          if ( ref_verify_crc8(p_obj->protocol_packet, REF_PROTOCOL_HEADER_SIZE) )
           {
             p_obj->unpack_step = STEP_DATA_CRC16;
           }
@@ -151,16 +178,16 @@ void referee_unpack_fifo_data(void)
 
       case STEP_DATA_CRC16:
       {
-        if (p_obj->index < (HEADER_LEN + CMD_LEN + p_obj->data_len + CRC_LEN))
+        if (p_obj->index < (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
         {
            p_obj->protocol_packet[p_obj->index++] = byte;  
         }
-        if (p_obj->index >= (HEADER_LEN + CMD_LEN + p_obj->data_len + CRC_LEN))
+        if (p_obj->index >= (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
         {
           p_obj->unpack_step = STEP_HEADER_SOF;
           p_obj->index = 0;
 
-          if ( ext_verify_crc16(p_obj->protocol_packet, HEADER_LEN + CMD_LEN + p_obj->data_len + CRC_LEN) )
+          if ( ref_verify_crc16(p_obj->protocol_packet, REF_HEADER_CRC_CMDID_LEN + p_obj->data_len) )
           {
             referee_data_handler(p_obj->protocol_packet);
           }
@@ -176,8 +203,8 @@ void referee_unpack_fifo_data(void)
   }
 }
 
-static const uint8_t ext_crc8_init = 0xff;
-static const uint8_t ext_crc8_tab[256] =
+static const uint8_t ref_crc8_init = 0xff;
+static const uint8_t ref_crc8_tab[256] =
 {
     0x00, 0x5e, 0xbc, 0xe2, 0x61, 0x3f, 0xdd, 0x83, 0xc2, 0x9c, 0x7e, 0x20, 0xa3, 0xfd, 0x1f, 0x41,
     0x9d, 0xc3, 0x21, 0x7f, 0xfc, 0xa2, 0x40, 0x1e, 0x5f, 0x01, 0xe3, 0xbd, 0x3e, 0x60, 0x82, 0xdc,
@@ -198,14 +225,14 @@ static const uint8_t ext_crc8_tab[256] =
 };
 
 
-uint8_t ext_get_crc8(uint8_t *p_msg, unsigned int len, uint8_t crc8)
+uint8_t ref_get_crc8(uint8_t *p_msg, unsigned int len, uint8_t crc8)
 {
     uint8_t uc_index;
 
     while (len--)
     {
         uc_index = crc8^(*p_msg++);
-        crc8  = ext_crc8_tab[uc_index];
+        crc8  = ref_crc8_tab[uc_index];
     }
 
     return(crc8);
@@ -217,13 +244,13 @@ uint8_t ext_get_crc8(uint8_t *p_msg, unsigned int len, uint8_t crc8)
 **  Input:        Data to Verify,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-unsigned int ext_verify_crc8(uint8_t *p_msg, unsigned int len)
+unsigned int ref_verify_crc8(uint8_t *p_msg, unsigned int len)
 {
     uint8_t uc_expected = 0;
 
     if ((p_msg == 0) || (len <= 2)) return 0;
 
-    uc_expected = ext_get_crc8 (p_msg, len-1, ext_crc8_init);
+    uc_expected = ref_get_crc8 (p_msg, len-1, ref_crc8_init);
 
     return ( uc_expected == p_msg[len-1] );
 }
@@ -234,20 +261,20 @@ unsigned int ext_verify_crc8(uint8_t *p_msg, unsigned int len)
 **  Input:        Data to CRC and append,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-void ext_append_crc8(uint8_t *p_msg, unsigned int len)
+void ref_append_crc8(uint8_t *p_msg, unsigned int len)
 {
     uint8_t crc8 = 0;
 
     if ((p_msg == 0) || (len <= 2)) return;
 
-    crc8 = ext_get_crc8 ( (uint8_t *)p_msg, len-1, ext_crc8_init);
+    crc8 = ref_get_crc8 ( (uint8_t *)p_msg, len-1, ref_crc8_init);
 
     p_msg[len-1] = crc8;
 }
 
 
-static uint16_t ext_crc16_init = 0xffff;
-static const uint16_t ext_crc16_tab[256] =
+static uint16_t ref_crc16_init = 0xffff;
+static const uint16_t ref_crc16_tab[256] =
     {
         0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
         0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5, 0xe97e, 0xf8f7,
@@ -290,7 +317,7 @@ static const uint16_t ext_crc16_tab[256] =
 **  Input:        Data to check,Stream length, initialized checksum
 **  Output:       CRC checksum
 */
-uint16_t ext_get_crc16(uint8_t *p_msg, uint16_t len, uint16_t crc16)
+uint16_t ref_get_crc16(uint8_t *p_msg, uint16_t len, uint16_t crc16)
 {
     uint8_t data;
     
@@ -302,7 +329,7 @@ uint16_t ext_get_crc16(uint8_t *p_msg, uint16_t len, uint16_t crc16)
     while(len--)
     {
         data = *p_msg++;
-        (crc16) = ((uint16_t)(crc16) >> 8)  ^ ext_crc16_tab[((uint16_t)(crc16) ^ (uint16_t)(data)) & 0x00ff];
+        (crc16) = ((uint16_t)(crc16) >> 8)  ^ ref_crc16_tab[((uint16_t)(crc16) ^ (uint16_t)(data)) & 0x00ff];
     }
 
     return crc16;
@@ -313,7 +340,7 @@ uint16_t ext_get_crc16(uint8_t *p_msg, uint16_t len, uint16_t crc16)
 **  Input:        Data to Verify,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-uint32_t ext_verify_crc16(uint8_t *p_msg, uint16_t len)
+uint32_t ref_verify_crc16(uint8_t *p_msg, uint16_t len)
 {
     uint16_t w_expected = 0;
 
@@ -321,7 +348,7 @@ uint32_t ext_verify_crc16(uint8_t *p_msg, uint16_t len)
     {
         return 1;
     }
-    w_expected = ext_get_crc16 ( p_msg, len - 2, ext_crc16_init);
+    w_expected = ref_get_crc16 ( p_msg, len - 2, ref_crc16_init);
 
     return ((w_expected & 0xff) == p_msg[len - 2] && ((w_expected >> 8) & 0xff) == p_msg[len - 1]);
 }
@@ -331,7 +358,7 @@ uint32_t ext_verify_crc16(uint8_t *p_msg, uint16_t len)
 **  Input:        Data to CRC and append,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-void ext_append_crc16(uint8_t* p_msg, uint32_t len)
+void ref_append_crc16(uint8_t* p_msg, uint32_t len)
 {
     uint16_t crc16 = 0;
 
@@ -339,7 +366,7 @@ void ext_append_crc16(uint8_t* p_msg, uint32_t len)
     {
         return;
     }
-    crc16 = ext_get_crc16 ( (uint8_t *)p_msg, len-2, ext_crc16_init );
+    crc16 = ref_get_crc16 ( (uint8_t *)p_msg, len-2, ref_crc16_init );
 
     p_msg[len-2] = (uint8_t)(crc16 & 0x00ff);
     p_msg[len-1] = (uint8_t)((crc16 >> 8)& 0x00ff);
