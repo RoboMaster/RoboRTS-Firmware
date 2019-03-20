@@ -76,7 +76,7 @@ int32_t dr16_rx_data_by_can(uint8_t *buff, uint16_t len)
   rc_offline = get_offline_dev();
   rc_dev = (rc_device_t)device_find("can_rc");
   rc_device_date_update(rc_dev, buff);
-  detect_device_update(rc_offline, RC_OFFLINE_EVENT); 
+  detect_device_update(rc_offline, RC_OFFLINE_EVENT);
   return 0;
 }
 
@@ -114,11 +114,11 @@ void communicate_task(void const *argument)
     protocol_local_init(GIMBAL_ADDRESS);
     protocol_can_interface_register("chassis_can2", 4096, 1, PROTOCOL_CAN_PORT2, CHASSIS_CAN_ID, GIMBAL_CAN_ID, can2_send_data);
     protocol_set_route(CHASSIS_ADDRESS, "chassis_can2");
-		protocol_set_route(MANIFOLD2_ADDRESS, "chassis_can2");
+    protocol_set_route(MANIFOLD2_ADDRESS, "chassis_can2");
     protocol_rcv_cmd_register(CMD_RC_DATA_FORWORD, dr16_rx_data_by_can);
   }
-  
-	protocol_rcv_cmd_register(CMD_MANIFOLD2_HEART, manifold2_heart_package);
+
+  protocol_rcv_cmd_register(CMD_MANIFOLD2_HEART, manifold2_heart_package);
   protocol_rcv_cmd_register(CMD_REPORT_VERSION, report_firmware_version);
 
   usb_vcp_rx_callback_register(usb_rcv_callback);

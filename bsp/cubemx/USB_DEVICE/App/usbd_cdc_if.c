@@ -183,7 +183,7 @@ USBD_CDC_ItfTypeDef USBD_Interface_fops_FS =
   */
 #include "fifo.h"
 fifo_s_t usb_tx_fifo;
-uint8_t usb_tx_fifo_buff[4096];
+uint8_t usb_tx_fifo_buff[APP_TX_DATA_SIZE];
 
 static int8_t CDC_Init_FS(void)
 {
@@ -338,7 +338,7 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
   return result;
 }
 
-uint8_t usb_tx_buff[4096];
+uint8_t usb_tx_buff[APP_TX_DATA_SIZE];
 
 void usb_tx_interrupt(void)
 {
