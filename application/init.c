@@ -109,7 +109,7 @@ void task_init(void)
   osThreadDef(TIMER_1MS, timer_task, osPriorityHigh, 0, 512);
   timer_task_t = osThreadCreate(osThread(TIMER_1MS), NULL);
 
-  osThreadDef(COMMUNICATE_TASK, communicate_task, osPriorityRealtime, 0, 4096);
+  osThreadDef(COMMUNICATE_TASK, communicate_task, osPriorityHigh, 0, 4096);
   communicate_task_t = osThreadCreate(osThread(COMMUNICATE_TASK), NULL);
 
   osThreadDef(CMD_TASK, infantry_cmd_task, osPriorityNormal, 0, 4096);
@@ -117,12 +117,12 @@ void task_init(void)
   
   if (app == CHASSIS_APP)
   {
-    osThreadDef(CHASSIS_TASK, chassis_task, osPriorityHigh, 0, 512);
+    osThreadDef(CHASSIS_TASK, chassis_task, osPriorityRealtime, 0, 512);
     chassis_task_t = osThreadCreate(osThread(CHASSIS_TASK), NULL);
   }
   else
   {
-    osThreadDef(GIMBAL_TASK, gimbal_task, osPriorityHigh, 0, 512);
+    osThreadDef(GIMBAL_TASK, gimbal_task, osPriorityRealtime, 0, 512);
     gimbal_task_t = osThreadCreate(osThread(GIMBAL_TASK), NULL);
 
     osThreadDef(SHOOT_TASK, shoot_task, osPriorityNormal, 0, 512);

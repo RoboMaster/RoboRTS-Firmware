@@ -26,7 +26,7 @@
 
 #include "sys.h"
 
-#define FIRMWARE_VERSION_0 0u
+#define FIRMWARE_VERSION_0 1u
 #define FIRMWARE_VERSION_1 1u
 #define FIRMWARE_VERSION_2 0u
 #define FIRMWARE_VERSION_3 1u
