@@ -95,7 +95,7 @@ static usb_vcp_call_back_f usb_vcp_call_back[USB_REC_MAX_NUM];
 /* Define size for the receive and transmit buffer over CDC */
 /* It's up to user to redefine and/or remove those define */
 #define APP_RX_DATA_SIZE  2048
-#define APP_TX_DATA_SIZE  2048
+#define APP_TX_DATA_SIZE  4096
 /* USER CODE END PRIVATE_DEFINES */
 
 /**
@@ -326,33 +326,34 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 {
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 7 */
-  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
-  if (hcdc->TxState != 0){
-		fifo_s_puts(&usb_tx_fifo, (char*)Buf, Len);
-    return USBD_BUSY;
-  }
-	memcpy(UserTxBufferFS, Buf, Len);
-  USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, Len);
-  result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
-  /* USER CODE END 7 */
+ 
+	fifo_s_puts(&usb_tx_fifo, (char*)Buf, Len);
+
   return result;
 }
 
-uint8_t usb_tx_buff[APP_TX_DATA_SIZE];
-
-void usb_tx_interrupt(void)
+int32_t usb_tx_flush(void* argc)
 {
-	//usb is disconnect
-	if(fifo_s_isfull(&usb_tx_fifo))
+	uint8_t result = USBD_OK;
+	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
+	
+	if (hcdc->TxState != 0){
+    return USBD_BUSY;
+  }
+	else
 	{
-		fifo_s_flush(&usb_tx_fifo);
-	}
-	else if(usb_tx_fifo.used_num)
-	{
+		FIFO_CPU_SR_TYPE cpu_sr;
 		uint32_t send_num;
+    cpu_sr = FIFO_GET_CPU_SR();
+
+    FIFO_ENTER_CRITICAL(); 
 		send_num = usb_tx_fifo.used_num;
-		fifo_s_gets(&usb_tx_fifo, (char*)usb_tx_buff, send_num);
-		CDC_Transmit_FS(usb_tx_buff, send_num);
+		fifo_s_gets_noprotect(&usb_tx_fifo, (char*)UserTxBufferFS, send_num);
+		FIFO_RESTORE_CPU_SR(cpu_sr);
+
+		USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, send_num);
+    result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+		return result;
 	}
 }
 
