@@ -17,7 +17,7 @@
 
 #include "timer_task.h"
 
-struct soft_timer soft_timer[TIMER_ELEMENT_NUM_MAX - 1];
+struct soft_timer soft_timer[TIMER_ELEMENT_NUM_MAX];
 
 void timer_task(void const *argument)
 {
@@ -57,5 +57,5 @@ int32_t soft_timer_register(int32_t (*soft_timer_callback)(void *argc), void *ar
       return i;
     }
   }
-  return 0;
+  return -1;
 }
