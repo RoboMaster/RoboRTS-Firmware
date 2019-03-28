@@ -57,5 +57,5 @@ int32_t soft_timer_register(int32_t (*soft_timer_callback)(void *argc), void *ar
       return i;
     }
   }
-  return 0;
+  return -1;
 }
