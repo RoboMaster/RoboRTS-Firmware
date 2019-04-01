@@ -242,7 +242,7 @@ static int32_t shoot_cmd_ctrl(struct shoot *shoot)
   }
   else if (shoot->state == SHOOT_READY)
   {
-    if ((shoot->fric_spd[0] > FRIC_MIN_SPEED) && (shoot->fric_spd[1] > FRIC_MIN_SPEED))
+    if ((shoot->fric_spd[0] >= FRIC_MIN_SPEED) && (shoot->fric_spd[1] >= FRIC_MIN_SPEED))
     {
       switch (shoot->cmd)
       {
@@ -274,7 +274,7 @@ static int32_t shoot_cmd_ctrl(struct shoot *shoot)
     }
   }
  
-	if ((shoot->fric_spd[0] > FRIC_MIN_SPEED) && (shoot->fric_spd[1] > FRIC_MIN_SPEED))
+	if ((shoot->fric_spd[0] >= FRIC_MIN_SPEED) && (shoot->fric_spd[1] >= FRIC_MIN_SPEED))
 	{
 		controller_enable(&(shoot->ctrl));
 	}
