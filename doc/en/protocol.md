@@ -1,26 +1,26 @@
-## 协议说明
+## protocol instruction
 
-### 协议数据
+### protocol data
 
-协议数据按照通信方向可以分为两大类：
+protocol data could separate to 2 category depend on transmition direction:
 
-#### 一、底层发送给上层的数据：
+#### 1.lower layer send to upper layer：
 
-1 反馈信息：包含各个机构传感器反馈信息、底层计算出来的一些反馈信息；
+1 Feedback information: including feedback information of various agencies' sensors and some feedback information calculated by the bottom layer;
 
-2 底层状态信息：包含底层设备运行状态、底层对上层数据的一些响应等；
+2 Underlying state information: including the running state of the underlying device, some response from the underlying layer to the upper layer data, etc.;
 
-3 转发数据：包含裁判系统的全部信息、服务器端的自定义信息；
+3 Forward data: contains all the information of the referee system, customized information on the server side;
 
-#### 二、底层接收的上层数据：
+#### 2. lower layer received from upper layer:
 
-1 控制信息：上层对底层 3 个执行机构的控制信息；
+1 Control information: upper layer control information on the bottom three actuators;
 
-## 协议数据说明
+## protocol data instruction
 
-一帧协议数据分为 4 个部分，分别是帧头数据、命令码ID、数据、帧尾校验数据。
+One frame of protocol data is divided into four parts, frame header data, command code ID, data, and frame end check data.
 
-### 1、帧头数据  
+### 1、frame header data
 
 ``` c
 /** 
@@ -57,66 +57,67 @@ typedef struct
 ```
 
 
-| 帧头数据      | 占用字节 | 详细描述                            |
-| :------------| :-------| :--------------------------------- |
-| sof          | 1       | 数据的域ID                          |
-| ver_data_len | 2       | 每帧内数据的长度和协议版本号          |
-| session      | 1       | 包序号，在0xA0域中保留               |
-| sender       | 1       |发送者地址                          |
-| reciver      | 1       |发送者地址                          |
-| res          | 2       |保留位                              |
-| seq          | 2       |包序号                              |
-| crc16        | 2       | 帧头的crc校验结果                   |
+| frame header data| Size in Byte | description                            					|
+| :----------------| :------------| :------------------------------------------------------ |
+| sof          	   | 1            | Domain ID of the data                                   |
+| ver_data_len 	   | 2            | Length of data in each frame and protocol version number|
+| session          | 1            | Packet sequence number, reserved in the 0xA0 field      |
+| sender           | 1            | sender address                                          |
+| reciver          | 1            | receiver address                                        |
+| res              | 2            | reserved bit                                            |
+| seq              | 2            | packet sequence number                                  |
+| crc16            | 2            | Frame header CRC  check result                          |
 
 
-### 2、命令码
+### 2、Command code
 
-| 命令码   | 占用字节 |
-| :---- | :--- |
-| cmdid | 2    |
+| command code | size in byte |
+| :----------- | :----------- |
+| cmdid 	   | 2            |
 
-一个命令码对应一帧包含具体信息的数据，下面是现有所有数据对应的命令码。
+A command code corresponds to one frame of data containing specific information, and the following is a command code corresponding to all existing data.
 
 
-命令码对应的数据传输方向和具体功能如下：
+The data transmission direction and specific functions corresponding to the command code are as follows:
 
-| 命令码    | 传输方向    | 功能介绍             | 频率             |
-| :----- | :------ | :--------------- | :------------- |
-| 0x0001 | 主控-->PC | 比赛时机器人状态         | 裁判系统10Hz       |
-| 0x0002 | 主控-->PC | 实时伤害数据           | 受到攻击时发送        |
-| 0x0003 | 主控-->PC | 实时射击数据           | 裁判系统           |
-| 0x0004 | 主控-->PC | 实时功率、热量数据        | ICRA不使用，不发送    |
-| 0x0005 | 主控-->PC | 场地 RFID 数据       | 检测到 IC 卡发送     |
-| 0x0006 | 主控-->PC | 比赛结果数据           | 比赛结束时发送        |
-| 0x0007 | 主控-->PC | 获得 buff 数据       | 裁判系统           |
-| 0x0008 | 主控-->PC | 场地 UWB 数据        | 裁判系统           |
-|        |           |                  |                |
-| 0x0204 | 主控-->PC | 机器人底盘相关信息        | 100Hz定频         |
-| 0x0304 | 主控-->PC | 机器人云台相关信息        | 100Hz定频         |
-| 0x0402 | 主控-->PC | UWB相关信息        | UWB更新频率         |
-|        |           |                  |                |
-| 0x0206 | PC-->主控 | 设置底盘速度        |          |
-| 0x0208 | PC-->主控 | 设置底盘速度(有加速度)  |      |
-| 0x0309 | PC-->主控 | 控制摩擦轮转速         | 开启摩擦轮使用         |
-| 0x030A | PC-->主控 | 控制射击     |         |
-| 0x0403 | PC-->主控 | 云台相关校准信息         | 需要校准云台时发送      |
+| command code    | transmition direction    | function            						| frequency             					|
+| :-------------- | :----------------------- | :--------------------------------------- | :---------------------------------------- |
+| 0x0001          | main control-->PC        | robot state in competition               | referee system 10Hz       				|
+| 0x0002          | main control-->PC        | real-time damage data           		    | when taking damage        				|
+| 0x0003          | main control-->PC        | real-time shooting data                  | referee system           					|
+| 0x0004          | main control-->PC        | real-time power consumption, heat data   | won't use in ICRA    						|
+| 0x0005          | main control-->PC        | field RFID data    					    | when IC card sending detected 			|
+| 0x0006          | main control-->PC        | competition result data           		| at the end of game        				|
+| 0x0007          | main control-->PC        | get buff data      						| referee system           					|
+| 0x0008          | main control-->PC        | field UWB data        					| referee system           					|
+|                 |                          |                  						|                							|
+| 0x0204          | main control-->PC        | robot chassis information        		| 100Hz				         				|
+| 0x0304          | main control-->PC        | robot gimbal information        			| 100Hz         							|
+| 0x0402          | main control-->PC        | UWB information        					| UWB refresh frequency         			|
+|                 |                          |                  						|                							|
+| 0x0206          | PC-->main control        | set chassis speed        				|          									|
+| 0x0208          | PC-->main control        | set chassis speed (with acceleration)  	|      										|
+| 0x0309          | PC-->main control        | control the speed of friction wheel      | at the beginning of using friction wheel  |
+| 0x030A          | PC-->main control        | control the shooting    					|         									|
+| 0x0403          | PC-->main control        | gimbal calibration information         	| when gimbal calibration needed	        |
 
-### 3、数据  
+### 3、Data  
 
-为命令码 ID 对应的数据结构，数据长度即这个结构体的大小。
+For the data structure corresponding to the command code ID, the data length is the size of this structure.
 
-| 数据   | 占用字节        |
-| :--- | :---------- |
-| data | data_length |
+| data   | size in byte |
+| :----- | :----------- |
+| data   | data_length  |
 
-#### 第一类
+#### Type 1
 
-裁判系统学生串口信息，详情查阅裁判系统手册
+referee system user data
+for more details please check referee system manual
 
-#### 第二类
+#### Type 2
 
-控制信息与推送信息：
-详细指令查看application/infantry_cmd.h
+control and push information
+for more details please check application/infantry_cmd.h
 
 ```c
 
@@ -195,11 +196,11 @@ struct cmd_shoot_num
 
 ```
 
-## 数据发送和接收
+## Data sending and receiving
 
-### 1、数据发送
+### 1、data sending
 
-使用如下API配置协议和发送的数据：
+use API below to configure protocol and the sending data:
 
 ```c
 int32_t protocol_send_cmd_config(uint16_t cmd,
@@ -235,9 +236,9 @@ uint32_t protocol_uart_rcv_data(uint8_t com_port, void *p_data, uint32_t data_le
 
 ```
 
-### 2、数据接收
+### 2、Data receiving
 
-使用下面的方式解决裁判系统粘包的问题
+use the method below to solve referee system sticky problem
 
 ```c
 

@@ -1,6 +1,8 @@
 
 ## 概述
 
+- en doc   [readme](doc/en/readme.md)
+
 ### 软件环境
 
  - Toolchain/IDE : MDK-ARM V5
@@ -67,6 +69,7 @@
 ### 文档
 
 - 协议文档  [protocol](doc/ch/protocol.md)
+- protocol [document](doc/en/protocol.md)
 
 ## 快速开始
 
