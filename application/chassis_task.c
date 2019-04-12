@@ -53,7 +53,7 @@ void chassis_task(void const *argument)
       if (rc_device_get_state(prc_dev, RC_S2_UP) == RM_OK)
       {
         vx = (float)prc_info->ch2 / 660 * MAX_CHASSIS_VX_SPEED;
-        vy = -(float)prc_info->ch1 / 660 * MAX_CHASSIS_VX_SPEED;
+        vy = -(float)prc_info->ch1 / 660 * MAX_CHASSIS_VY_SPEED;
         wz = -pid_calculate(&pid_follow, follow_relative_angle, 0);
         chassis_set_offset(pchassis, ROTATE_X_OFFSET, ROTATE_Y_OFFSET);
         chassis_set_speed(pchassis, vx, vy, wz);
@@ -62,7 +62,7 @@ void chassis_task(void const *argument)
       if (rc_device_get_state(prc_dev, RC_S2_MID) == RM_OK)
       {
         vx = (float)prc_info->ch2 / 660 * MAX_CHASSIS_VX_SPEED;
-        vy = -(float)prc_info->ch1 / 660 * MAX_CHASSIS_VX_SPEED;
+        vy = -(float)prc_info->ch1 / 660 * MAX_CHASSIS_VY_SPEED;
         wz = -(float)prc_info->ch3 / 660 * MAX_CHASSIS_VW_SPEED;
         chassis_set_offset(pchassis, 0, 0);
         chassis_set_speed(pchassis, vx, vy, wz);
