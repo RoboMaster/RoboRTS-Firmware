@@ -181,7 +181,7 @@ void infantry_cmd_task(void const *argument)
 int32_t student_data_transmit(uint8_t *buff, uint16_t len)
 {
   uint16_t cmd_id = *(uint16_t *)buff;
-  referee_protocol_tansmit(cmd_id, buff + 2, len);
+  referee_protocol_tansmit(cmd_id, buff + 2, len - 2);
   return 0;
 }
 
