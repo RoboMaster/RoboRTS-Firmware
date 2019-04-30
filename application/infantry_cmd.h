@@ -26,7 +26,7 @@
 
 #include "sys.h"
 
-#define FIRMWARE_VERSION_0 5u
+#define FIRMWARE_VERSION_0 6u
 #define FIRMWARE_VERSION_1 1u
 #define FIRMWARE_VERSION_2 0u
 #define FIRMWARE_VERSION_3 1u
@@ -36,6 +36,8 @@
 #define MANIFOLD2_ADDRESS      0x00
 #define CHASSIS_ADDRESS        0x01
 #define GIMBAL_ADDRESS         0x02
+
+/* cmd id can not be set 0xffff */
 
 #define CMD_MANIFOLD2_HEART                 (0x0001u)
 #define CMD_REPORT_VERSION                  (0x0002u)

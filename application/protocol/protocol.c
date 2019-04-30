@@ -161,12 +161,21 @@ uint32_t protocol_local_init(uint8_t address)
   }
 
   MUTEX_INIT(protocol_local_info.mutex_lock);
-
+  
   memset(protocol_local_info.route_table, 0xFF, PROTOCOL_ROUTE_TABLE_MAX_NUM);
-  memset(protocol_local_info.interface, 0, sizeof(protocol_local_info.interface));
-  memset(&boardcast_object, 0, sizeof(boardcast_object_t));
-  memset(&protocol_local_info.send_cmd_info, 0, sizeof(protocol_local_info.send_cmd_info));
-  memset(&protocol_local_info.rcv_cmd_info, 0, sizeof(protocol_local_info.rcv_cmd_info));
+	
+	for(int i; i < PROTOCOL_INTERFACE_MAX; i++)
+	{
+		/* initalization user data is 0xFF */
+		memset(&protocol_local_info.interface[i].user_data, 0xFF, sizeof(union interface_user_data));
+	}
+
+  for(int i; i < PROTOCOL_CMD_MAX_NUM; i++)
+	{
+		/* initalization cmd is 0xFF */
+		memset(&protocol_local_info.send_cmd_info[i].cmd, 0xFFFF, 2);
+    memset(&protocol_local_info.rcv_cmd_info[i].cmd, 0xFFFF, 2);
+	}
 
   protocol_local_info.address = address;
   protocol_local_info.rcv_nor_callBack = protocol_rcv_pack_handle;
