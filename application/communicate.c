@@ -100,6 +100,7 @@ void communicate_task(void const *argument)
 {
   uint8_t app;
   app = get_sys_cfg();
+	app = CHASSIS_APP; // for testing
 
   if (app == CHASSIS_APP)
   {
