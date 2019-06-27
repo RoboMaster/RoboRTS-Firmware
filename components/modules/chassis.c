@@ -206,6 +206,7 @@ int32_t chassis_get_info(struct chassis *chassis, struct chassis_info *info)
   ANGLE_LIMIT_360(info->yaw_gyro_angle, chassis->mecanum.gyro.yaw_gyro_angle);
   ANGLE_LIMIT_360_TO_180(info->yaw_gyro_angle);
   info->yaw_gyro_rate = chassis->mecanum.gyro.yaw_gyro_rate;
+	info->yaw_gyro_rate = 21.12; //test
 
   for (int i = 0; i < 4; i++)
   {

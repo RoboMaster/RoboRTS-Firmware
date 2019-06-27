@@ -24,8 +24,8 @@
   #define INIT_H_EXTERN extern
 #endif
 
-#define CHASSIS_APP 0
-#define GIMBAL_APP  1
+#define CHASSIS_APP 1 //origin 0
+#define GIMBAL_APP  0 //origin 1
 
 uint8_t get_sys_cfg(void);
 void hw_init(void);
