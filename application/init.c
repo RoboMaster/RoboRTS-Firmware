@@ -113,7 +113,7 @@ void task_init(void)
   communicate_task_t = osThreadCreate(osThread(COMMUNICATE_TASK), NULL);
 
   osThreadDef(CMD_TASK, infantry_cmd_task, osPriorityNormal, 0, 4096);
-  cmd_task_t = osThreadCreate(osThread(CMD_TASK), NULL);
+	cmd_task_t = osThreadCreate(osThread(CMD_TASK), NULL);
   
   if (app == CHASSIS_APP)
   {

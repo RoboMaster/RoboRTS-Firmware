@@ -124,13 +124,16 @@ int32_t chassis_execute(struct chassis *chassis)
     pdata = motor_device_get_data(&(chassis->motor[i]));
 
     wheel_fdb[i].total_ecd = pdata->total_ecd;
-    wheel_fdb[i].speed_rpm = pdata->speed_rpm;
-
+    wheel_fdb[i].speed_rpm = pdata->speed_rpm;	
+		
+		chassis->ctrl[i].enable = 1;
     controller_set_input(&chassis->ctrl[i], chassis->mecanum.wheel_rpm[i]);
     controller_execute(&chassis->ctrl[i], (void *)pdata);
     controller_get_output(&chassis->ctrl[i], &motor_out);
 
     motor_device_set_current(&chassis->motor[i], (int16_t)motor_out);
+	
+
   }
 
   mecanum_position_measure(&(chassis->mecanum), wheel_fdb);
@@ -206,13 +209,15 @@ int32_t chassis_get_info(struct chassis *chassis, struct chassis_info *info)
   ANGLE_LIMIT_360(info->yaw_gyro_angle, chassis->mecanum.gyro.yaw_gyro_angle);
   ANGLE_LIMIT_360_TO_180(info->yaw_gyro_angle);
   info->yaw_gyro_rate = chassis->mecanum.gyro.yaw_gyro_rate;
-	info->yaw_gyro_rate = 21.12; //test
 
   for (int i = 0; i < 4; i++)
   {
     info->wheel_rpm[i] = chassis->mecanum.wheel_rpm[i] * MOTOR_DECELE_RATIO;
   }
-
+	//get io info here
+	info->io_1 = HAL_GPIO_ReadPin(LED_G_GPIO_Port,LED_G_Pin);
+	info->io_2 = HAL_GPIO_ReadPin(LED_R_GPIO_Port,LED_R_Pin);
+	
   return RM_OK;
 }
 

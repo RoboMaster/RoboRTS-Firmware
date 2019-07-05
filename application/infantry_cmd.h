@@ -81,6 +81,8 @@ struct cmd_chassis_info
   int16_t angle_deg;
   int16_t v_x_mm;
   int16_t v_y_mm;
+	uint8_t io_1;
+	uint8_t io_2;
 };
 
 struct cmd_gimbal_info

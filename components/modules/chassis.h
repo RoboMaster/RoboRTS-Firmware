@@ -62,6 +62,8 @@ struct chassis_info
   float yaw_gyro_angle;
   float yaw_gyro_rate;
   float wheel_rpm[4];
+	int io_1;
+	int io_2;
 };
 
 chassis_t chassis_find(const char *name);

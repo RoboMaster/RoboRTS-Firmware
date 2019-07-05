@@ -100,6 +100,7 @@ void infantry_cmd_task(void const *argument)
 
   while (1)
   {
+		/*
     if (rc_device_get_state(prc_dev, RC_S2_DOWN) != RM_OK)
     {
       memset(&manifold_cmd, 0, sizeof(struct manifold_cmd));
@@ -107,8 +108,9 @@ void infantry_cmd_task(void const *argument)
     }
     else
     {
+		*/
       event = osSignalWait(MANIFOLD2_CHASSIS_SIGNAL | MANIFOLD2_GIMBAL_SIGNAL |
-                               MANIFOLD2_SHOOT_SIGNAL | MANIFOLD2_FRICTION_SIGNAL | MANIFOLD2_CHASSIS_ACC_SIGNAL,
+                           MANIFOLD2_SHOOT_SIGNAL | MANIFOLD2_FRICTION_SIGNAL | MANIFOLD2_CHASSIS_ACC_SIGNAL,
                            500);
 
       if (event.status == osEventSignal)
@@ -175,7 +177,7 @@ void infantry_cmd_task(void const *argument)
         shoot_set_cmd(pshoot, SHOOT_STOP_CMD, 0);
       }
     }
-  }
+  
 }
 
 int32_t student_data_transmit(uint8_t *buff, uint16_t len)
@@ -280,6 +282,8 @@ int32_t chassis_push_info(void *argc)
   cmd_chassis_info.position_y_mm = info.position_y_mm;
   cmd_chassis_info.v_x_mm = info.v_x_mm;
   cmd_chassis_info.v_y_mm = info.v_y_mm;
+	cmd_chassis_info.io_1 = info.io_1;
+	cmd_chassis_info.io_2 = info.io_2;
 
   protocol_send(MANIFOLD2_ADDRESS, CMD_PUSH_CHASSIS_INFO, &cmd_chassis_info, sizeof(cmd_chassis_info));
 

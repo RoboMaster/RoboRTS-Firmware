@@ -41,13 +41,14 @@ void chassis_task(void const *argument)
   else
   {
   }
-
+	
   soft_timer_register(chassis_push_info, (void *)pchassis, 10);
 
   pid_struct_init(&pid_follow, MAX_CHASSIS_VW_SPEED, 50, 8.0f, 0.0f, 2.0f);
-
+	
   while (1)
   {
+    
     if (rc_device_get_state(prc_dev, RC_S2_DOWN) != RM_OK)
     {
       if (rc_device_get_state(prc_dev, RC_S2_UP) == RM_OK)

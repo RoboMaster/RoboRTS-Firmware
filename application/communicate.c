@@ -121,7 +121,7 @@ void communicate_task(void const *argument)
 
   protocol_rcv_cmd_register(CMD_MANIFOLD2_HEART, manifold2_heart_package);
   protocol_rcv_cmd_register(CMD_REPORT_VERSION, report_firmware_version);
-
+	
   usb_vcp_rx_callback_register(usb_rcv_callback);
   soft_timer_register(usb_tx_flush, NULL, 1);
 	protocol_send_list_add_callback_reg(protocol_send_success_callback);
