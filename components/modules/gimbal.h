@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,12 +18,6 @@
 #ifndef __GIMBAL_H__
 #define __GIMBAL_H__
 
-#ifdef GIMBAL_H_GLOBAL
-  #define GIMBAL_H_EXTERN 
-#else
-  #define GIMBAL_H_EXTERN extern
-#endif
-
 /* gimbal relevant */
 #define PITCH_ANGLE_MAX      20.0f
 #define PITCH_ANGLE_MIN      -20.0f
@@ -34,22 +28,24 @@
 /* the ratio of motor encoder value translate to degree */
 #ifndef ENCODER_ANGLE_RATIO
   #define ENCODER_ANGLE_RATIO    (8192.0f/360.0f)
-#endif 
+#endif
 
-#define RAD_TO_DEG 57.3f
+#ifndef RAD_TO_DEG
+#define RAD_TO_DEG 57.29f
+#endif
 
 /* the deceleration ratio of pitch axis motor */
 #define PIT_DECELE_RATIO       1.0f
 /* the deceleration ratio of yaw axis motor */
 #define YAW_DECELE_RATIO       1.0f
 /* the positive direction of pitch axis motor */
-#define PITCH_MOTOR_POSITIVE_DIR  1.0f
+#define PITCH_MOTOR_POSITIVE_DIR  -1.0f
 /* the positive direction of yaw axis motor */
 #define YAW_MOTOR_POSITIVE_DIR  1.0f
 
 #include "motor.h"
 #include "single_gyro.h"
-#include "pid_controller.h"
+#include "pid.h"
 
 #define YAW_MOTOR_INDEX 0
 #define PITCH_MOTOR_INDEX 1
@@ -69,22 +65,22 @@ typedef struct gimbal *gimbal_t;
 
 struct gimbal_param
 {
-  int16_t pitch_ecd_center;
-  int16_t yaw_ecd_center;
+  uint16_t pitch_ecd_center;
+  uint16_t yaw_ecd_center;
 };
 
 struct gimbal_p_y
 {
   /* unit: degree */
   float yaw;
-  float pitch;  
+  float pitch;
 };
 
 struct gimbal_rate
 {
   /* unit: degree/s */
   float yaw_rate;
-  float pitch_rate;  
+  float pitch_rate;
 };
 
 struct gimbal_sensor
@@ -95,7 +91,7 @@ struct gimbal_sensor
 
 struct gimbal
 {
-  struct object parent;
+  struct device parent;
   struct gimbal_param param;
 
   union {
@@ -107,16 +103,19 @@ struct gimbal
     } bit;
   } mode;
 
-  struct gimbal_sensor sensor;  
+  struct gimbal_sensor sensor;
   struct gimbal_p_y ecd_angle;
-  
+
   struct gimbal_p_y gyro_target_angle;
   struct gimbal_p_y ecd_target_angle;
 
-  struct motor_device motor[2];
-  struct cascade cascade[2];
-  struct cascade_feedback cascade_fdb[2];
-  struct controller ctrl[2];
+  struct motor_device yaw_motor;
+	struct pid yaw_inter_pid;
+	struct pid yaw_outer_pid;
+
+	struct motor_device pitch_motor;
+  struct pid pitch_inter_pid;
+	struct pid pitch_outer_pid;
 };
 
 struct gimbal_info
@@ -130,9 +129,15 @@ struct gimbal_info
   float pitch_rate;
 };
 
-gimbal_t gimbal_find(const char *name);
-int32_t gimbal_cascade_register(struct gimbal *gimbal, const char *name, enum device_can can);
-int32_t gimbal_execute(struct gimbal *gimbal);
+int32_t gimbal_cascade_init(struct gimbal *gimbal, const char *name,
+														struct pid_param yaw_inter_param,
+														struct pid_param yaw_outer_param,
+														struct pid_param pitch_inter_param,
+														struct pid_param pitch_outer_param,
+														enum device_can can);
+
+int32_t gimbal_pid_init(struct gimbal *gimbal, const char *name, enum device_can can);
+int32_t gimbal_cascade_calculate(struct gimbal *gimbal);
 
 int32_t gimbal_yaw_gyro_update(struct gimbal *gimbal, float yaw);
 int32_t gimbal_pitch_gyro_update(struct gimbal *gimbal, float pitch);

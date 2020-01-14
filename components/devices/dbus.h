@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,12 +17,6 @@
 
 #ifndef __DBUS_H__
 #define __DBUS_H__
-
-#ifdef DBUS_H_GLOBAL
-  #define DBUS_H_EXTERN
-#else
-  #define DBUS_H_EXTERN extern
-#endif
 
 #include "device.h"
 
@@ -48,7 +42,7 @@ typedef struct rc_info *rc_info_t;
 
 // #pragma pack(push, 1)
 
-/** 
+/**
   * @brief  remote control information
   */
 struct rc_info
@@ -109,13 +103,11 @@ struct rc_device
   void (*get_state)(rc_device_t);
 };
 
-int32_t rc_device_register(rc_device_t rc_dev, const char *name, uint16_t flags);
+int32_t rc_device_register(rc_device_t rc_dev, const char *name);
 int32_t rc_device_date_update(rc_device_t rc_dev, uint8_t *buff);
 int32_t rc_device_get_state(rc_device_t rc_dev, uint16_t state);
 rc_info_t rc_device_get_info(rc_device_t rc_dev);
 rc_device_t rc_device_find(const char *name);
-
-
 
 
 #endif // __DBUS_H__

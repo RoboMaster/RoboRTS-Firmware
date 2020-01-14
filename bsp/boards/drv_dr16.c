@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #include "usart.h"
 #include "drv_dr16.h"
 
-extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart3;
 
 int UART_Receive_DMA_No_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint32_t Size);
 
@@ -27,33 +27,21 @@ dr16_rx_callback_t dr16_forword_callback = NULL;
 
 static uint8_t dr16_uart_rx_buff[DR16_RX_BUFFER_SIZE];
 
-int32_t dr16_rx_uart_callback_register(dr16_rx_callback_t fn)
+void dr16_uart_init(dr16_rx_callback_t rx_fn,
+	                  dr16_rx_callback_t forword_fn)
 {
-  if(fn != NULL)
-  {
-    dr16_rx_callback = fn;
-    return 0;
-  }
-  return 1;
+  UART_Receive_DMA_No_IT(&huart3, dr16_uart_rx_buff, DR16_RX_BUFFER_SIZE);
+
+  __HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);
+	dr16_rx_callback = rx_fn;
+	dr16_forword_callback = forword_fn;
 }
 
-int32_t dr16_forword_callback_register(dr16_rx_callback_t fn)
-{
-  if(fn != NULL)
-  {
-    dr16_forword_callback = fn;
-    return 0;
-  }
-  return 1;
-}
-
-void dr16_uart_init(void)
-{
-  UART_Receive_DMA_No_IT(&huart1, dr16_uart_rx_buff, DR16_RX_BUFFER_SIZE);
-  
-  __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
-}
-
+/**
+  * @brief  uart idle interupt
+  * @param
+  * @retval error code
+  */
 uint32_t dr16_uart_rx_data_handle(UART_HandleTypeDef *huart)
 {
   if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE))
@@ -85,6 +73,11 @@ uint32_t dr16_uart_rx_data_handle(UART_HandleTypeDef *huart)
   return 0;
 }
 
+/**
+  * @brief  dr16 uart dma configration
+  * @param
+  * @retval error code
+  */
 int UART_Receive_DMA_No_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint32_t Size)
 {
   uint32_t tmp = 0;

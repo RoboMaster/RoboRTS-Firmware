@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,13 +18,11 @@
 #ifndef __PID_H__
 #define __PID_H__
 
-#ifdef PID_H_GLOBAL
-#define PID_H_EXTERN
-#else
-#define PID_H_EXTERN extern
-#endif
+#include "stdint.h"
 
+#if defined(__CC_ARM)
 typedef struct pid *pid_t;
+#endif
 
 struct pid_param
 {
@@ -34,12 +32,14 @@ struct pid_param
   float input_max_err;
 
   float max_out;
-  float inte_limit;
+  float integral_limit;
 };
 
 struct pid
 {
   struct pid_param param;
+
+	uint8_t enable;
 
   float set;
   float get;
@@ -54,7 +54,7 @@ struct pid
 
   void (*f_param_init)(struct pid *pid,
                        float max_output,
-                       float inte_limit,
+                       float integral_limit,
                        float p,
                        float i,
                        float d);

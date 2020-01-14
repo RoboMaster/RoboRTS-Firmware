@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,23 +18,15 @@
 #ifndef __DRV_CAN_H__
 #define __DRV_CAN_H__
 
-#ifdef DRV_CAN_H_GLOBAL
-#define DRV_CAN_H_EXTERN
-#else
-#define DRV_CAN_H_EXTERN extern
-#endif
-
 #include "fifo.h"
 
 typedef int32_t (*can_stdmsg_rx_callback_t)(CAN_RxHeaderTypeDef *header, uint8_t *data);
 
-#define CAN1_TX_FIFO_UNIT_NUM (64)
+#define CAN1_TX_FIFO_UNIT_NUM (256)
 #define CAN1_TX_FIFO_SIZE (CAN1_TX_FIFO_UNIT_NUM * sizeof(struct can_std_msg))
 
-#define CAN2_TX_FIFO_UNIT_NUM (64)
+#define CAN2_TX_FIFO_UNIT_NUM (256)
 #define CAN2_TX_FIFO_SIZE (CAN2_TX_FIFO_UNIT_NUM * sizeof(struct can_std_msg))
-
-#define MAX_CAN_REGISTER_NUM 5
 
 typedef struct can_manage_obj *can_manage_obj_t;
 
@@ -44,7 +36,7 @@ struct can_manage_obj
   fifo_t tx_fifo;
   uint8_t *tx_fifo_buffer;
   uint8_t is_sending;
-  can_stdmsg_rx_callback_t can_rec_callback[MAX_CAN_REGISTER_NUM];
+  can_stdmsg_rx_callback_t can_rec_callback;
 };
 
 struct can_std_msg
@@ -58,9 +50,13 @@ extern struct can_manage_obj can1_manage;
 extern struct can_manage_obj can2_manage;
 
 void can_manage_init(void);
-int32_t can_fifo0_rx_callback_register(can_manage_obj_t m_obj, can_stdmsg_rx_callback_t fun);
 
+uint32_t can1_std_transmit(uint16_t std_id, uint8_t *data, uint16_t len);
+uint32_t can2_std_transmit(uint16_t std_id, uint8_t *data, uint16_t len);
+
+int32_t can_fifo0_rx_callback_register(can_manage_obj_t m_obj,
+                                       can_stdmsg_rx_callback_t fun);
 uint32_t can_msg_bytes_send(CAN_HandleTypeDef *hcan,
-                            uint8_t *data, uint16_t len, uint16_t std_id);
+                             uint16_t std_id, uint8_t *data, uint16_t len);
 
 #endif // __DRV_CAN_H__

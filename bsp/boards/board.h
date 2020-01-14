@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #define __BOARD_H__
 
 #ifdef BOARD_H_GLOBAL
-  #define BOARD_H_EXTERN 
+  #define BOARD_H_EXTERN
 #else
   #define BOARD_H_EXTERN extern
 #endif
@@ -32,7 +32,8 @@
 #include "drv_imu.h"
 #include "drv_io.h"
 #include "drv_uart.h"
-
+#include "usbd_cdc_if.h"
+#include "usb_device.h"
 void board_config(void);
 
 #endif // __BOARD__

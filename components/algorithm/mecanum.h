@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,9 +30,9 @@
 /* the perimeter of wheel(mm) */
 #define PERIMETER 478
 /* wheel track distance(mm) */
-#define WHEELTRACK 394
+#define WHEELTRACK 400
 /* wheelbase distance(mm) */
-#define WHEELBASE 415
+#define WHEELBASE 376
 
 /* gimbal is relative to chassis center x axis offset(mm) */
 #define ROTATE_X_OFFSET 7
@@ -52,7 +52,7 @@
 
 #define MOTOR_ENCODER_ACCURACY 8192.0f
 
-/** 
+/**
   * @brief  infantry structure configuration information
   */
 struct mecanum_structure

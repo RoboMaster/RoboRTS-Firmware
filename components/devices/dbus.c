@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,43 +16,44 @@
  ***************************************************************************/
 
 #include "dbus.h"
+#include "sys.h"
+
+#define LOG_TAG "drv.dbus"
+#define LOG_OUTPUT_LEVEL  LOG_INFO
+#include "log.h"
 
 static void get_dr16_data(rc_device_t rc_dev, uint8_t *buff);
 static void get_dr16_state(rc_device_t rc_dev);
 
-int32_t rc_device_register(rc_device_t rc_dev, const char *name, uint16_t flags)
+int32_t rc_device_register(rc_device_t rc_dev, const char *name)
 {
-  if (rc_dev == NULL)
-    return -RM_INVAL;
+  device_assert(rc_dev != NULL);
 
-  if (device_find(name) != NULL)
-    return -RM_EXISTED;
-
-  ((device_t)rc_dev)->type = Device_Class_RC;
+  ((device_t)rc_dev)->type = DEVICE_DBUS;
 
   rc_dev->get_data = get_dr16_data;
   rc_dev->get_state = get_dr16_state;
 
-  device_register( &(rc_dev->parent), name, flags);
+  device_init( &(rc_dev->parent), name);
 
-  return RM_OK;
+  return E_OK;
 }
 
 int32_t rc_device_date_update(rc_device_t rc_dev, uint8_t *buff)
-{ 
+{
   if (rc_dev != NULL)
   {
     rc_dev->get_data(rc_dev, buff);
     rc_dev->get_state(rc_dev);
-    return RM_OK;
+    return E_OK;
   }
-  return -RM_UNREGISTERED;
+  return -E_UNREGISTERED;
 }
 
 int32_t rc_device_get_state(rc_device_t rc_dev, uint16_t state)
 {
   var_cpu_sr();
-    
+
   enter_critical();
 
   if (rc_dev != NULL)
@@ -61,50 +62,25 @@ int32_t rc_device_get_state(rc_device_t rc_dev, uint16_t state)
     {
       rc_dev->state &=(~(state & 0x00FF));
       exit_critical();
-      return RM_OK;   
+      return E_OK;
     }
     else
     {
       exit_critical();
-      return -RM_NOSTATE;
+      return -E_NOSTATE;
     }
   }
-  
+
   exit_critical();
 
-  return -RM_UNREGISTERED;
+  return -E_UNREGISTERED;
 }
 
 rc_info_t rc_device_get_info(rc_device_t rc_dev)
 {
-  if (rc_dev == NULL)
-  {
-    return NULL;
-  }
+  device_assert(rc_dev!=NULL);
 
   return &(rc_dev->rc_info);
-}
-
-rc_device_t rc_device_find(const char *name)
-{
-  rc_device_t rc_dev;
-  enum device_type type;
-
-  rc_dev = (rc_device_t)device_find(name);
-  
-  if(rc_dev == NULL)
-    return NULL;
-  
-  type = ((device_t)rc_dev)->type;
-  
-  if (type == Device_Class_RC)
-  {
-    return rc_dev;
-  }
-  else
-  {
-    return NULL;
-  }
 }
 
 static void get_dr16_data(rc_device_t rc_dev, uint8_t *buff)
@@ -113,7 +89,7 @@ static void get_dr16_data(rc_device_t rc_dev, uint8_t *buff)
   memcpy(&(rc_dev->last_rc_info), &rc_dev->rc_info, sizeof(struct rc_info));
 
   rc_info_t rc = &rc_dev->rc_info;
-  
+
   rc->ch1 = (buff[0] | buff[1] << 8) & 0x07FF;
   rc->ch1 -= 1024;
   rc->ch2 = (buff[1] >> 3 | buff[2] << 5) & 0x07FF;
@@ -122,7 +98,7 @@ static void get_dr16_data(rc_device_t rc_dev, uint8_t *buff)
   rc->ch3 -= 1024;
   rc->ch4 = (buff[4] >> 1 | buff[5] << 7) & 0x07FF;
   rc->ch4 -= 1024;
-  
+
   /* prevent remote control zero deviation */
   if(rc->ch1 <= 5 && rc->ch1 >= -5)
     rc->ch1 = 0;
@@ -132,10 +108,10 @@ static void get_dr16_data(rc_device_t rc_dev, uint8_t *buff)
     rc->ch3 = 0;
   if(rc->ch4 <= 5 && rc->ch4 >= -5)
     rc->ch4 = 0;
-  
+
   rc->sw1 = ((buff[5] >> 4) & 0x000C) >> 2;
   rc->sw2 = (buff[5] >> 4) & 0x0003;
-  
+
   if ((abs(rc->ch1) > 660) || \
       (abs(rc->ch2) > 660) || \
       (abs(rc->ch3) > 660) || \
@@ -193,7 +169,7 @@ static void get_dr16_state(rc_device_t rc_dev)
       rc_dev->state |= RC_S1_MID2DOWN;
     }
   }
-  
+
   if(rc_dev->rc_info.sw2 == 3)
   {
     rc_dev->state |= RC_S2_MID;

@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,20 +17,30 @@
 
 #include "ramp.h"
 
-void ramp_init(ramp_t *ramp, int32_t scale)
+/**
+  * @brief     ramp filter initialize
+  * @param[in]
+  * @retval    void
+  */
+void ramp_v0_init(ramp_v0_t *ramp, int32_t scale)
 {
   ramp->count = 0;
   ramp->scale = scale;
 }
 
-float ramp_calculate(ramp_t *ramp)
+/**
+  * @brief     caculate output of ramp filter
+  * @param[in] ramp: a ramp filter pointer
+  * @retval    output
+  */
+float ramp_v0_calculate(ramp_v0_t *ramp)
 {
   if (ramp->scale <= 0)
     return 0;
-  
+
   if (ramp->count++ >= ramp->scale)
     ramp->count = ramp->scale;
-  
+
   ramp->out = ramp->count / ((float)ramp->scale);
   return ramp->out;
 }

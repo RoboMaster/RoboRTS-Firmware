@@ -1,51 +1,23 @@
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : usbd_cdc_if.c
   * @version        : v1.0_Cube
   * @brief          : Usb device for Virtual Com Port.
   ******************************************************************************
-  * This notice applies to any and all portions of this file
-  * that are not between comment pairs USER CODE BEGIN and
-  * USER CODE END. Other portions of this file, whether 
-  * inserted by the user or by software development tools
-  * are owned by their respective copyright owners.
+  * @attention
   *
-  * Copyright (c) 2018 STMicroelectronics International N.V. 
-  * All rights reserved.
+  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+  * All rights reserved.</center></h2>
   *
-  * Redistribution and use in source and binary forms, with or without 
-  * modification, are permitted, provided that the following conditions are met:
-  *
-  * 1. Redistribution of source code must retain the above copyright notice, 
-  *    this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  *    this list of conditions and the following disclaimer in the documentation
-  *    and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of other 
-  *    contributors to this software may be used to endorse or promote products 
-  *    derived from this software without specific written permission.
-  * 4. This software, including modifications and/or derivative works of this 
-  *    software, must execute solely and exclusively on microcontroller or
-  *    microprocessor devices manufactured by or for STMicroelectronics.
-  * 5. Redistribution and use of this software other than as permitted under 
-  *    this license is void and will automatically terminate your rights under 
-  *    this license. 
-  *
-  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS" 
-  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT 
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
-  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
-  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT 
-  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
-  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software component is licensed by ST under Ultimate Liberty license
+  * SLA0044, the "License"; You may not use this file except in compliance with
+  * the License. You may obtain a copy of the License at:
+  *                             www.st.com/SLA0044
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_if.h"
@@ -60,8 +32,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-#define USB_REC_MAX_NUM 5
-static usb_vcp_call_back_f usb_vcp_call_back[USB_REC_MAX_NUM];
+
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -95,7 +66,7 @@ static usb_vcp_call_back_f usb_vcp_call_back[USB_REC_MAX_NUM];
 /* Define size for the receive and transmit buffer over CDC */
 /* It's up to user to redefine and/or remove those define */
 #define APP_RX_DATA_SIZE  2048
-#define APP_TX_DATA_SIZE  4096
+#define APP_TX_DATA_SIZE  2048
 /* USER CODE END PRIVATE_DEFINES */
 
 /**
@@ -181,17 +152,12 @@ USBD_CDC_ItfTypeDef USBD_Interface_fops_FS =
   * @brief  Initializes the CDC media low layer over the FS USB IP
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
-#include "fifo.h"
-fifo_s_t usb_tx_fifo;
-uint8_t usb_tx_fifo_buff[APP_TX_DATA_SIZE];
-
 static int8_t CDC_Init_FS(void)
 {
   /* USER CODE BEGIN 3 */
   /* Set Application Buffers */
   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, 0);
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS);
-	fifo_s_init(&usb_tx_fifo, usb_tx_fifo_buff, 4096);
   return (USBD_OK);
   /* USER CODE END 3 */
 }
@@ -297,14 +263,6 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
-  for (int i = 0; i < USB_REC_MAX_NUM; i++)
-  {
-    if(usb_vcp_call_back[i] != NULL)
-    {
-        (*usb_vcp_call_back[i])(Buf, *Len);
-    }
-  }
-  
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
   return (USBD_OK);
@@ -326,52 +284,18 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 {
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 7 */
- 
-	fifo_s_puts(&usb_tx_fifo, (char*)Buf, Len);
-
+  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
+  if (hcdc->TxState != 0){
+    return USBD_BUSY;
+  }
+  USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
+  result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+  /* USER CODE END 7 */
   return result;
 }
 
-int32_t usb_tx_flush(void* argc)
-{
-	uint8_t result = USBD_OK;
-	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
-	
-	if (hcdc->TxState != 0){
-    return USBD_BUSY;
-  }
-	else
-	{
-		FIFO_CPU_SR_TYPE cpu_sr;
-		uint32_t send_num;
-    cpu_sr = FIFO_GET_CPU_SR();
-
-    FIFO_ENTER_CRITICAL(); 
-		send_num = usb_tx_fifo.used_num;
-		fifo_s_gets_noprotect(&usb_tx_fifo, (char*)UserTxBufferFS, send_num);
-		FIFO_RESTORE_CPU_SR(cpu_sr);
-
-		USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, send_num);
-    result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
-		return result;
-	}
-}
-
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
-int32_t usb_vcp_rx_callback_register(usb_vcp_call_back_f fun)
-{
-    
-  for (int i = 0; i < USB_REC_MAX_NUM; i++)
-  {
-    if(usb_vcp_call_back[i] == NULL)
-    {
-      usb_vcp_call_back[i] = fun;
-      return USBD_OK;
-    }
-  }
-    
-  return USBD_FAIL;
-}
+
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**

@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,67 +18,53 @@
 #ifndef __DEVICE_H__
 #define __DEVICE_H__
 
-#ifdef DEVICE_H_GLOBAL
-  #define DEVICE_H_EXTERN 
-#else
-  #define DEVICE_H_EXTERN extern
+#include "sys.h"
+
+//This macro must be greater than 16.
+#define OBJECT_NAME_MAX_LEN 50
+
+#if OBJECT_NAME_MAX_LEN < 16
+  #error "Macro OBJECT_NAME_MAX_LEN must be greater than 16."
 #endif
-  
-#include "object.h"
-
-#define DEV_LOG_ENABLE
-
-#define DEVICE_FLAG_DEACTIVATE 0X000
-
-#define DEVICE_FLAG_RDONLY     0x001
-#define DEVICE_FLAG_WRONLY     0x002
-#define DEVICE_FLAG_RDWR       0x003
-
-#define DEVICE_FLAG_REMOVABLE  0x004
-#define DEVICE_FLAG_STANDALONE 0x008
-#define DEVICE_FLAG_ACTIVATED   0x010
-#define DEVICE_FLAG_SUSPENDED  0x020
-#define DEVICE_FLAG_STREAM     0x040
-
-#define DEVICE_OFLAG_CLOSE    0x000
-#define DEVICE_OFLAG_RDONLY   0x001
-#define DEVICE_OFLAG_WRONLY   0x002
-#define DEVICE_OFLAG_RDWR     0x003
-#define DEVICE_OFLAG_OPEN     0x008
-#define DEVICE_OFLAG_MASK     0xf0f
-
-typedef struct device *device_t;
 
 enum device_can
 {
   DEVICE_CAN1 = 0,
   DEVICE_CAN2,
-  DEVICE_CAN_NUM,
+	DEVICE_CAN_ALL,
+  DEVICE_CAN_NUM = DEVICE_CAN_ALL,
 };
 
 enum device_type
 {
-  Device_Class_Motor = 0,
-  Device_Class_RC = 1,
-  Device_Class_Detect = 2,
-  Device_Class_Unknown,
+	DEVICE_INIT = 0,
+  DEVICE_MOTOR,
+	DEVICE_DBUS,
+	DEVICE_SINGLE_GYRO,
+	DEVICE_UNKNOW
 };
 
 struct device
 {
-  struct object parent;
-  enum device_type type;
-  uint16_t flag;
-  uint16_t open_flag;
+  char name[OBJECT_NAME_MAX_LEN];
+  uint8_t type;
+  list_t  list;
+	void *param;
+	void *user_data;
 
-  uint8_t ref_count;
-  uint8_t device_id;
-
-  void *user_data;
+	void (*device_init)(void *param);
 };
 
-int32_t device_register(struct device *dev, const char *name, uint16_t flags);
-int32_t device_unregister(struct device *dev);
-device_t device_find(const char* name);
+typedef struct device *device_t;
+
+struct device_information
+{
+  list_t object_list;          /**< object list */
+};
+
+device_t device_find(const char *name, uint8_t type);
+int32_t device_init(struct device *object, const char *name);
+void device_detach(device_t object);
+struct device_information *get_device_information(void);
 
 #endif // __DEVICE_H__

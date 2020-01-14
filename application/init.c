@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,115 +17,103 @@
 
 #include "main.h"
 #include "can.h"
+
 #include "board.h"
 #include "motor.h"
-#include "dbus.h"
-#include "detect.h"
-#include "test.h"
-#include "chassis.h"
-#include "gimbal.h"
-#include "shoot.h"
-
-#include "chassis_task.h"
-#include "gimbal_task.h"
-#include "timer_task.h"
-#include "shoot_task.h"
-#include "communicate.h"
-#include "infantry_cmd.h"
 #include "init.h"
-
+#include "easyflash.h"
 #include "protocol.h"
-#include "ulog.h"
-#include "param.h"
-#include "offline_check.h"
-#include "referee_system.h"
+#include "shell.h"
 
-struct chassis chassis;
-struct gimbal gimbal;
-struct shoot shoot;
-static struct rc_device rc_dev;
+#include "sensor_task.h"
+#include "communicate.h"
+#include "offline_service.h"
+
+#include "chassis_app.h"
+#include "gimbal_app.h"
+
+#include "SEGGER_SYSVIEW.h"
+
+#include "log.h"
 
 static uint8_t glb_sys_cfg;
 
-extern int ulog_console_backend_init(void);
+void system_config(void);
+void hw_init(void);
+
+void task_init(void)
+{
+  uint8_t app = 0;
+  app = get_sys_cfg();
+  if (app == CHASSIS_APP)
+  {
+    chassis_app_init();
+  }
+  else
+  {
+    gimbal_app_init();
+  }
+  app_protocol_init();
+  communicate_task_init();
+}
+
+void sys_task(void)
+{
+  thread_cli_init();
+  offline_service_task_init();
+  soft_timer_FreeRTOS_init();
+  sensor_task_init();
+}
+
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+{
+  debug_raw_printf("\r\n %s Stack Over flow! \r\n", pcTaskName);
+  while (1)
+    ;
+}
+
+void vApplicationMallocFailedHook(void)
+{
+  debug_raw_printf("\r\n FreeRTOS Malloc Failed! \r\n");
+}
+
+/**
+  * @brief  all task init. This thread is called in main.c
+  * @param
+  * @retval void
+  */
+void services_task(void const *argument)
+{
+  /* init code for USB_DEVICE */
+  MX_USB_DEVICE_Init();
+  SEGGER_SYSVIEW_Conf();
+  hw_init();
+  sys_task();
+  task_init();
+
+  log_printf("\r\nRoboMaster>");
+  /* USER CODE BEGIN services_task */
+  /* Infinite loop */
+  for (;;)
+  {
+    osDelay(100);
+  }
+  /* USER CODE END services_task */
+}
 
 void system_config(void)
 {
-  glb_sys_cfg = HAL_GPIO_ReadPin(SYS_CFG_Port, SYS_CFG_Pin);
+  glb_sys_cfg = HAL_GPIO_ReadPin(APP_CONFIG_GPIO_Port, APP_CONFIG_Pin);
+}
+
+void hw_init(void)
+{
+  board_config();
+  system_config();
+  easyflash_init();
 }
 
 uint8_t get_sys_cfg(void)
 {
   return glb_sys_cfg;
-}
-
-void hw_init(void)
-{
-  cali_param_init();
-  board_config();
-  test_init();
-  system_config();
-  ulog_init();
-  ulog_console_backend_init();
-  
-  referee_param_init();
-  usart3_rx_callback_register(referee_uart_rx_data_handle);
-  referee_send_data_register(usart3_transmit);
-
-  if(glb_sys_cfg == CHASSIS_APP)
-  {
-    rc_device_register(&rc_dev, "uart_rc", 0);
-    dr16_forword_callback_register(rc_data_forword_by_can);
-    chassis_pid_register(&chassis, "chassis", DEVICE_CAN1);
-    chassis_disable(&chassis);
-  }
-  else
-  {
-    rc_device_register(&rc_dev, "can_rc", 0);
-    gimbal_cascade_register(&gimbal, "gimbal", DEVICE_CAN1);
-
-    shoot_pid_register(&shoot, "shoot", DEVICE_CAN1);
-
-    gimbal_yaw_disable(&gimbal);
-    gimbal_pitch_disable(&gimbal);
-    shoot_disable(&shoot);
-  }
-
-  offline_init();
-}
-
-osThreadId timer_task_t;
-osThreadId chassis_task_t;
-osThreadId gimbal_task_t;
-osThreadId communicate_task_t;
-osThreadId cmd_task_t;
-osThreadId shoot_task_t;
-
-void task_init(void)
-{
-  uint8_t app;
-  app = get_sys_cfg();
-
-  osThreadDef(TIMER_1MS, timer_task, osPriorityHigh, 0, 512);
-  timer_task_t = osThreadCreate(osThread(TIMER_1MS), NULL);
-
-  osThreadDef(COMMUNICATE_TASK, communicate_task, osPriorityHigh, 0, 4096);
-  communicate_task_t = osThreadCreate(osThread(COMMUNICATE_TASK), NULL);
-
-  osThreadDef(CMD_TASK, infantry_cmd_task, osPriorityNormal, 0, 4096);
-  cmd_task_t = osThreadCreate(osThread(CMD_TASK), NULL);
-  
-  if (app == CHASSIS_APP)
-  {
-    osThreadDef(CHASSIS_TASK, chassis_task, osPriorityRealtime, 0, 512);
-    chassis_task_t = osThreadCreate(osThread(CHASSIS_TASK), NULL);
-  }
-  else
-  {
-    osThreadDef(GIMBAL_TASK, gimbal_task, osPriorityRealtime, 0, 512);
-    gimbal_task_t = osThreadCreate(osThread(GIMBAL_TASK), NULL);
-
-    osThreadDef(SHOOT_TASK, shoot_task, osPriorityNormal, 0, 512);
-    shoot_task_t = osThreadCreate(osThread(SHOOT_TASK), NULL);
-  }
 }

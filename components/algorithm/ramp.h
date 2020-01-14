@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,33 +19,33 @@
 #define __RAMP_H__
 
 #ifdef RAMP_H_GLOBAL
-  #define RAMP_H_EXTERN 
+  #define RAMP_H_EXTERN
 #else
   #define RAMP_H_EXTERN extern
 #endif
 
 #include "stdint.h"
 
-typedef struct ramp_t
+typedef struct ramp_v0_t
 {
   int32_t count;
   int32_t scale;
   float   out;
-  void  (*init)(struct ramp_t *ramp, int32_t scale);
-  float (*calc)(struct ramp_t *ramp);
-}ramp_t;
+  void  (*init)(struct ramp_v0_t *ramp, int32_t scale);
+  float (*calc)(struct ramp_v0_t *ramp);
+}ramp_v0_t;
 
 #define RAMP_GEN_DAFAULT     \
   {                          \
     .count = 0,              \
     .scale = 0,              \
     .out = 0,                \
-    .init = &ramp_init,      \
-    .calc = &ramp_calculate, \
+    .init = &ramp_v0_init,      \
+    .calc = &ramp_v0_calculate, \
   }
 
-void  ramp_init(ramp_t *ramp, int32_t scale);
-float ramp_calculate(ramp_t *ramp);
+void  ramp_v0_init(ramp_v0_t *ramp, int32_t scale);
+float ramp_v0_calculate(ramp_v0_t *ramp);
 
 #endif // __RAMP_H__
 

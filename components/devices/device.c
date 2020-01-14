@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,43 +16,117 @@
  ***************************************************************************/
 
 #include "device.h"
+#include "errno.h"
 
-int32_t device_register(struct device *dev,
-                        const char *name,
-                        uint16_t flags)
+#define LOG_TAG "device"
+#define LOG_OUTPUT_LEVEL  5
+#include "log.h"
+
+char *device_name[DEVICE_UNKNOW] = {
+	"NULL",
+  "MOTOR",
+	"DBUS",
+	"SINGLE_GYRO",
+};
+
+/* Device Infonation Link Table */
+static struct device_information
+object_container = {{&(object_container.object_list), &(object_container.object_list)}};
+
+/* return device infornation pointer */
+struct device_information *get_device_information(void)
 {
-  if (dev == NULL)
-    return -RM_INVAL;
-  if (device_find(name) != NULL)
-    return -RM_EXISTED;
-
-  object_init(&(dev->parent), Object_Class_Device, name);
-
-  dev->flag = flags;
-  dev->ref_count = 0;
-  dev->open_flag = 0;
-
-  return RM_OK;
+	return &object_container;
 }
 
-int32_t device_unregister(struct device *dev)
+/**
+  * @brief  device intialize, all object is static.
+  * @param  int32_t
+  * @retval error code
+  */
+int32_t device_init(struct device *object,
+                    const char *name)
 {
-  if (dev == NULL)
-    return -RM_INVAL;
-  if (device_find(((object_t)dev)->name) == NULL)
-    return RM_OK;
+  var_cpu_sr();
 
-  object_detach(&(dev->parent));
+  device_assert(object != NULL);
 
-  return RM_OK;
+  /* copy name */
+  if (strlen(name) > OBJECT_NAME_MAX_LEN - 1)
+  {
+    return -1;
+  }
+
+  strcpy(object->name, name);
+
+  /* lock interrupt */
+  enter_critical();
+
+  {
+    /* insert object into information object list */
+    list_add(&(object->list), &(object_container.object_list));
+  }
+  log_i("%s register successful, type: %s.", name, device_name[object->type]);
+  /* unlock interrupt */
+  exit_critical();
+  return 0;
 }
 
-device_t device_find(const char *name)
+/**
+  * @brief  find a device by name, type
+  * @param  int32_t
+  * @retval error code
+  */
+device_t device_find(const char *name, uint8_t type)
 {
-  struct object *object;
+  struct device *object = NULL;
+  list_t *node = NULL;
 
-  object = object_find(name, Object_Class_Device);
+  var_cpu_sr();
 
-  return (device_t)object;
+  /* parameter check */
+  if ((name == NULL) || (type >= DEVICE_UNKNOW))
+    return NULL;
+
+  /* enter critical */
+  enter_critical();
+
+  /* try to find object */
+  for (node = object_container.object_list.next;
+       node != &(object_container.object_list);
+       node = node->next)
+  {
+    object = list_entry(node, struct device, list);
+    if ((strncmp(object->name, name, strlen(name)) == 0) && (type == object->type))
+    {
+      /* leave critical */
+      exit_critical();
+
+      return object;
+    }
+  }
+
+  /* leave critical */
+  exit_critical();
+
+  return NULL;
 }
 
+void device_detach(device_t object)
+{
+  var_cpu_sr();
+
+  /* object check */
+  device_assert(object != NULL);
+
+  /* reset object type */
+  object->type = DEVICE_UNKNOW;
+  /* lock interrupt */
+  enter_critical();
+
+  /* remove from old list */
+  list_del(&(object->list));
+
+  /* unlock interrupt */
+  exit_critical();
+}

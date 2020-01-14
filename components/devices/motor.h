@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ struct motor_device
   uint16_t init_offset_f;
 
   int16_t current;
- 
+
   void (*get_data)(motor_device_t, uint8_t*);
 };
 
@@ -85,13 +85,13 @@ typedef int32_t (*fn_can_send)(enum device_can can, struct can_msg);
 
 void motor_device_can_send_register(fn_can_send fn);
 
-motor_device_t motor_device_find(const char *name);
-motor_device_t motor_device_find_by_canid(enum device_can can, uint16_t can_id);
-int32_t motor_device_register(motor_device_t motor_dev, const char *name, uint16_t flags);
-void motor_device_can_send_register(fn_can_send fn);
-motor_data_t motor_device_get_data(motor_device_t motor_dev); 
-int32_t motor_device_set_current(motor_device_t motor_dev, int16_t current);
-int32_t motor_device_data_update(enum device_can can, uint16_t can_id, uint8_t can_rx_data[]);                            
-int32_t motor_device_can_output(enum device_can m_can);
-
+motor_device_t motor_find(const char *name);
+motor_device_t motor_find_by_canid(enum device_can can, uint16_t can_id);
+int32_t motor_register(motor_device_t motor_dev, const char *name);
+void motor_can_send_register(fn_can_send fn);
+motor_data_t motor_get_data(motor_device_t motor_dev);
+int32_t motor_set_current(motor_device_t motor_dev, int16_t current);
+int32_t motor_data_update(enum device_can can, uint16_t can_id, uint8_t can_rx_data[]);
+int32_t motor_can_output(enum device_can m_can);
+int32_t motor_auto_set_id(enum device_can can);
 #endif // __MOTOR_H__

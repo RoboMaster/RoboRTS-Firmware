@@ -218,14 +218,14 @@ uint32_t protocol_send_list_add_callback_reg(void_fn_t fn);
 
 int32_t protocol_can_interface_register(char *interface_name,
                                         uint16_t rcv_buf_size,
-                                        uint8_t boardcast_output_enable,
+                                        uint8_t broadcast_output_enable,
                                         uint8_t can_port,
                                         uint32_t can_tx_id,
                                         uint32_t can_rx_id,
                                         int (*can_send_fn)(uint32_t std_id, uint8_t *p_data, uint32_t len));
 int32_t protocol_uart_interface_register(char *interface_name,
                                         uint16_t rcv_buf_size,
-                                        uint8_t boardcast_output_enable,
+                                        uint8_t broadcast_output_enable,
                                         uint8_t com_port,
                                         int (*com_send_fn)(uint8_t *p_data, uint32_t len));
 

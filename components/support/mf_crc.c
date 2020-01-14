@@ -12,8 +12,6 @@
 
 #include "mf_crc.h"
 
-
-
 /*******************************************************************************
 *                      CRC8  functions algorithm  liboray                     *
 *******************************************************************************/
@@ -22,9 +20,8 @@
 #define G8_X5_X4     // for generator polynomial:G(x)=x8+x5+x4+1
 //#define G8_X2_X1   // for generator polynomial:G(x)=x8+x2+x+1
 
-
 /*
-**  初始CRC的值，可以设定一个初始的CRC值
+**  initial value
 */
 static const uint8_t CRC8_INIT = 0x77;
 
@@ -52,7 +49,6 @@ static const uint8_t CRC8_TAB[256] =
     0x74, 0x2a, 0xc8, 0x96, 0x15, 0x4b, 0xa9, 0xf7, 0xb6, 0xe8, 0x0a, 0x54, 0xd7, 0x89, 0x6b, 0x35,
 };
 
-
 // caculate crc value by lookup table
 uint8_t get_crc8(uint8_t *pchMessage,uint32_t dwLength,uint8_t ucCRC8)
 {
@@ -66,8 +62,6 @@ uint8_t get_crc8(uint8_t *pchMessage,uint32_t dwLength,uint8_t ucCRC8)
 
     return(ucCRC8);
 }
-
-
 
 #else
 
@@ -107,8 +101,6 @@ uint8_t get_crc8(uint8_t *pchMessage,uint32_t dwLength,uint8_t ucCRC8)
     return ucCRC8;
 }
 
-
-
 #endif
 
 /*
@@ -116,7 +108,6 @@ uint8_t get_crc8(uint8_t *pchMessage,uint32_t dwLength,uint8_t ucCRC8)
 **  Input:        Data to Verify,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-//CRC 的验证方法也可以是看append后的字节流经过CRC运算后结果是否为零来判断
 uint32_t verify_crc8(uint8_t *pchMessage, uint32_t dwLength)
 {
     uint8_t ucExpected = 0;
@@ -150,7 +141,7 @@ void append_crc8(uint8_t *pchMessage, uint32_t dwLength)
 *******************************************************************************/
 
 /*
-**  初始CRC的值，可以设定一个初始的CRC值
+**  inital value
 */
 static const uint16_t CRC16_INIT = 0x3aa3;
 
@@ -219,7 +210,6 @@ uint16_t get_crc16(uint8_t *pchMessage,uint32_t dwLength,uint16_t wCRC)
 **  Input:        Data to Verify,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-//CRC 的验证方法也可以是看append后的字节流经过CRC运算后结果是否为零来判断
 uint32_t verify_crc16(uint8_t *pchMessage, uint32_t dwLength)
 {
     uint16_t wExpected = 0;
@@ -302,7 +292,7 @@ static const uint32_t CRC32_Table[] = {
 };
 
 /*
-**  初始CRC的值，可以设定一个初始的CRC值
+**  initial value
 */
 static const uint16_t CRC32_INIT = 0x3aa3;
 
@@ -333,7 +323,6 @@ uint32_t get_crc32(uint8_t *pchMessage,uint32_t dwLength,uint32_t wCRC)
 **  Input:        Data to Verify,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-//CRC 的验证方法也可以是看append后的字节流经过CRC运算后结果是否为零来判断
 uint32_t verify_crc32(uint8_t *pchMessage, uint32_t dwLength)
 {
     uint32_t wExpected = 0;

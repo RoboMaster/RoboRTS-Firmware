@@ -35,4 +35,6 @@ JLinkLog.txt
 *.sct
 *.uvguix.*
 build/*
-!build/infantry.sct
+MDK-ARM/DebugConfig/*
+MDK-ARM/RTE/*
+.vscode/*

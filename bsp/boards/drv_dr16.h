@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #define __DRV_DR16_H__
 
 #ifdef DRV_DR16_H_GLOBAL
-  #define DRV_DR16_H_EXTERN 
+  #define DRV_DR16_H_EXTERN
 #else
   #define DRV_DR16_H_EXTERN extern
 #endif
@@ -31,8 +31,9 @@ typedef int32_t (*dr16_rx_callback_t)(uint8_t *buff, uint16_t len);
 #define DR16_RX_BUFFER_SIZE      (50u)
 #define DR16_DATA_LEN            (18u)
 
-int32_t dr16_rx_uart_callback_register(dr16_rx_callback_t fn);
-int32_t dr16_forword_callback_register(dr16_rx_callback_t fn);
-void dr16_uart_init(void);
-  
+void dr16_uart_init(dr16_rx_callback_t rx_fn,
+	                  dr16_rx_callback_t forword_fn);
+
+uint32_t dr16_uart_rx_data_handle(UART_HandleTypeDef *huart);
+
 #endif // __DRV_DR16_H__

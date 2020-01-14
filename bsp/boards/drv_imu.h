@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,46 +27,17 @@
 #include "stm32f4xx_hal.h"
 #include "ahrs.h"
 
-#define MPU_IO_PROBE() //HAL_GPIO_TogglePin(IO_PROBE_GPIO_Port, IO_PROBE_Pin);
+#define BMI088_PARAM_KEY "BMI088_PARAM"
 
-struct mpu_calibrate
-{
-  uint8_t gyro_flag;
-  uint8_t acc_flag;
-  uint8_t mag_flag;
-};
+void bmi088_get_data(struct ahrs_sensor *sensor);
+void bmi088_get_temp(float *tmp);
+uint8_t bmi088_device_init(void);
 
-struct mpu_data_info
-{
-  int16_t ax;
-  int16_t ay;
-  int16_t az;
+int ahrs_update(struct ahrs_sensor *atti, uint8_t period_ms);
 
-  int16_t gx;
-  int16_t gy;
-  int16_t gz;
-
-  int16_t mx;
-  int16_t my;
-  int16_t mz;
-
-  int16_t temp;
-
-  int16_t ax_offset;
-  int16_t ay_offset;
-  int16_t az_offset;
-
-  int16_t gx_offset;
-  int16_t gy_offset;
-  int16_t gz_offset;
-
-  int16_t mx_offset;
-  int16_t my_offset;
-  int16_t mz_offset;
-};
-
-uint8_t mpu_device_init(void);
-void mpu_get_data(struct ahrs_sensor *sensor);
-void mpu_get_temp(float *tmp);
+int32_t imu_temp_keep(void *argc);
+void imu_temp_ctrl_init(void);
+uint8_t bmi088_set_offset(void);
+uint8_t bmi088_get_offset(void);
 
 #endif // __DRV_IMU_H__

@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #include "sys.h"
 #include "pid.h"
 
-void abs_limit(float *a, float ABS_MAX)
+static void abs_limit(float *a, float ABS_MAX)
 {
   if (*a > ABS_MAX)
     *a = ABS_MAX;
@@ -29,13 +29,13 @@ void abs_limit(float *a, float ABS_MAX)
 static void pid_param_init(
     struct pid *pid,
     float maxout,
-    float inte_limit,
+    float integral_limit,
     float kp,
     float ki,
     float kd)
 {
 
-  pid->param.inte_limit = inte_limit;
+  pid->param.integral_limit = integral_limit;
   pid->param.max_out = maxout;
 
   pid->param.p = kp;
@@ -66,7 +66,7 @@ static void pid_reset(struct pid *pid, float kp, float ki, float kd)
   * @param[in] pid: control pid struct
   * @param[in] get: measure feedback value
   * @param[in] set: target value
-  * @retval    pid calculate output 
+  * @retval    pid calculate output
   */
 float pid_calculate(struct pid *pid, float get, float set)
 {
@@ -80,9 +80,14 @@ float pid_calculate(struct pid *pid, float get, float set)
   pid->iout += pid->param.i * pid->err;
   pid->dout = pid->param.d * (pid->err - pid->last_err);
 
-  abs_limit(&(pid->iout), pid->param.inte_limit);
+  abs_limit(&(pid->iout), pid->param.integral_limit);
   pid->out = pid->pout + pid->iout + pid->dout;
   abs_limit(&(pid->out), pid->param.max_out);
+
+	if(pid->enable == 0)
+	{
+		pid->out = 0;
+	}
 
   return pid->out;
 }
@@ -93,15 +98,16 @@ float pid_calculate(struct pid *pid, float get, float set)
 void pid_struct_init(
     struct pid *pid,
     float maxout,
-    float inte_limit,
+    float integral_limit,
 
     float kp,
     float ki,
     float kd)
 {
+	pid->enable = 1;
   pid->f_param_init = pid_param_init;
   pid->f_pid_reset = pid_reset;
 
-  pid->f_param_init(pid, maxout, inte_limit, kp, ki, kd);
+  pid->f_param_init(pid, maxout, integral_limit, kp, ki, kd);
   pid->f_pid_reset(pid, kp, ki, kd);
 }

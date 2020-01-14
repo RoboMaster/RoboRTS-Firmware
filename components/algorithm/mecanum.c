@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -89,6 +89,11 @@ void mecanum_calculate(struct mecanum *mec)
   memcpy(mec->wheel_rpm, wheel_rpm, 4 * sizeof(float));
 }
 
+/**
+  * @brief get mecanum chassis odometry, using global yaw gyro angle.
+  * @param
+  * @note
+  */
 void mecanum_position_measure(struct mecanum *mec, struct mecanum_motor_fdb wheel_fdb[])
 {
   static float rotate_ratio_fr;

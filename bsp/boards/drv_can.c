@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -15,6 +15,8 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  ***************************************************************************/
 
+/* standard can frame S/R driver*/
+
 #include "can.h"
 #include "drv_can.h"
 
@@ -24,17 +26,21 @@ struct can_manage_obj can2_manage;
 static uint8_t can1_tx_fifo_buff[CAN1_TX_FIFO_SIZE];
 static uint8_t can2_tx_fifo_buff[CAN2_TX_FIFO_SIZE];
 
+/******************** Custom API ****************************/
+/**
+  * @brief  CAN1, CAN2 manage object init.
+  * @param
+  * @retval void
+  */
 void can_manage_init(void)
 {
   can1_manage.is_sending = 0;
   can1_manage.hcan = &hcan1;
 
-  for (int i = 0; i < MAX_CAN_REGISTER_NUM; i++)
-  {
-    can1_manage.can_rec_callback[i] = NULL;
-    can2_manage.can_rec_callback[i] = NULL;
-  }
+  can1_manage.can_rec_callback = NULL;
+  can2_manage.can_rec_callback = NULL;
 
+	/* asynchronism fifo init */
   fifo_init(&(can1_manage.tx_fifo),
             can1_tx_fifo_buff,
             sizeof(struct can_std_msg),
@@ -85,8 +91,35 @@ void can_manage_init(void)
   return;
 }
 
+uint32_t can1_std_transmit(uint16_t std_id, uint8_t *data, uint16_t len)
+{
+	return can_msg_bytes_send(&hcan1, std_id, data, len);
+}
+
+uint32_t can2_std_transmit(uint16_t std_id, uint8_t *data, uint16_t len)
+{
+	return can_msg_bytes_send(&hcan2, std_id, data, len);
+}
+
+/******************** Usual API ****************************/
+/**
+  * @brief  register can callback function.
+  * @param
+  * @retval error code
+  */
+int32_t can_fifo0_rx_callback_register(can_manage_obj_t m_obj, can_stdmsg_rx_callback_t fun)
+{
+  m_obj->can_rec_callback = fun;
+  return E_OK;
+}
+
+/**
+  * @brief  can transmit function
+  * @param
+  * @retval send successful length
+  */
 uint32_t can_msg_bytes_send(CAN_HandleTypeDef *hcan,
-                            uint8_t *data, uint16_t len, uint16_t std_id)
+                            uint16_t std_id, uint8_t *data, uint16_t len)
 {
   uint8_t *send_ptr;
   uint16_t send_num;
@@ -160,27 +193,18 @@ uint32_t can_msg_bytes_send(CAN_HandleTypeDef *hcan,
   return send_num;
 }
 
-int32_t can_fifo0_rx_callback_register(can_manage_obj_t m_obj, can_stdmsg_rx_callback_t fun)
-{
-  for (int i = 0; i < MAX_CAN_REGISTER_NUM; i++)
-  {
-    if (m_obj->can_rec_callback[i] == NULL)
-    {
-      m_obj->can_rec_callback[i] = fun;
-      return i;
-    }
-  }
-  return -1;
-}
+/**
+  * @brief  send complete callback
+  * @param
+  * @retval void
+  */
 static void can_tx_mailbox_complete_hanle(can_manage_obj_t m_obj)
 {
   struct can_std_msg msg;
   CAN_TxHeaderTypeDef header;
   uint32_t send_mail_box;
 
-  FIFO_CPU_SR_TYPE cpu_sr;
-  cpu_sr = FIFO_GET_CPU_SR();
-  FIFO_ENTER_CRITICAL();
+	CRITICAL_SETCION_ENTER();
 
   if (!fifo_is_empty(&(m_obj->tx_fifo)))
   {
@@ -209,7 +233,7 @@ static void can_tx_mailbox_complete_hanle(can_manage_obj_t m_obj)
     m_obj->is_sending = 0;
   }
 
-  FIFO_RESTORE_CPU_SR(cpu_sr);
+	CRITICAL_SETCION_EXIT();
 
   return;
 }
@@ -262,6 +286,11 @@ void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
   HAL_CAN_ResetError(hcan);
 }
 
+/**
+  * @brief  can rx interupt
+  * @param
+  * @retval void
+  */
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
   CAN_RxHeaderTypeDef rx_header;
@@ -271,22 +300,16 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
   if (hcan == &hcan1)
   {
-    for (int i = 0; i < MAX_CAN_REGISTER_NUM; i++)
+    if (can1_manage.can_rec_callback != NULL)
     {
-      if (can1_manage.can_rec_callback[i] != NULL)
-      {
-        (*(can1_manage.can_rec_callback[i]))(&rx_header, rx_data);
-      }
+      (*(can1_manage.can_rec_callback))(&rx_header, rx_data);
     }
   }
   else if (hcan == &hcan2)
   {
-    for (int i = 0; i < MAX_CAN_REGISTER_NUM; i++)
+    if (can2_manage.can_rec_callback != NULL)
     {
-      if (can2_manage.can_rec_callback[i] != NULL)
-      {
-        (*(can2_manage.can_rec_callback[i]))(&rx_header, rx_data);
-      }
+      (*(can2_manage.can_rec_callback))(&rx_header, rx_data);
     }
   }
 }

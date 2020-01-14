@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,25 +18,20 @@
 #ifndef __DRV_UART_H__
 #define __DRV_UART_H__
 
-#ifdef DRV_UART_H_GLOBAL
-#define DRV_UART_H_EXTERN
-#else
-#define DRV_UART_H_EXTERN extern
-#endif
-
 #include "sys.h"
+#include "fifo.h"
 
-#define USART3_RX_BUFFER_SIZE (512)
-#define USART3_TX_BUFFER_SIZE (512)
-#define USART3_TX_FIFO_SIZE (1024)
+#define USART1_RX_BUFFER_SIZE (512)
+#define USART1_TX_BUFFER_SIZE (512)
+#define USART1_TX_FIFO_SIZE (2048)
 
 #define USART6_RX_BUFFER_SIZE (512)
 #define USART6_TX_BUFFER_SIZE (512)
 #define USART6_TX_FIFO_SIZE (1024)
 
-#define USART6_PRINTF_BUFF_SIZE (128)
+#define USART1_PRINTF_BUFF_SIZE (128)
 
-typedef uint32_t (*usart_call_back)(uint8_t *buf, uint32_t len);
+typedef uint32_t (*usart_call_back)(uint8_t *buf, uint16_t len);
 
 typedef struct
 {
@@ -62,21 +57,19 @@ typedef enum
   INTERRUPT_TYPE_DMA_ALL = 2
 } interrput_type;
 
-typedef enum
-{
-  ERR_DATA_SIZE_TOO_LARGE = -1,
-  ERR_NORAML = 0
-} UART_Err;
-
-void usart3_manage_init(void);
-void usart6_manage_init(void);
 void usart_rx_callback_register(usart_manage_obj_t *m_obj, usart_call_back fun);
-UART_Err usart_transmit(usart_manage_obj_t *m_obj, uint8_t *buf, uint16_t len);
-int usart6_printf(char *fmt, ...);
+int32_t usart_transmit(usart_manage_obj_t *m_obj, uint8_t *buf, uint16_t len);
+
+void usart1_manage_init(void);
+void usart6_manage_init(void);
+void usart1_transmit(uint8_t *buff, uint16_t len);
 void usart6_transmit(uint8_t *buff, uint16_t len);
-void usart3_transmit(uint8_t *buff, uint16_t len);
+void usart1_idle_callback(void);
 void usart6_idle_callback(void);
-void usart3_idle_callback(void);
 uint32_t uart6_rx_data_handle(uint8_t *buff, uint32_t len);
-void usart3_rx_callback_register(usart_call_back fun);
+void usart1_rx_callback_register(usart_call_back fun);
+void usart6_rx_callback_register(usart_call_back fun);
+
+void debug_raw_printf(char *fmt, ...);
+
 #endif // __DRV_UART_H__

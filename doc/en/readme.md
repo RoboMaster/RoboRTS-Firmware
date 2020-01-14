@@ -3,9 +3,9 @@
 
 ### software environment
 
- - Toolchain/IDE : MDK-ARM V5
- - package version: STM32Cube FW_F4 V1.21.0
- - FreeRTOS version: 9.0.0
+ - Toolchain/IDE : MDK-ARM V5 / arm-none-eabi
+ - package version: STM32Cube FW_F4 V1.24.0
+ - FreeRTOS version: 10.0.0
  - CMSIS-RTOS version: 1.02
 
 ### Programming standard
@@ -22,17 +22,16 @@
 
 3.In gimbal control logic, consider that testing virsual recognize armor may need shoot bullet, we allowed single shoot mode under full-auto mode, but if you forget to return the rod to the middle. it will cause the robot change from full-auto mode to manual mode and start continuous shoot mode. As a result, **after you shoot a bullet under full-auto mode, please return the left rod to the middle**
 
-4.International development board type A have a jumper cap. it used to short on board 4-pin serial port R and G (only the board on chassis need short R and G). the firmware check if the signal of R is low to decide it on the chassis or gimbal. if you cannot control the robot and no-sound-and-light alert, please check if the jumper cap is loose.
+4.International development board type C have a jumper cap. The firmware check if the signal of pin is low to decide it on the chassis or gimbal. if you cannot control the robot and no-sound-and-light alert, please check if the jumper cap is loose.
 
 ### Gimbal calibration method
-Underlying code integrated with gimbal automatic calibration function. it first uses IMU to calibrate pitch, making gimbal stays at water level. This process spends 20 to 30 seconds. Then Yaw calculate the mid-value after turns left until reach the left limit and turns right until reach the right limit.
+Underlying code integrated with gimbal and gyro automatic calibration function. You can press the user key to trigger. First, gyro will be calibrated and LED is white. Pitch calculate the mid-value after turns  up until reach the up limit and turns down until reach the down limit.Then Yaw calculate the mid-value after turns left until reach the left limit and turns right until reach the right limit.
 
 Triggering Condition:
 1. Development board first time flashed program or parameter area is emptied
 2. press the on-board white button to trigger
-3. Host send a protocol signal to trigger
 
-Notice：when you calibrate, you must put the chassis on a horizontal ground. Pitch may not able to reach the position in the range of error during calibration. That's because the load on gimbal is too heavy. you can manually move upward the gimbal in this case, to accelerate the calibration.
+Notice：when you calibrate, you must put the chassis on a horizontal ground.
 
 ### Module Offline Instruction
 When a certain module of the vehicle is offline, it can determine which module has a problem according to the different state of the buzzer of the development board. And perform error positioning.
@@ -54,11 +53,14 @@ The status of the module offline is as follows. The number corresponds to the nu
 5. gimbal yaw motor offline
 6. gimbal pitch motor offline
 7. load motor offline
-8. single axis gyroscope offline
 
 #### Remote Controller
 
 The red light is always on when The remote control is offline or the referee system or the serial port of the PC is not connected.
+
+#### PC Heart
+
+The blue light is always on when chassis do not receive PC heart packages in auto mode.
 
 ### Document
 
@@ -68,17 +70,16 @@ The red light is always on when The remote control is offline or the referee sys
 
 ### Hardware Port
 
-Using RM Development Board Type A as main control board, the location of each functional port is as follows：
+Develop board type c ports:
 
-**Chassis Hardware Port**
+![](doc/image/hardware.png)
 
-Attention: uwb, single axis gyroscope and CAN2 communication port use the same CAN bus, no need to care about the specific order
+**gimbal port**
+17: pwm pin
+18: trigger pin
 
-![](../image/chassis.PNG)
-
-**Gimbal Hardware Port**
-
-![](../image/gimbal.PNG)
+**chassis port**
+19: firmware config pin.
 
 ### Functional Module
 
@@ -120,33 +121,24 @@ left toggle rod position and its corresponding function:
 2. Using standard CMSIS-RTOS interface, convenient to transfer to other operating system or platform
 3. Provide a set of abstract infantry robot bsp, simplifying upper logic
 
-![](../image/frame.png)
-
 **Driver**：Directly operate the device driver of the underlying hardware. On the basis of library functions and registers, add lock and asynchronous mechanisms to provide an easier to use api.
+**application**：application task. For example: chassis task.
 
-**Device**：An external module with one or more bus inputs, one or more data outputs, or a general-purpose software module (drop-off protection). Currently, the driver is abstracted into devices for RM materials.
+**bsp**: type c board software package
 
-**Controller**：Single-input single-output models. Providing some common call interfaces, and changing different control algorithms depends on different registration functions.
+**components**：usualy robot module
 
-**Algorithm**：Providing module algorithms, no interdependencies between basic files.
+**doc**：document
 
-**Module**：A module consisting of a driver, device, controller, and algorithm, which can realize a specific function. For example, a two-axis pan gimbal composed of RM motors and a McNamm wheel chassis.
+**MDK-ARM**: MDK project
 
-**Utilities**：General system components, such as the log system.
-
-**Protocol**：A set of upper and lower layer communication protocols for oriented-interfaces.
-
-**Application**：Upper application logic, including various mode switches.
+**tools**：cmake gnu toolchain. You should install make, cmake, arm-none-eabi and set env value.
 
 ### Software system
 
-#### system startup
-system startup and distinguish the start task through jumper cap of the international Development Board Type A.
-![](../image/startup.png)
+SDK uses observe mode to distribute information.
 
-### Inheritance Relationship
-
-![](../image/object.png)
+![](../image/software.png)
 
 ### Hardware system
 

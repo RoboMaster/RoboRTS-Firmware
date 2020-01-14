@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,14 +18,10 @@
 #ifndef __INIT_H__
 #define __INIT_H__
 
-#ifdef INIT_H_GLOBAL
-  #define INIT_H_EXTERN 
-#else
-  #define INIT_H_EXTERN extern
-#endif
+#define CHASSIS_APP 1
+#define GIMBAL_APP  0
 
-#define CHASSIS_APP 0
-#define GIMBAL_APP  1
+#include "os_timer.h"
 
 uint8_t get_sys_cfg(void);
 void hw_init(void);

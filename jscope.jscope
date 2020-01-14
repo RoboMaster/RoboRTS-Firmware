@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<JScopeProject>
+    <FileVersion major="1" minor="1" />
+    <Project>
+        <Configuration>
+            <JLink>
+                <Options IsRTTSession="0" IsRTTWithTimeStamp="1" SamplingPeriod="100" Connection="1" SerialNo="0" IP="" TargetDevice="unspecified" TargetInterface="SWD" InterfaceSpeed="4000" />
+            </JLink>
+            <ElfFile Name="D:\BB1702\AI_Type_C\build\infantry.axf" />
+            <DataFile Name="" />
+            <RawFile Name="" />
+            <Scope>
+                <Options TimeResolutionUs="500000" />
+            </Scope>
+        </Configuration>
+        <Windows>
+            <Graph Show="1" />
+            <Watch Show="1" />
+        </Windows>
+        <SelectedSymbols>
+            <Symbol>
+                <Options Name="pit_angle_fdb_js" Address="0x20000074" Type="int" TypeID="12" Size="4" GraphColorRed="255" GraphColorGreen="215" GraphColorBlue="0" YMinSampled="-33090" YMaxSampled="109078848" YAvgSampled="-1032" Offset="4" ShowInGraph="0" YOffset="540" IsAutoConfig="0" YResolution="10000" MaxValue="20900000" File="..\application\gimbal_task.c" Scope="0" DrawStyle="0" />
+            </Symbol>
+            <Symbol>
+                <Options Name="pit_angle_ref_js" Address="0x20000078" Type="int" TypeID="12" Size="4" GraphColorRed="0" GraphColorGreen="255" GraphColorBlue="0" YMinSampled="-20000" YMaxSampled="1212339206" YAvgSampled="0" Offset="8" ShowInGraph="0" YOffset="540" IsAutoConfig="0" YResolution="10000" MaxValue="20900000" File="..\application\gimbal_task.c" Scope="0" DrawStyle="0" />
+            </Symbol>
+            <Symbol>
+                <Options Name="pit_spd_fdb_js" Address="0x20000084" Type="int" TypeID="12" Size="4" GraphColorRed="0" GraphColorGreen="0" GraphColorBlue="255" YMinSampled="-61084428" YMaxSampled="1619085632" YAvgSampled="252" Offset="12" ShowInGraph="0" YOffset="200" IsAutoConfig="0" YResolution="100000" MaxValue="2000000000" File="..\application\gimbal_task.c" Scope="0" DrawStyle="0" />
+            </Symbol>
+            <Symbol>
+                <Options Name="pit_spd_ref_js" Address="0x20000088" Type="int" TypeID="12" Size="4" GraphColorRed="160" GraphColorGreen="32" GraphColorBlue="240" YMinSampled="-774858" YMaxSampled="1198530560" YAvgSampled="41324" Offset="16" ShowInGraph="0" YOffset="200" IsAutoConfig="0" YResolution="100000" MaxValue="20000000" File="..\application\gimbal_task.c" Scope="0" DrawStyle="0" />
+            </Symbol>
+            <Symbol>
+                <Options Name="yaw_angle_fdb_js" Address="0x2000006C" Type="int" TypeID="12" Size="4" GraphColorRed="255" GraphColorGreen="0" GraphColorBlue="0" YMinSampled="-98657" YMaxSampled="586180801" YAvgSampled="879" Offset="20" ShowInGraph="1" YOffset="530" IsAutoConfig="0" YResolution="10000" MaxValue="1045000000" File="..\application\gimbal_task.c" Scope="0" DrawStyle="0" />
+            </Symbol>
+            <Symbol>
+                <Options Name="yaw_angle_ref_js" Address="0x20000070" Type="int" TypeID="12" Size="4" GraphColorRed="0" GraphColorGreen="191" GraphColorBlue="255" YMinSampled="-10000" YMaxSampled="1623278353" YAvgSampled="1009" Offset="24" ShowInGraph="1" YOffset="530" IsAutoConfig="0" YResolution="10000" MaxValue="2090000000" File="..\application\gimbal_task.c" Scope="0" DrawStyle="0" />
+            </Symbol>
+            <Symbol>
+                <Options Name="yaw_spd_fdb_js" Address="0x2000007C" Type="int" TypeID="12" Size="4" GraphColorRed="0" GraphColorGreen="100" GraphColorBlue="0" YMinSampled="-9794555" YMaxSampled="1610697024" YAvgSampled="-41" Offset="28" ShowInGraph="1" YOffset="220" IsAutoConfig="0" YResolution="100000" MaxValue="2000000000" File="..\application\gimbal_task.c" Scope="0" DrawStyle="0" />
+            </Symbol>
+            <Symbol>
+                <Options Name="yaw_spd_ref_js" Address="0x20000080" Type="int" TypeID="12" Size="4" GraphColorRed="205" GraphColorGreen="133" GraphColorBlue="63" YMinSampled="-828906" YMaxSampled="1614881030" YAvgSampled="3212" Offset="32" ShowInGraph="1" YOffset="220" IsAutoConfig="0" YResolution="100000" MaxValue="2000000000" File="..\application\gimbal_task.c" Scope="0" DrawStyle="0" />
+            </Symbol>
+        </SelectedSymbols>
+    </Project>
+</JScopeProject>

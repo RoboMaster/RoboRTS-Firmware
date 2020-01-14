@@ -1,5 +1,5 @@
 /****************************************************************************
- *  Copyright (C) 2019 RoboMaster.
+ *  Copyright (C) 2020 RoboMaster.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,21 +18,15 @@
 #ifndef __SHOOT_H__
 #define __SHOOT_H__
 
-#ifdef SHOOT_H_GLOBAL
-#define SHOOT_H_EXTERN
-#else
-#define SHOOT_H_EXTERN extern
-#endif
-
 #include "motor.h"
-#include "pid_controller.h"
+#include "pid.h"
 
 #define SHOOT_STOP_CMD (0u)
 #define SHOOT_ONCE_CMD (1u)
 #define SHOOT_CONTINUOUS_CMD (2u)
 
 #define FIRC_STOP_SPEED 1000u
-#define FIRC_MAX_SPEED 1400u
+#define FIRC_MAX_SPEED 1800u
 #define FRIC_MIN_SPEED 1220u
 
 #define BLOCK_CURRENT_DEFAULT 26000.0F
@@ -74,7 +68,7 @@ typedef struct shoot *shoot_t;
 
 struct shoot
 {
-  struct object parent;
+  struct device parent;
   struct shoot_param param;
 
   enum shoot_state state;
@@ -91,16 +85,13 @@ struct shoot
 
   struct motor_device motor;
   struct pid motor_pid;
-  struct pid_feedback motor_feedback;
-  struct controller ctrl;
 };
 
-shoot_t shoot_find(const char *name);
-int32_t shoot_pid_register(struct shoot *shoot, const char *name, enum device_can can);
+int32_t shoot_pid_init(struct shoot *shoot, const char *name, struct pid_param param, enum device_can can);
 int32_t shoot_set_fric_speed(struct shoot *shoot, uint16_t fric_spd1, uint16_t fric_spd2);
 int32_t shoot_get_fric_speed(struct shoot *shoot, uint16_t *fric_spd1, uint16_t *fric_spd2);
 int32_t shoot_set_cmd(struct shoot *shoot, uint8_t cmd, uint32_t shoot_num);
-int32_t shoot_execute(struct shoot *shoot);
+int32_t shoot_pid_calculate(struct shoot *shoot);
 int32_t shoot_state_update(struct shoot *shoot);
 int32_t shoot_enable(struct shoot *shoot);
 int32_t shoot_disable(struct shoot *shoot);

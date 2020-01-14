@@ -5,21 +5,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "macro_mutex.h"
-
-#define HEAP_ASSERT(x)
+#include "sys.h"
 
 #define mem_printf(...)
 
-// #define HEAP_ASSERT(x)
-// {
-//     if((x) == 0)
-//     {
-//         for(; ; );
-//     }
-// }
+#define HEAP_ASSERT(x) \
+{                      \
+    if(!(x))           \
+    {                  \
+        for(; ; );     \
+    }                  \
+}                       
 
-#define TOTAL_HEAP_SIZE (1024 * 60)
+#ifndef TOTAL_HEAP_SIZE
+#define TOTAL_HEAP_SIZE (1024 * 20)
+#endif
 
 /* must be power of 2, at least 8 */
 #define BYTE_ALIGNMENT (8)
