@@ -135,7 +135,7 @@
 
 **doc**：说明文档
 
-**MDK-ARM**：armcc工具链，注意：未购买license最多只能便宜20kb大小固件
+**MDK-ARM**：armcc工具链，注意：未购买license最多只能编译20kb大小固件
 
 **tools**: cmake gnu toolchain. You should install make, cmake, arm-none-eabi and set env value.
 
