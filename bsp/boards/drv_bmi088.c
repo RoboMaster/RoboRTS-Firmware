@@ -87,8 +87,10 @@ uint8_t bmi088_device_init(void)
 
   bmi088_cali_slove(gyro, accel, &bmi088_real_data);
 
-  AHRS_init(ins_quat, gyro, mag);
-
+  AHRS_init(ins_quat, accel, mag);
+  
+  get_angle(ins_quat, ins_angle, ins_angle + 1, ins_angle + 2);
+	
   return 0;
 }
 
@@ -209,7 +211,7 @@ static void bmi088_cali_slove(fp32 gyro[3], fp32 accel[3], bmi088_real_data_t *b
 {
   for (uint8_t i = 0; i < 3; i++)
   {
-    gyro[i] = bmi088->gyro[0] * gyro_scale_factor[i][0] + bmi088->gyro[1] * gyro_scale_factor[i][1] + bmi088->gyro[2] * gyro_scale_factor[i][2] + gyro_offset[i];
-    accel[i] = bmi088->accel[0] * accel_scale_factor[i][0] + bmi088->accel[1] * accel_scale_factor[i][1] + bmi088->accel[2] * accel_scale_factor[i][2] + accel_offset[i];
+    gyro[i] = bmi088->gyro[0] * gyro_scale_factor[i][0] + bmi088->gyro[1] * gyro_scale_factor[i][1] + bmi088->gyro[2] * gyro_scale_factor[i][2] - gyro_offset[i];
+    accel[i] = bmi088->accel[0] * accel_scale_factor[i][0] + bmi088->accel[1] * accel_scale_factor[i][1] + bmi088->accel[2] * accel_scale_factor[i][2] - accel_offset[i];
   }
 }

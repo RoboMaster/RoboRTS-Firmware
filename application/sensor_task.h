@@ -18,7 +18,7 @@
 #ifndef __SENSOR_TASK_H__
 #define __SENSOR_TASK_H__
 
-#define SENSOR_TASK_PERIOD 2
+#define SENSOR_TASK_PERIOD 5
 
 void sensor_task_init(void);
 
