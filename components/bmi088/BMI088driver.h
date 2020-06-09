@@ -98,6 +98,6 @@ extern void get_BMI088_gyro(int16_t gyro[3]);
 extern void get_BMI088_accel(fp32 accel[3]);
 
 extern void BMI088_read_gyro_who_am_i(void);
-extern void BMI088_read_accel_who_am_i(void);
+extern uint8_t BMI088_read_accel_who_am_i(void);
 
 #endif

@@ -362,11 +362,11 @@ void BMI088_read_gyro_who_am_i(void)
 }
 
 
-void BMI088_read_accel_who_am_i(void)
+uint8_t BMI088_read_accel_who_am_i(void)
 {
     uint8_t buf;
     BMI088_ACCEL_Read_Single_Reg(BMI088_ACC_CHIP_ID, buf);
-    buf = 0;
+    return buf;
 
 }
 

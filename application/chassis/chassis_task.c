@@ -59,7 +59,7 @@ void chassis_task(void const *argument)
   EventSubscribe(&listSubs, DBUS_MSG, DBUS_MSG_LEN, 3, chassis_dr16_data_update);
 
   EventSubscribeInit(&nolistSubs, SUBS_MODE_NOLIST);
-  EventSubscribe(&nolistSubs, AHRS_MSG, AHRS_MSG_LEN, NULL, NULL);
+  EventSubscribe(&nolistSubs, AHRS_MSG, AHRS_MSG_LEN, 0, NULL);
 
   rc_device_register(&chassis_rc, "Chassis RC");
   p_rc_info = rc_device_get_info(&chassis_rc);
@@ -191,5 +191,11 @@ int32_t follow_angle_info_rcv(uint8_t *buff, uint16_t len)
   struct cmd_gimbal_info *info;
   info = (struct cmd_gimbal_info *)buff;
   follow_relative_angle = info->yaw_ecd_angle / 10.0f;
+  offline_event_time_update(OFFLINE_GIMBAL_INFO);
   return 0;
+}
+
+void set_follow_relative(float val)
+{
+	follow_relative_angle = val;
 }

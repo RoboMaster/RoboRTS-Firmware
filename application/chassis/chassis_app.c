@@ -38,6 +38,9 @@ void chassis_heart_online(void);
 void chassis_control_online(void);
 void chassis_control_offline(void);
 
+void gimbal_info_offline(void);
+void gimbal_info_online(void);
+
 /* no send cmd need ack */
 struct protocol_send_cfg_obj chassis_send_cfg_table[] = {0};
 
@@ -57,12 +60,15 @@ struct offline_obj chassis_offline_table[] =
         {SYSTEM_PROTECT, ENABLE, 0, 0, 0, 0, chassis_offline, chassis_online, NULL},
 
         {OFFLINE_DBUS, ENABLE, OFFLINE_ERROR_LEVEL, 0, 100, NULL, NULL, NULL, NULL},
+
         {OFFLINE_CHASSIS_MOTOR1, ENABLE, OFFLINE_ERROR_LEVEL, 1, 100, NULL, NULL, NULL, NULL},
         {OFFLINE_CHASSIS_MOTOR2, ENABLE, OFFLINE_ERROR_LEVEL, 2, 100, NULL, NULL, NULL, NULL},
         {OFFLINE_CHASSIS_MOTOR3, ENABLE, OFFLINE_ERROR_LEVEL, 3, 100, NULL, NULL, NULL, NULL},
         {OFFLINE_CHASSIS_MOTOR4, ENABLE, OFFLINE_ERROR_LEVEL, 4, 100, NULL, NULL, NULL, NULL},
-        {OFFLINE_MANIFOLD2_HEART, DISABLE, OFFLINE_WARINING_LEVEL, BEEP_DISENABLE, 700, NULL, chassis_heart_offline, NULL, chassis_heart_online},
-        {OFFLINE_CONTROL_CMD, ENABLE, OFFLINE_WARINING_LEVEL, BEEP_DISENABLE, 700, NULL, chassis_control_offline, NULL, chassis_control_online},
+        {OFFLINE_MANIFOLD2_HEART, DISABLE, OFFLINE_WARNING_LEVEL, BEEP_DISABLE, 700, NULL, chassis_heart_offline, NULL, chassis_heart_online},
+        {OFFLINE_CONTROL_CMD, ENABLE, OFFLINE_WARNING_LEVEL, BEEP_DISABLE, 700, NULL, chassis_control_offline, NULL, chassis_control_online},
+
+        {OFFLINE_GIMBAL_INFO, ENABLE, APP_PROTECT_LEVEL, 0, 700, NULL, gimbal_info_offline, NULL, gimbal_info_online},
 };
 
 struct route_obj chassis_route_table[] =
@@ -216,3 +222,15 @@ void chassis_control_online(void)
 {
   LED_B_OFF();
 }
+
+void gimbal_info_offline(void)
+{
+	set_follow_relative(0);
+}
+
+void gimbal_info_online(void)
+{
+	return;
+}
+
+

@@ -41,7 +41,7 @@ int32_t shoot_firction_toggle(shoot_t p_shoot);
 
 void shoot_task(void const *argument)
 {
-  uint32_t shoot_time;
+  uint32_t shoot_time = 0;
 
   subscriber_t listSubs;
 

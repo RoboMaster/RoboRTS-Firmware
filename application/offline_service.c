@@ -68,8 +68,11 @@ void offline_service(void const *argument)
 
         if (offline_manage[i].beep_times < beep_time)
         {
-          beep_time = offline_manage[i].beep_times;
-          display_event = (offline_event)i;
+          if (offline_manage[i].error_level <= OFFLINE_WARNING_LEVEL)
+          {
+            beep_time = offline_manage[i].beep_times;
+            display_event = (offline_event)i;
+          }
         }
       }
       else
@@ -111,6 +114,16 @@ void offline_service(void const *argument)
 
     osDelay(20);
   }
+}
+
+/**
+  * @brief  get system offline event
+  * @param
+  * @retval void
+  */
+uint8_t get_system_status(void)
+{
+	return offline_manage[SYSTEM_PROTECT].online_state;
 }
 
 /**

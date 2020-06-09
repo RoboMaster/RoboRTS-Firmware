@@ -72,7 +72,13 @@ int32_t beep_ctrl_times(void *argc)
   static uint32_t beep_tick;
   static uint32_t times_tick;
   static uint8_t times;
-
+	
+  /* The beep works after the system starts 3s */
+  if(get_time_ms()/1000 < 3)
+  {
+    return 0;
+  }
+	
   if(get_time_ms() - beep_tick > BEEP_PERIOD)
   {
     times = beep_times;

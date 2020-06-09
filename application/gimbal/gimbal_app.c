@@ -71,8 +71,8 @@ struct offline_obj gimbal_offline_table[] =
         {OFFLINE_GIMBAL_YAW, ENABLE, OFFLINE_ERROR_LEVEL, 5, 100, NULL, NULL, NULL, NULL},
         {OFFLINE_GIMBAL_PITCH, ENABLE, OFFLINE_ERROR_LEVEL, 6, 100, NULL, NULL, NULL, NULL},
         {OFFLINE_GIMBAL_TURN_MOTOR, ENABLE, OFFLINE_ERROR_LEVEL, 7, 100, NULL, NULL, NULL, NULL},
-        {OFFLINE_MANIFOLD2_HEART, DISABLE, OFFLINE_WARINING_LEVEL, BEEP_DISENABLE, 700, gimbal_heart_offline, NULL, NULL, gimbal_heart_online},
-        {OFFLINE_CONTROL_CMD, ENABLE, OFFLINE_WARINING_LEVEL, BEEP_DISENABLE, 700, NULL, gimbal_control_offline, NULL, gimbal_control_online},
+        {OFFLINE_MANIFOLD2_HEART, DISABLE, OFFLINE_WARNING_LEVEL, BEEP_DISABLE, 700, gimbal_heart_offline, NULL, NULL, gimbal_heart_online},
+        {OFFLINE_CONTROL_CMD, ENABLE, OFFLINE_WARNING_LEVEL, BEEP_DISABLE, 700, NULL, gimbal_control_offline, NULL, gimbal_control_online},
 };
 
 struct route_obj gimbal_route_table[] =
@@ -232,8 +232,8 @@ void gimbal_heart_offline(void)
 
 void gimbal_heart_online(void)
 {
-  struct gimbal *p_gimbal;
-  p_gimbal = get_gimbal();
+//  struct gimbal *p_gimbal;
+//  p_gimbal = get_gimbal();
 
   struct shoot *p_shoot;
   p_shoot = get_shoot();

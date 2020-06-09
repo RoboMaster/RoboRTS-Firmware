@@ -13,7 +13,7 @@ set(CMAKE_OBJDUMP arm-none-eabi-objdump)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 # core flags
-set(CORE_FLAGS "-mthumb -mcpu=cortex-m4 -mlittle-endian -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork --specs=nano.specs --specs=nosys.specs ${ADDITIONAL_CORE_FLAGS}")
+set(CORE_FLAGS "-mthumb -mcpu=cortex-m4 -mlittle-endian -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork -fno-strict-aliasing --specs=nano.specs --specs=nosys.specs ${ADDITIONAL_CORE_FLAGS}")
 
 # compiler: language specific flags
 set(CMAKE_C_FLAGS "${CORE_FLAGS} -fno-builtin -Wall -std=gnu99 -fdata-sections -ffunction-sections -g -o -gdwarf-2" CACHE INTERNAL "c compiler flags")

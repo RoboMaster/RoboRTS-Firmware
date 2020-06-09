@@ -159,7 +159,13 @@ int32_t gimbal_info_push(void *argc)
 	{
 		cmd_gimbal_info.yaw_ecd_angle = 0;
 	}
-
+	
+	/* gimbal motor is offline */
+	if (get_system_status() != STATE_ONLINE)
+	{
+		cmd_gimbal_info.yaw_ecd_angle = 0;
+	}
+	
 	protocol_send(PROTOCOL_BROADCAST_ADDR, CMD_PUSH_GIMBAL_INFO, &cmd_gimbal_info, sizeof(cmd_gimbal_info));
 	return 0;
 }

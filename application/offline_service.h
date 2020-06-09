@@ -26,9 +26,10 @@
 /* system protection uses event 0. */
 #define SYSTEM_PROTECT NO_OFFLINE
 #define OFFLINE_ERROR_LEVEL 0
-#define OFFLINE_WARINING_LEVEL 1
+#define OFFLINE_WARNING_LEVEL 1
+#define APP_PROTECT_LEVEL 2
 
-#define BEEP_DISENABLE 0xFF
+#define BEEP_DISABLE 0xFF
 
 typedef void (*offline_t)(void);
 
@@ -46,6 +47,7 @@ typedef enum
     OFFLINE_SINGLE_GYRO,
     OFFLINE_MANIFOLD2_HEART,
     OFFLINE_CONTROL_CMD,
+    OFFLINE_GIMBAL_INFO,
     OFFLINE_EVENT_MAX_NUM,
 } offline_event;
 
@@ -74,5 +76,7 @@ void offline_event_init(struct offline_manage_obj obj);
 void offline_event_time_update(offline_event event);
 void offline_event_enable(offline_event event);
 void offline_event_disable(offline_event event);
+
+uint8_t get_system_status(void);
 
 #endif

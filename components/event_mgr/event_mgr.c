@@ -209,7 +209,7 @@ int EventSubscribe(subscriber_t* pSubscriber, uint32_t eventID, uint32_t msgSize
 
     if(targetEvent != NULL)
     {
-        void *memoryPool;
+        void *memoryPool = NULL;
         // mutex = targetEvent->mutex;
 
         /* 申请订阅列表项空间 */

@@ -111,7 +111,7 @@ void gimbal_task(void const *argument)
   EventSubscribe(&listSubs, DBUS_MSG, DBUS_MSG_LEN, 3, gimbal_dr16_data_update);
 
   EventSubscribeInit(&nolistSubs, SUBS_MODE_NOLIST);
-  EventSubscribe(&nolistSubs, AHRS_MSG, AHRS_MSG_LEN, NULL, NULL);
+  EventSubscribe(&nolistSubs, AHRS_MSG, AHRS_MSG_LEN, 0, NULL);
 
   rc_device_register(&gimbal_rc, "Gimbal RC");
   p_rc_info = rc_device_get_info(&gimbal_rc);
