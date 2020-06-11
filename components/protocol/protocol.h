@@ -38,16 +38,16 @@ int32_t protocol_rcv_cmd_register(uint16_t cmd, rcv_handle_fn_t rcv_callback);
 void protocol_set_local_address(uint8_t address);
 uint32_t protocol_local_object_init(void);
 
-uint32_t protocol_send(uint8_t reciver, uint16_t cmd, void *p_data, uint32_t data_len);
+uint32_t protocol_send(uint8_t reciver, uint16_t cmd, void* p_data, uint32_t data_len);
 
-uint32_t protocol_ack(uint8_t reciver, uint8_t session, void *p_data,
+uint32_t protocol_ack(uint8_t reciver, uint8_t session, void* p_data,
                       uint32_t data_len, uint16_t ack_seq);
 
 uint32_t protocol_send_flush(void);
 
 uint32_t protocol_unpack_flush(void);
 
-uint32_t protocol_rcv_data(void *p_data, uint32_t data_len, struct perph_interface *perph);
+uint32_t protocol_rcv_data(void* p_data, uint32_t data_len, struct perph_interface* perph);
 
 uint32_t protocol_send_list_add_callback_reg(void_fn_t fn);
 

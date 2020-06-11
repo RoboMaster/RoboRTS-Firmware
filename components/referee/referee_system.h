@@ -44,39 +44,39 @@ typedef void (*ref_cmd_callback_t)(uint16_t cmd_id, uint8_t* pdata, uint16_t len
 
 typedef struct
 {
-  uint8_t  sof;
-  uint16_t data_length;
-  uint8_t  seq;
-  uint8_t  crc8;
+    uint8_t  sof;
+    uint16_t data_length;
+    uint8_t  seq;
+    uint8_t  crc8;
 } frame_header_t;
 
 #pragma pack(pop)
 
 typedef enum
 {
-  STEP_HEADER_SOF  = 0,
-  STEP_LENGTH_LOW  = 1,
-  STEP_LENGTH_HIGH = 2,
-  STEP_FRAME_SEQ   = 3,
-  STEP_HEADER_CRC8 = 4,
-  STEP_DATA_CRC16  = 5,
+    STEP_HEADER_SOF  = 0,
+    STEP_LENGTH_LOW  = 1,
+    STEP_LENGTH_HIGH = 2,
+    STEP_FRAME_SEQ   = 3,
+    STEP_HEADER_CRC8 = 4,
+    STEP_DATA_CRC16  = 5,
 } unpack_step_e;
 
 typedef struct
 {
-  fifo_s_t       *data_fifo;
-  frame_header_t *p_header;
-  uint16_t       data_len;
-  uint8_t        protocol_packet[REF_PROTOCOL_FRAME_MAX_SIZE];
-  unpack_step_e  unpack_step;
-  uint16_t       index;
+    fifo_s_t*       data_fifo;
+    frame_header_t* p_header;
+    uint16_t       data_len;
+    uint8_t        protocol_packet[REF_PROTOCOL_FRAME_MAX_SIZE];
+    unpack_step_e  unpack_step;
+    uint16_t       index;
 } unpack_data_t;
 
 void referee_param_init(ref_send_handler_t send_t,
-	                      ref_rx_complete_callabck_t rx_callback,
-	                      ref_cmd_callback_t cmd_callback);
+                        ref_rx_complete_callabck_t rx_callback,
+                        ref_cmd_callback_t cmd_callback);
 void     referee_unpack_fifo_data(void);
-uint32_t referee_uart_rx_data_handle(uint8_t *data, uint16_t len);
+uint32_t referee_uart_rx_data_handle(uint8_t* data, uint16_t len);
 void     referee_protocol_tansmit(uint16_t cmd_id, void* p_buf, uint16_t len);
 
 #endif // __REFEREE_SYSTEM_H__

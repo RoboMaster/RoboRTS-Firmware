@@ -22,14 +22,14 @@
 #include "cmsis_os.h"
 #include "sensor_task.h"
 
-static void sensor_task(void const *argc);
+static void sensor_task(void const* argc);
 
 osThreadId sensor_task_t;
 
 void sensor_task_init(void)
 {
-  osThreadDef(SENSOR_TASK, sensor_task, osPriorityNormal, 0, 512);
-  sensor_task_t = osThreadCreate(osThread(SENSOR_TASK), NULL);
+    osThreadDef(SENSOR_TASK, sensor_task, osPriorityNormal, 0, 512);
+    sensor_task_t = osThreadCreate(osThread(SENSOR_TASK), NULL);
 }
 
 float ahrs_run_time;
@@ -39,36 +39,36 @@ float ahrs_run_time;
   * @param
   * @retval void
   */
-void sensor_task(void const *argc)
+void sensor_task(void const* argc)
 {
-  /* The parameters are not used. */
-  (void)argc;
-  TickType_t peroid = osKernelSysTick();
-  ;
-  struct ahrs_sensor gyro_sensor;
+    /* The parameters are not used. */
+    (void)argc;
+    TickType_t peroid = osKernelSysTick();
+    ;
+    struct ahrs_sensor gyro_sensor;
 
-  static publisher_t ahrsPub;
+    static publisher_t ahrsPub;
 
-  /* set gyro zero drift */
-  bmi088_get_offset();
+    /* set gyro zero drift */
+    bmi088_get_offset();
 
-  imu_temp_ctrl_init();
-  soft_timer_register(imu_temp_keep, (void *)NULL, 5);
+    imu_temp_ctrl_init();
+    soft_timer_register(imu_temp_keep, (void*)NULL, 5);
 
-  EventPostInit(&ahrsPub, AHRS_MSG, AHRS_MSG_LEN);
+    EventPostInit(&ahrsPub, AHRS_MSG, AHRS_MSG_LEN);
 
-  while (1)
-  {
-    uint32_t time_id;
+    while(1)
+    {
+        uint32_t time_id;
 
-    get_period_start(&time_id);
+        get_period_start(&time_id);
 
-    ahrs_update(&gyro_sensor, SENSOR_TASK_PERIOD);
+        ahrs_update(&gyro_sensor, SENSOR_TASK_PERIOD);
 
-    EventMsgPost(&ahrsPub, &gyro_sensor, AHRS_MSG_LEN);
+        EventMsgPost(&ahrsPub, &gyro_sensor, AHRS_MSG_LEN);
 
-    ahrs_run_time = get_period_end(time_id);
+        ahrs_run_time = get_period_end(time_id);
 
-    osDelayUntil(&peroid, SENSOR_TASK_PERIOD);
-  }
+        osDelayUntil(&peroid, SENSOR_TASK_PERIOD);
+    }
 }

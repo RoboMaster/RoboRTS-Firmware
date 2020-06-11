@@ -57,8 +57,9 @@
 #define ADDR_FLASH_SECTOR_23     ((uint32_t)0x081E0000) /* Base address of Sector 23, 128 K bytes */
 
 /* default ENV set for user */
-static const ef_env default_env_set[] = {
-        {"boot_times","0"},
+static const ef_env default_env_set[] =
+{
+    {"boot_times", "0"},
 };
 
 static char log_buf[CONSOLEBUF_SIZE];
@@ -74,7 +75,8 @@ static uint32_t stm32_get_sector_size(uint32_t sector);
  *
  * @return result
  */
-EfErrCode ef_port_init(ef_env const **default_env, size_t *default_env_size) {
+EfErrCode ef_port_init(ef_env const** default_env, size_t* default_env_size)
+{
     EfErrCode result = EF_NO_ERR;
 
     *default_env = default_env_set;
@@ -93,14 +95,16 @@ EfErrCode ef_port_init(ef_env const **default_env, size_t *default_env_size) {
  *
  * @return result
  */
-EfErrCode ef_port_read(uint32_t addr, uint32_t *buf, size_t size) {
+EfErrCode ef_port_read(uint32_t addr, uint32_t* buf, size_t size)
+{
     EfErrCode result = EF_NO_ERR;
-    uint8_t *buf_8 = (uint8_t *)buf;
+    uint8_t* buf_8 = (uint8_t*)buf;
     size_t i;
 
     /*copy from flash to ram */
-    for (i = 0; i < size; i++, addr ++, buf_8++) {
-        *buf_8 = *(uint8_t *) addr;
+    for(i = 0; i < size; i++, addr ++, buf_8++)
+    {
+        *buf_8 = *(uint8_t*) addr;
     }
 
     return result;
@@ -116,7 +120,8 @@ EfErrCode ef_port_read(uint32_t addr, uint32_t *buf, size_t size) {
  *
  * @return result
  */
-EfErrCode ef_port_erase(uint32_t addr, size_t size) {
+EfErrCode ef_port_erase(uint32_t addr, size_t size)
+{
     EfErrCode result = EF_NO_ERR;
 
     size_t erased_size = 0;
@@ -125,25 +130,26 @@ EfErrCode ef_port_erase(uint32_t addr, size_t size) {
     /* make sure the start address is a multiple of EF_ERASE_MIN_SIZE */
     EF_ASSERT(addr % EF_ERASE_MIN_SIZE == 0);
 
-		uint32_t SectorError;
-	  FLASH_EraseInitTypeDef EraseInitStruct;
-		EraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
-		EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
-		EraseInitStruct.NbSectors = 1;
+    uint32_t SectorError;
+    FLASH_EraseInitTypeDef EraseInitStruct;
+    EraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
+    EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+    EraseInitStruct.NbSectors = 1;
 
     /* start erase */
     HAL_FLASH_Unlock();
 
     /* it will stop when erased size is greater than setting size */
-    while(erased_size < size) {
+    while(erased_size < size)
+    {
         cur_erase_sector = stm32_get_sector(addr + erased_size);
-			  EraseInitStruct.Sector = cur_erase_sector;
+        EraseInitStruct.Sector = cur_erase_sector;
 
-				if(HAL_OK != HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError))
-				{
-					  result = EF_ERASE_ERR;
+        if(HAL_OK != HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError))
+        {
+            result = EF_ERASE_ERR;
             break;
-				}
+        }
 
         erased_size += stm32_get_sector_size(cur_erase_sector);
     }
@@ -162,22 +168,24 @@ EfErrCode ef_port_erase(uint32_t addr, size_t size) {
  *
  * @return result
  */
-EfErrCode ef_port_write(uint32_t addr, const uint32_t *buf, size_t size) {
+EfErrCode ef_port_write(uint32_t addr, const uint32_t* buf, size_t size)
+{
     EfErrCode result = EF_NO_ERR;
     size_t i;
     uint32_t read_data;
-    uint8_t *buf_8 = (uint8_t *)buf;
+    uint8_t* buf_8 = (uint8_t*)buf;
 
     HAL_FLASH_Unlock();
 
-    for (i = 0; i < size; i++, buf_8++, addr++)
+    for(i = 0; i < size; i++, buf_8++, addr++)
     {
         /* write data */
-			  HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, addr, *buf_8);
+        HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, addr, *buf_8);
 
-        read_data = *(uint8_t *) addr;
+        read_data = *(uint8_t*) addr;
         /* check data */
-        if (read_data != *buf_8) {
+        if(read_data != *buf_8)
+        {
             result = EF_WRITE_ERR;
             break;
         }
@@ -190,14 +198,16 @@ EfErrCode ef_port_write(uint32_t addr, const uint32_t *buf, size_t size) {
 /**
  * lock the ENV ram cache
  */
-void ef_port_env_lock(void) {
+void ef_port_env_lock(void)
+{
     __disable_irq();
 }
 
 /**
  * unlock the ENV ram cache
  */
-void ef_port_env_unlock(void) {
+void ef_port_env_unlock(void)
+{
     __enable_irq();
 }
 
@@ -209,60 +219,84 @@ void ef_port_env_unlock(void) {
  *
  * @return The sector of a given address
  */
-static uint32_t stm32_get_sector(uint32_t address) {
+static uint32_t stm32_get_sector(uint32_t address)
+{
     uint32_t sector = 0;
 
-    if ((address < ADDR_FLASH_SECTOR_1) && (address >= ADDR_FLASH_SECTOR_0)) {
+    if((address < ADDR_FLASH_SECTOR_1) && (address >= ADDR_FLASH_SECTOR_0))
+    {
         sector = FLASH_SECTOR_0;
-    } else if ((address < ADDR_FLASH_SECTOR_2) && (address >= ADDR_FLASH_SECTOR_1)) {
+    }
+    else if((address < ADDR_FLASH_SECTOR_2) && (address >= ADDR_FLASH_SECTOR_1))
+    {
         sector = FLASH_SECTOR_1;
-    } else if ((address < ADDR_FLASH_SECTOR_3) && (address >= ADDR_FLASH_SECTOR_2)) {
+    }
+    else if((address < ADDR_FLASH_SECTOR_3) && (address >= ADDR_FLASH_SECTOR_2))
+    {
         sector = FLASH_SECTOR_2;
-    } else if ((address < ADDR_FLASH_SECTOR_4) && (address >= ADDR_FLASH_SECTOR_3)) {
+    }
+    else if((address < ADDR_FLASH_SECTOR_4) && (address >= ADDR_FLASH_SECTOR_3))
+    {
         sector = FLASH_SECTOR_3;
-    } else if ((address < ADDR_FLASH_SECTOR_5) && (address >= ADDR_FLASH_SECTOR_4)) {
+    }
+    else if((address < ADDR_FLASH_SECTOR_5) && (address >= ADDR_FLASH_SECTOR_4))
+    {
         sector = FLASH_SECTOR_4;
-    } else if ((address < ADDR_FLASH_SECTOR_6) && (address >= ADDR_FLASH_SECTOR_5)) {
+    }
+    else if((address < ADDR_FLASH_SECTOR_6) && (address >= ADDR_FLASH_SECTOR_5))
+    {
         sector = FLASH_SECTOR_5;
-    } else if ((address < ADDR_FLASH_SECTOR_7) && (address >= ADDR_FLASH_SECTOR_6)) {
+    }
+    else if((address < ADDR_FLASH_SECTOR_7) && (address >= ADDR_FLASH_SECTOR_6))
+    {
         sector = FLASH_SECTOR_6;
-    } else if ((address < ADDR_FLASH_SECTOR_8) && (address >= ADDR_FLASH_SECTOR_7)) {
+    }
+    else if((address < ADDR_FLASH_SECTOR_8) && (address >= ADDR_FLASH_SECTOR_7))
+    {
         sector = FLASH_SECTOR_7;
-    } else if ((address < ADDR_FLASH_SECTOR_9) && (address >= ADDR_FLASH_SECTOR_8)) {
+    }
+    else if((address < ADDR_FLASH_SECTOR_9) && (address >= ADDR_FLASH_SECTOR_8))
+    {
         sector = FLASH_SECTOR_8;
-    } else if ((address < ADDR_FLASH_SECTOR_10) && (address >= ADDR_FLASH_SECTOR_9)) {
+    }
+    else if((address < ADDR_FLASH_SECTOR_10) && (address >= ADDR_FLASH_SECTOR_9))
+    {
         sector = FLASH_SECTOR_9;
-    } else if ((address < ADDR_FLASH_SECTOR_11) && (address >= ADDR_FLASH_SECTOR_10)) {
+    }
+    else if((address < ADDR_FLASH_SECTOR_11) && (address >= ADDR_FLASH_SECTOR_10))
+    {
         sector = FLASH_SECTOR_10;
-    } else if ((address < ADDR_FLASH_SECTOR_12) && (address >= ADDR_FLASH_SECTOR_11)) {
+    }
+    else if((address < ADDR_FLASH_SECTOR_12) && (address >= ADDR_FLASH_SECTOR_11))
+    {
         sector = FLASH_SECTOR_11;
-		}
-//    else if ((address < ADDR_FLASH_SECTOR_13) && (address >= ADDR_FLASH_SECTOR_12)) {
-//        sector = FLASH_SECTOR_12;
-//    } else if ((address < ADDR_FLASH_SECTOR_14) && (address >= ADDR_FLASH_SECTOR_13)) {
-//        sector = FLASH_SECTOR_13;
-//    } else if ((address < ADDR_FLASH_SECTOR_15) && (address >= ADDR_FLASH_SECTOR_14)) {
-//        sector = FLASH_SECTOR_14;
-//    } else if ((address < ADDR_FLASH_SECTOR_16) && (address >= ADDR_FLASH_SECTOR_15)) {
-//        sector = FLASH_SECTOR_15;
-//    } else if ((address < ADDR_FLASH_SECTOR_17) && (address >= ADDR_FLASH_SECTOR_16)) {
-//        sector = FLASH_SECTOR_16;
-//    } else if ((address < ADDR_FLASH_SECTOR_18) && (address >= ADDR_FLASH_SECTOR_17)) {
-//        sector = FLASH_SECTOR_17;
-//    } else if ((address < ADDR_FLASH_SECTOR_19) && (address >= ADDR_FLASH_SECTOR_18)) {
-//        sector = FLASH_SECTOR_18;
-//    } else if ((address < ADDR_FLASH_SECTOR_20) && (address >= ADDR_FLASH_SECTOR_19)) {
-//        sector = FLASH_SECTOR_19;
-//    } else if ((address < ADDR_FLASH_SECTOR_21) && (address >= ADDR_FLASH_SECTOR_20)) {
-//        sector = FLASH_SECTOR_20;
-//    } else if ((address < ADDR_FLASH_SECTOR_22) && (address >= ADDR_FLASH_SECTOR_21)) {
-//        sector = FLASH_SECTOR_21;
-//    } else if ((address < ADDR_FLASH_SECTOR_23) && (address >= ADDR_FLASH_SECTOR_22)) {
-//        sector = FLASH_SECTOR_22;
-//    } else /*(address < FLASH_END_ADDR) && (address >= ADDR_FLASH_SECTOR_23))*/
-//    {
-//        sector = FLASH_SECTOR_23;
-//    }
+    }
+    //    else if ((address < ADDR_FLASH_SECTOR_13) && (address >= ADDR_FLASH_SECTOR_12)) {
+    //        sector = FLASH_SECTOR_12;
+    //    } else if ((address < ADDR_FLASH_SECTOR_14) && (address >= ADDR_FLASH_SECTOR_13)) {
+    //        sector = FLASH_SECTOR_13;
+    //    } else if ((address < ADDR_FLASH_SECTOR_15) && (address >= ADDR_FLASH_SECTOR_14)) {
+    //        sector = FLASH_SECTOR_14;
+    //    } else if ((address < ADDR_FLASH_SECTOR_16) && (address >= ADDR_FLASH_SECTOR_15)) {
+    //        sector = FLASH_SECTOR_15;
+    //    } else if ((address < ADDR_FLASH_SECTOR_17) && (address >= ADDR_FLASH_SECTOR_16)) {
+    //        sector = FLASH_SECTOR_16;
+    //    } else if ((address < ADDR_FLASH_SECTOR_18) && (address >= ADDR_FLASH_SECTOR_17)) {
+    //        sector = FLASH_SECTOR_17;
+    //    } else if ((address < ADDR_FLASH_SECTOR_19) && (address >= ADDR_FLASH_SECTOR_18)) {
+    //        sector = FLASH_SECTOR_18;
+    //    } else if ((address < ADDR_FLASH_SECTOR_20) && (address >= ADDR_FLASH_SECTOR_19)) {
+    //        sector = FLASH_SECTOR_19;
+    //    } else if ((address < ADDR_FLASH_SECTOR_21) && (address >= ADDR_FLASH_SECTOR_20)) {
+    //        sector = FLASH_SECTOR_20;
+    //    } else if ((address < ADDR_FLASH_SECTOR_22) && (address >= ADDR_FLASH_SECTOR_21)) {
+    //        sector = FLASH_SECTOR_21;
+    //    } else if ((address < ADDR_FLASH_SECTOR_23) && (address >= ADDR_FLASH_SECTOR_22)) {
+    //        sector = FLASH_SECTOR_22;
+    //    } else /*(address < FLASH_END_ADDR) && (address >= ADDR_FLASH_SECTOR_23))*/
+    //    {
+    //        sector = FLASH_SECTOR_23;
+    //    }
 
     return sector;
 }
@@ -274,35 +308,50 @@ static uint32_t stm32_get_sector(uint32_t address) {
  *
  * @return sector size
  */
-static uint32_t stm32_get_sector_size(uint32_t sector) {
+static uint32_t stm32_get_sector_size(uint32_t sector)
+{
     EF_ASSERT(IS_FLASH_SECTOR(sector));
 
-    switch (sector) {
-    case FLASH_SECTOR_0: return 16 * 1024;
-    case FLASH_SECTOR_1: return 16 * 1024;
-    case FLASH_SECTOR_2: return 16 * 1024;
-    case FLASH_SECTOR_3: return 16 * 1024;
-    case FLASH_SECTOR_4: return 64 * 1024;
-    case FLASH_SECTOR_5: return 128 * 1024;
-    case FLASH_SECTOR_6: return 128 * 1024;
-    case FLASH_SECTOR_7: return 128 * 1024;
-    case FLASH_SECTOR_8: return 128 * 1024;
-    case FLASH_SECTOR_9: return 128 * 1024;
-    case FLASH_SECTOR_10: return 128 * 1024;
-    case FLASH_SECTOR_11: return 128 * 1024;
-//    case FLASH_SECTOR_12: return 16 * 1024;
-//    case FLASH_SECTOR_13: return 16 * 1024;
-//    case FLASH_SECTOR_14: return 16 * 1024;
-//    case FLASH_SECTOR_15: return 16 * 1024;
-//    case FLASH_SECTOR_16: return 64 * 1024;
-//    case FLASH_SECTOR_17: return 128 * 1024;
-//    case FLASH_SECTOR_18: return 128 * 1024;
-//    case FLASH_SECTOR_19: return 128 * 1024;
-//    case FLASH_SECTOR_20: return 128 * 1024;
-//    case FLASH_SECTOR_21: return 128 * 1024;
-//    case FLASH_SECTOR_22: return 128 * 1024;
-//    case FLASH_SECTOR_23: return 128 * 1024;
-    default : return 128 * 1024;
+    switch(sector)
+    {
+    case FLASH_SECTOR_0:
+        return 16 * 1024;
+    case FLASH_SECTOR_1:
+        return 16 * 1024;
+    case FLASH_SECTOR_2:
+        return 16 * 1024;
+    case FLASH_SECTOR_3:
+        return 16 * 1024;
+    case FLASH_SECTOR_4:
+        return 64 * 1024;
+    case FLASH_SECTOR_5:
+        return 128 * 1024;
+    case FLASH_SECTOR_6:
+        return 128 * 1024;
+    case FLASH_SECTOR_7:
+        return 128 * 1024;
+    case FLASH_SECTOR_8:
+        return 128 * 1024;
+    case FLASH_SECTOR_9:
+        return 128 * 1024;
+    case FLASH_SECTOR_10:
+        return 128 * 1024;
+    case FLASH_SECTOR_11:
+        return 128 * 1024;
+    //    case FLASH_SECTOR_12: return 16 * 1024;
+    //    case FLASH_SECTOR_13: return 16 * 1024;
+    //    case FLASH_SECTOR_14: return 16 * 1024;
+    //    case FLASH_SECTOR_15: return 16 * 1024;
+    //    case FLASH_SECTOR_16: return 64 * 1024;
+    //    case FLASH_SECTOR_17: return 128 * 1024;
+    //    case FLASH_SECTOR_18: return 128 * 1024;
+    //    case FLASH_SECTOR_19: return 128 * 1024;
+    //    case FLASH_SECTOR_20: return 128 * 1024;
+    //    case FLASH_SECTOR_21: return 128 * 1024;
+    //    case FLASH_SECTOR_22: return 128 * 1024;
+    //    case FLASH_SECTOR_23: return 128 * 1024;
+    default :
+        return 128 * 1024;
     }
 }
 
@@ -318,7 +367,8 @@ static uint32_t stm32_get_sector_size(uint32_t sector) {
  * @param ... args
  *
  */
-void ef_log_debug(const char *file, const long line, const char *format, ...) {
+void ef_log_debug(const char* file, const long line, const char* format, ...)
+{
 
 #ifdef PRINT_DEBUG
 
@@ -341,7 +391,8 @@ void ef_log_debug(const char *file, const long line, const char *format, ...) {
  * @param format output format
  * @param ... args
  */
-void ef_log_info(const char *format, ...) {
+void ef_log_info(const char* format, ...)
+{
     va_list args;
 
     /* args point to the first variable parameter */
@@ -357,7 +408,8 @@ void ef_log_info(const char *format, ...) {
  * @param format output format
  * @param ... args
  */
-void ef_print(const char *format, ...) {
+void ef_print(const char* format, ...)
+{
     va_list args;
     /* args point to the first variable parameter */
     va_start(args, format);

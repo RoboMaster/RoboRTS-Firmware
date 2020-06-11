@@ -19,9 +19,9 @@
 #define __BOARD_H__
 
 #ifdef BOARD_H_GLOBAL
-  #define BOARD_H_EXTERN
+    #define BOARD_H_EXTERN
 #else
-  #define BOARD_H_EXTERN extern
+    #define BOARD_H_EXTERN extern
 #endif
 
 #include "sys.h"

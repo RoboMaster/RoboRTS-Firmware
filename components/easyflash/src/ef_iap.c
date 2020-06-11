@@ -38,7 +38,8 @@ static uint32_t bak_app_start_addr = 0;
  *
  * @return result
  */
-EfErrCode ef_iap_init(void) {
+EfErrCode ef_iap_init(void)
+{
     EfErrCode result = EF_NO_ERR;
 
     bak_app_start_addr = EF_START_ADDR ;
@@ -61,16 +62,20 @@ EfErrCode ef_iap_init(void) {
  *
  * @return result
  */
-EfErrCode ef_erase_bak_app(size_t app_size) {
+EfErrCode ef_erase_bak_app(size_t app_size)
+{
     EfErrCode result = EF_NO_ERR;
 
     result = ef_port_erase(ef_get_bak_app_start_addr(), app_size);
-    switch (result) {
-    case EF_NO_ERR: {
+    switch(result)
+    {
+    case EF_NO_ERR:
+    {
         EF_INFO("Erased backup area application OK.\n");
         break;
     }
-    case EF_ERASE_ERR: {
+    case EF_ERASE_ERR:
+    {
         EF_INFO("Warning: Erase backup area application fault!\n");
         /* will return when erase fault */
         return result;
@@ -90,16 +95,20 @@ EfErrCode ef_erase_bak_app(size_t app_size) {
  * @return result
  */
 EfErrCode ef_erase_spec_user_app(uint32_t user_app_addr, size_t app_size,
-        EfErrCode (*app_erase)(uint32_t addr, size_t size)) {
+                                 EfErrCode(*app_erase)(uint32_t addr, size_t size))
+{
     EfErrCode result = EF_NO_ERR;
 
     result = app_erase(user_app_addr, app_size);
-    switch (result) {
-    case EF_NO_ERR: {
+    switch(result)
+    {
+    case EF_NO_ERR:
+    {
         EF_INFO("Erased user application OK.\n");
         break;
     }
-    case EF_ERASE_ERR: {
+    case EF_ERASE_ERR:
+    {
         EF_INFO("Warning: Erase user application fault!\n");
         /* will return when erase fault */
         return result;
@@ -117,7 +126,8 @@ EfErrCode ef_erase_spec_user_app(uint32_t user_app_addr, size_t app_size,
  *
  * @return result
  */
-EfErrCode ef_erase_user_app(uint32_t user_app_addr, size_t app_size) {
+EfErrCode ef_erase_user_app(uint32_t user_app_addr, size_t app_size)
+{
     return ef_erase_spec_user_app(user_app_addr, app_size, ef_port_erase);
 }
 
@@ -129,16 +139,20 @@ EfErrCode ef_erase_user_app(uint32_t user_app_addr, size_t app_size) {
  *
  * @return result
  */
-EfErrCode ef_erase_bl(uint32_t bl_addr, size_t bl_size) {
+EfErrCode ef_erase_bl(uint32_t bl_addr, size_t bl_size)
+{
     EfErrCode result = EF_NO_ERR;
 
     result = ef_port_erase(bl_addr, bl_size);
-    switch (result) {
-    case EF_NO_ERR: {
+    switch(result)
+    {
+    case EF_NO_ERR:
+    {
         EF_INFO("Erased bootloader OK.\n");
         break;
     }
-    case EF_ERASE_ERR: {
+    case EF_ERASE_ERR:
+    {
         EF_INFO("Warning: Erase bootloader fault!\n");
         /* will return when erase fault */
         return result;
@@ -158,23 +172,28 @@ EfErrCode ef_erase_bl(uint32_t bl_addr, size_t bl_size) {
  *
  * @return result
  */
-EfErrCode ef_write_data_to_bak(uint8_t *data, size_t size, size_t *cur_size,
-        size_t total_size) {
+EfErrCode ef_write_data_to_bak(uint8_t* data, size_t size, size_t* cur_size,
+                               size_t total_size)
+{
     EfErrCode result = EF_NO_ERR;
 
     /* make sure don't write excess data */
-    if (*cur_size + size > total_size) {
+    if(*cur_size + size > total_size)
+    {
         size = total_size - *cur_size;
     }
 
-    result = ef_port_write(ef_get_bak_app_start_addr() + *cur_size, (uint32_t *) data, size);
-    switch (result) {
-    case EF_NO_ERR: {
+    result = ef_port_write(ef_get_bak_app_start_addr() + *cur_size, (uint32_t*) data, size);
+    switch(result)
+    {
+    case EF_NO_ERR:
+    {
         *cur_size += size;
         EF_DEBUG("Write data to backup area OK.\n");
         break;
     }
-    case EF_WRITE_ERR: {
+    case EF_WRITE_ERR:
+    {
         EF_INFO("Warning: Write data to backup area fault!\n");
         break;
     }
@@ -193,7 +212,8 @@ EfErrCode ef_write_data_to_bak(uint8_t *data, size_t size, size_t *cur_size,
  * @return result
  */
 EfErrCode ef_copy_spec_app_from_bak(uint32_t user_app_addr, size_t app_size,
-        EfErrCode (*app_write)(uint32_t addr, const uint32_t *buf, size_t size)) {
+                                    EfErrCode(*app_write)(uint32_t addr, const uint32_t* buf, size_t size))
+{
     size_t cur_size;
     uint32_t app_cur_addr, bak_cur_addr;
     EfErrCode result = EF_NO_ERR;
@@ -201,22 +221,27 @@ EfErrCode ef_copy_spec_app_from_bak(uint32_t user_app_addr, size_t app_size,
     uint32_t buff[32];
 
     /* cycle copy data */
-    for (cur_size = 0; cur_size < app_size; cur_size += sizeof(buff)) {
+    for(cur_size = 0; cur_size < app_size; cur_size += sizeof(buff))
+    {
         app_cur_addr = user_app_addr + cur_size;
         bak_cur_addr = ef_get_bak_app_start_addr() + cur_size;
         ef_port_read(bak_cur_addr, buff, sizeof(buff));
         result = app_write(app_cur_addr, buff, sizeof(buff));
-        if (result != EF_NO_ERR) {
+        if(result != EF_NO_ERR)
+        {
             break;
         }
     }
 
-    switch (result) {
-    case EF_NO_ERR: {
+    switch(result)
+    {
+    case EF_NO_ERR:
+    {
         EF_INFO("Write data to application entry OK.\n");
         break;
     }
-    case EF_WRITE_ERR: {
+    case EF_WRITE_ERR:
+    {
         EF_INFO("Warning: Write data to application entry fault!\n");
         break;
     }
@@ -233,7 +258,8 @@ EfErrCode ef_copy_spec_app_from_bak(uint32_t user_app_addr, size_t app_size,
  *
  * @return result
  */
-EfErrCode ef_copy_app_from_bak(uint32_t user_app_addr, size_t app_size) {
+EfErrCode ef_copy_app_from_bak(uint32_t user_app_addr, size_t app_size)
+{
     return ef_copy_spec_app_from_bak(user_app_addr, app_size, ef_port_write);
 }
 
@@ -245,7 +271,8 @@ EfErrCode ef_copy_app_from_bak(uint32_t user_app_addr, size_t app_size) {
  *
  * @return result
  */
-EfErrCode ef_copy_bl_from_bak(uint32_t bl_addr, size_t bl_size) {
+EfErrCode ef_copy_bl_from_bak(uint32_t bl_addr, size_t bl_size)
+{
     size_t cur_size;
     uint32_t bl_cur_addr, bak_cur_addr;
     EfErrCode result = EF_NO_ERR;
@@ -253,22 +280,27 @@ EfErrCode ef_copy_bl_from_bak(uint32_t bl_addr, size_t bl_size) {
     uint32_t buff[32];
 
     /* cycle copy data by 32bytes buffer */
-    for (cur_size = 0; cur_size < bl_size; cur_size += sizeof(buff)) {
+    for(cur_size = 0; cur_size < bl_size; cur_size += sizeof(buff))
+    {
         bl_cur_addr = bl_addr + cur_size;
         bak_cur_addr = ef_get_bak_app_start_addr() + cur_size;
         ef_port_read(bak_cur_addr, buff, sizeof(buff));
         result = ef_port_write(bl_cur_addr, buff, sizeof(buff));
-        if (result != EF_NO_ERR) {
+        if(result != EF_NO_ERR)
+        {
             break;
         }
     }
 
-    switch (result) {
-    case EF_NO_ERR: {
+    switch(result)
+    {
+    case EF_NO_ERR:
+    {
         EF_INFO("Write data to bootloader entry OK.\n");
         break;
     }
-    case EF_WRITE_ERR: {
+    case EF_WRITE_ERR:
+    {
         EF_INFO("Warning: Write data to bootloader entry fault!\n");
         break;
     }
@@ -282,7 +314,8 @@ EfErrCode ef_copy_bl_from_bak(uint32_t bl_addr, size_t bl_size) {
  *
  * @return size
  */
-uint32_t ef_get_bak_app_start_addr(void) {
+uint32_t ef_get_bak_app_start_addr(void)
+{
     return bak_app_start_addr;
 }
 

@@ -68,14 +68,16 @@ if (!(EXPR))                                                                  \
     while (1);                                                                \
 }
 
-typedef struct _ef_env {
-    char *key;
-    void *value;
+typedef struct _ef_env
+{
+    char* key;
+    void* value;
     size_t value_len;
 } ef_env, *ef_env_t;
 
 /* EasyFlash error code */
-typedef enum {
+typedef enum
+{
     EF_NO_ERR,
     EF_ERASE_ERR,
     EF_READ_ERR,
@@ -87,13 +89,15 @@ typedef enum {
 } EfErrCode;
 
 /* the flash sector current status */
-typedef enum {
+typedef enum
+{
     EF_SECTOR_EMPTY,
     EF_SECTOR_USING,
     EF_SECTOR_FULL,
 } EfSecrorStatus;
 
-enum env_status {
+enum env_status
+{
     ENV_UNUSED,
     ENV_PRE_WRITE,
     ENV_WRITE,
@@ -104,7 +108,8 @@ enum env_status {
 };
 typedef enum env_status env_status_t;
 
-struct env_node_obj {
+struct env_node_obj
+{
     env_status_t status;                         /**< ENV node status, @see node_status_t */
     bool crc_is_ok;                              /**< ENV node CRC32 check is OK */
     uint8_t name_len;                            /**< name length */
@@ -112,12 +117,13 @@ struct env_node_obj {
     uint32_t len;                                /**< ENV node total length (header + name + value), must align by EF_WRITE_GRAN */
     uint32_t value_len;                          /**< value length */
     char name[EF_ENV_NAME_MAX];                  /**< name */
-    struct {
+    struct
+    {
         uint32_t start;                          /**< ENV node start address */
         uint32_t value;                          /**< value start address */
     } addr;
 };
-typedef struct env_node_obj *env_node_obj_t;
+typedef struct env_node_obj* env_node_obj_t;
 
 #ifdef __cplusplus
 }

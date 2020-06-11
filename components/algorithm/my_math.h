@@ -4,12 +4,12 @@
 /* math relevant */
 /* radian coefficient */
 #ifndef RADIAN_COEF
-  #define RADIAN_COEF 57.3f
+    #define RADIAN_COEF 57.3f
 #endif
 
 /* circumference ratio */
 #ifndef PI
-  #define PI 3.14159265354f
+    #define PI 3.14159265354f
 #endif
 
 #define VAL_LIMIT(val, min, max) \

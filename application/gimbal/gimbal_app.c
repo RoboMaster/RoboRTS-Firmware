@@ -33,8 +33,8 @@
 osThreadId gimbal_task_t;
 osThreadId shoot_task_t;
 
-static void gimbal_can1_callback(uint16_t std_id, uint8_t *data, uint8_t dlc);
-static void gimbal_can2_callback(uint16_t std_id, uint8_t *data, uint8_t dlc);
+static void gimbal_can1_callback(uint16_t std_id, uint8_t* data, uint8_t dlc);
+static void gimbal_can2_callback(uint16_t std_id, uint8_t* data, uint8_t dlc);
 
 void gimbal_user_key_handle(void);
 static void gimbal_dbus_rx_complete(void);
@@ -53,32 +53,32 @@ void gimbal_control_online(void);
 struct protocol_send_cfg_obj gimbal_send_cfg_table[] = {0};
 
 struct protocol_recv_cmd_obj gimbal_recv_cmd_table[] =
-    {
-        /* CMD | callback function */
-        {CMD_SET_GIMBAL_ANGLE, gimbal_angle_ctrl},
-        {CMD_SET_FRICTION_SPEED, shoot_firction_ctrl},
-        {CMD_SET_SHOOT_FREQUENTCY, shoot_num_ctrl},
-        {CMD_GIMBAL_ADJUST, gimbal_adjust_cmd},
-        {CMD_MANIFOLD2_HEART, gimbal_manifold_heart},
+{
+    /* CMD | callback function */
+    {CMD_SET_GIMBAL_ANGLE, gimbal_angle_ctrl},
+    {CMD_SET_FRICTION_SPEED, shoot_firction_ctrl},
+    {CMD_SET_SHOOT_FREQUENTCY, shoot_num_ctrl},
+    {CMD_GIMBAL_ADJUST, gimbal_adjust_cmd},
+    {CMD_MANIFOLD2_HEART, gimbal_manifold_heart},
 };
 
 struct offline_obj gimbal_offline_table[] =
-    {
-        /* event | enable | beep_times | offline time | offline_first_func| offline_func | online_first_func | online_func */
-        {SYSTEM_PROTECT, ENABLE, 0, 0, 0, NULL, gimbal_offline, gimbal_dbus_online, gimbal_online},
+{
+    /* event | enable | beep_times | offline time | offline_first_func| offline_func | online_first_func | online_func */
+    {SYSTEM_PROTECT, ENABLE, 0, 0, 0, NULL, gimbal_offline, gimbal_dbus_online, gimbal_online},
 
-        {OFFLINE_DBUS, ENABLE, OFFLINE_ERROR_LEVEL, 0, 100, NULL, NULL, NULL, NULL},
-        {OFFLINE_GIMBAL_YAW, ENABLE, OFFLINE_ERROR_LEVEL, 5, 100, NULL, NULL, NULL, NULL},
-        {OFFLINE_GIMBAL_PITCH, ENABLE, OFFLINE_ERROR_LEVEL, 6, 100, NULL, NULL, NULL, NULL},
-        {OFFLINE_GIMBAL_TURN_MOTOR, ENABLE, OFFLINE_ERROR_LEVEL, 7, 100, NULL, NULL, NULL, NULL},
-        {OFFLINE_MANIFOLD2_HEART, DISABLE, OFFLINE_WARNING_LEVEL, BEEP_DISABLE, 700, gimbal_heart_offline, NULL, NULL, gimbal_heart_online},
-        {OFFLINE_CONTROL_CMD, ENABLE, OFFLINE_WARNING_LEVEL, BEEP_DISABLE, 700, NULL, gimbal_control_offline, NULL, gimbal_control_online},
+    {OFFLINE_DBUS, ENABLE, OFFLINE_ERROR_LEVEL, 0, 100, NULL, NULL, NULL, NULL},
+    {OFFLINE_GIMBAL_YAW, ENABLE, OFFLINE_ERROR_LEVEL, 5, 100, NULL, NULL, NULL, NULL},
+    {OFFLINE_GIMBAL_PITCH, ENABLE, OFFLINE_ERROR_LEVEL, 6, 100, NULL, NULL, NULL, NULL},
+    {OFFLINE_GIMBAL_TURN_MOTOR, ENABLE, OFFLINE_ERROR_LEVEL, 7, 100, NULL, NULL, NULL, NULL},
+    {OFFLINE_MANIFOLD2_HEART, DISABLE, OFFLINE_WARNING_LEVEL, BEEP_DISABLE, 700, gimbal_heart_offline, NULL, NULL, gimbal_heart_online},
+    {OFFLINE_CONTROL_CMD, ENABLE, OFFLINE_WARNING_LEVEL, BEEP_DISABLE, 700, NULL, gimbal_control_offline, NULL, gimbal_control_online},
 };
 
 struct route_obj gimbal_route_table[] =
-    {
-        {GIMBAL_ADDRESS, "can1_0x600_to_0x500"},
-        {MANIFOLD2_ADDRESS, "can1_0x600_to_0x500"},
+{
+    {GIMBAL_ADDRESS, "can1_0x600_to_0x500"},
+    {MANIFOLD2_ADDRESS, "can1_0x600_to_0x500"},
 };
 
 /**
@@ -88,45 +88,45 @@ struct route_obj gimbal_route_table[] =
   */
 void gimbal_app_init(void)
 {
-  struct app_manage *app;
-  gimbal_t p_gimbal;
+    struct app_manage* app;
+    gimbal_t p_gimbal;
 
-  app = get_current_app();
-  p_gimbal = get_gimbal();
+    app = get_current_app();
+    p_gimbal = get_gimbal();
 
-  protocol_can_interface_register("can1_0x600_to_0x500", 1024, 1, CAN1_PORT, CHASSIS_CAN_ID, GIMBAL_CAN_ID, can1_std_transmit);
+    protocol_can_interface_register("can1_0x600_to_0x500", 1024, 1, CAN1_PORT, CHASSIS_CAN_ID, GIMBAL_CAN_ID, can1_std_transmit);
 
-  app->local_addr = GIMBAL_ADDRESS;
-  app->recv_cmd_table = gimbal_recv_cmd_table;
-  app->recv_cmd_tab_size = sizeof(gimbal_recv_cmd_table) / sizeof(struct protocol_recv_cmd_obj);
+    app->local_addr = GIMBAL_ADDRESS;
+    app->recv_cmd_table = gimbal_recv_cmd_table;
+    app->recv_cmd_tab_size = sizeof(gimbal_recv_cmd_table) / sizeof(struct protocol_recv_cmd_obj);
 
-  app->send_cfg_table = NULL;
+    app->send_cfg_table = NULL;
 
-  app->offline_table = gimbal_offline_table;
-  app->offline_tab_size = sizeof(gimbal_offline_table) / sizeof(struct offline_obj);
+    app->offline_table = gimbal_offline_table;
+    app->offline_tab_size = sizeof(gimbal_offline_table) / sizeof(struct offline_obj);
 
-  app->route_table = gimbal_route_table;
-  app->route_tab_size = sizeof(gimbal_route_table) / sizeof(struct route_obj);
+    app->route_table = gimbal_route_table;
+    app->route_tab_size = sizeof(gimbal_route_table) / sizeof(struct route_obj);
 
-  app->can1_msg_callback = gimbal_can1_callback;
-  app->can2_msg_callback = gimbal_can2_callback;
-  app->dbus_rx_complete = gimbal_dbus_rx_complete;
+    app->can1_msg_callback = gimbal_can1_callback;
+    app->can2_msg_callback = gimbal_can2_callback;
+    app->dbus_rx_complete = gimbal_dbus_rx_complete;
 
-  app->user_input_callback = gimbal_input_handle;
-  app->user_key_callback = gimbal_user_key_handle;
+    app->user_input_callback = gimbal_input_handle;
+    app->user_key_callback = gimbal_user_key_handle;
 
-  soft_timer_register(gimbal_info_push, p_gimbal, 10);
+    soft_timer_register(gimbal_info_push, p_gimbal, 10);
 
-  osThreadDef(GIMBAL_TASK, gimbal_task, osPriorityNormal, 0, 512);
-  gimbal_task_t = osThreadCreate(osThread(GIMBAL_TASK), NULL);
+    osThreadDef(GIMBAL_TASK, gimbal_task, osPriorityNormal, 0, 512);
+    gimbal_task_t = osThreadCreate(osThread(GIMBAL_TASK), NULL);
 
-  osThreadDef(SHOOT_TASK, shoot_task, osPriorityNormal, 0, 512);
-  gimbal_task_t = osThreadCreate(osThread(SHOOT_TASK), NULL);
+    osThreadDef(SHOOT_TASK, shoot_task, osPriorityNormal, 0, 512);
+    gimbal_task_t = osThreadCreate(osThread(SHOOT_TASK), NULL);
 }
 
-void gimbal_can1_callback(uint16_t std_id, uint8_t *data, uint8_t dlc)
+void gimbal_can1_callback(uint16_t std_id, uint8_t* data, uint8_t dlc)
 {
-  gimbal_gyro_yaw_update(std_id, data);
+    gimbal_gyro_yaw_update(std_id, data);
 }
 
 /**
@@ -134,20 +134,20 @@ void gimbal_can1_callback(uint16_t std_id, uint8_t *data, uint8_t dlc)
   * @param
   * @retval void
   */
-void gimbal_can2_callback(uint16_t std_id, uint8_t *data, uint8_t dlc)
+void gimbal_can2_callback(uint16_t std_id, uint8_t* data, uint8_t dlc)
 {
-  switch (std_id)
-  {
-  case 0x205:
-    offline_event_time_update(OFFLINE_GIMBAL_YAW);
-    break;
-  case 0x206:
-    offline_event_time_update(OFFLINE_GIMBAL_PITCH);
-    break;
-  case 0x207:
-    offline_event_time_update(OFFLINE_GIMBAL_TURN_MOTOR);
-    break;
-  }
+    switch(std_id)
+    {
+    case 0x205:
+        offline_event_time_update(OFFLINE_GIMBAL_YAW);
+        break;
+    case 0x206:
+        offline_event_time_update(OFFLINE_GIMBAL_PITCH);
+        break;
+    case 0x207:
+        offline_event_time_update(OFFLINE_GIMBAL_TURN_MOTOR);
+        break;
+    }
 }
 
 /**
@@ -157,91 +157,91 @@ void gimbal_can2_callback(uint16_t std_id, uint8_t *data, uint8_t dlc)
   */
 void gimbal_user_key_handle(void)
 {
-  MASTER_INT_DISABLE();
+    MASTER_INT_DISABLE();
 
-  ef_del_env(BMI088_PARAM_KEY);
-  ef_del_env(GIMBAL_PARAM_KEY);
-  HAL_Delay(2000);
+    ef_del_env(BMI088_PARAM_KEY);
+    ef_del_env(GIMBAL_PARAM_KEY);
+    HAL_Delay(2000);
 
-  /* reboot */
-  NVIC_SystemReset();
+    /* reboot */
+    NVIC_SystemReset();
 }
 
 void gimbal_input_handle(void)
 {
-  shoot_t p_shoot;
+    shoot_t p_shoot;
 
-  p_shoot = get_shoot();
+    p_shoot = get_shoot();
 
-  shoot_state_update(p_shoot);
+    shoot_state_update(p_shoot);
 }
 
 void gimbal_dbus_rx_complete(void)
 {
-  offline_event_time_update(OFFLINE_DBUS);
+    offline_event_time_update(OFFLINE_DBUS);
 }
 
 void gimbal_online(void)
 {
-  struct shoot *p_shoot;
-  struct gimbal *p_gimbal;
-  p_shoot = get_shoot();
-  p_gimbal = get_gimbal();
+    struct shoot* p_shoot;
+    struct gimbal* p_gimbal;
+    p_shoot = get_shoot();
+    p_gimbal = get_gimbal();
 
-  shoot_enable(p_shoot);
-  gimbal_yaw_enable(p_gimbal);
-  gimbal_pitch_enable(p_gimbal);
+    shoot_enable(p_shoot);
+    gimbal_yaw_enable(p_gimbal);
+    gimbal_pitch_enable(p_gimbal);
 }
 
 void gimbal_dbus_online(void)
 {
-  gimbal_init_start();
+    gimbal_init_start();
 }
 
 void gimbal_offline(void)
 {
-  struct shoot *p_shoot;
-  struct gimbal *p_gimbal;
-  p_shoot = get_shoot();
-  p_gimbal = get_gimbal();
+    struct shoot* p_shoot;
+    struct gimbal* p_gimbal;
+    p_shoot = get_shoot();
+    p_gimbal = get_gimbal();
 
-  shoot_disable(p_shoot);
-  gimbal_yaw_disable(p_gimbal);
-  gimbal_pitch_disable(p_gimbal);
+    shoot_disable(p_shoot);
+    gimbal_yaw_disable(p_gimbal);
+    gimbal_pitch_disable(p_gimbal);
 }
 
 void gimbal_heart_offline(void)
 {
-  set_gimbal_sdk_mode(GIMBAL_SDK_OFF);
+    set_gimbal_sdk_mode(GIMBAL_SDK_OFF);
 
-  struct gimbal *p_gimbal;
-  p_gimbal = get_gimbal();
-  gimbal_set_pitch_mode(p_gimbal, ENCODER_MODE);
-  gimbal_set_pitch_angle(p_gimbal, 0);
-  gimbal_set_yaw_mode(p_gimbal, ENCODER_MODE);
-  gimbal_set_yaw_angle(p_gimbal, 0, 0);
+    struct gimbal* p_gimbal;
+    p_gimbal = get_gimbal();
+    gimbal_set_pitch_mode(p_gimbal, ENCODER_MODE);
+    gimbal_set_pitch_angle(p_gimbal, 0);
+    gimbal_set_yaw_mode(p_gimbal, ENCODER_MODE);
+    gimbal_set_yaw_angle(p_gimbal, 0, 0);
 
-  struct shoot *p_shoot;
-  p_shoot = get_shoot();
-  shoot_disable(p_shoot);
+    struct shoot* p_shoot;
+    p_shoot = get_shoot();
+    shoot_disable(p_shoot);
 
-  set_gimbal_sdk_mode(GIMBAL_SDK_OFF);
+    set_gimbal_sdk_mode(GIMBAL_SDK_OFF);
 
-  LED_B_ON();
+    LED_B_ON();
 }
 
 void gimbal_heart_online(void)
 {
-//  struct gimbal *p_gimbal;
-//  p_gimbal = get_gimbal();
+    //  struct gimbal *p_gimbal;
+    //  p_gimbal = get_gimbal();
 
-  struct shoot *p_shoot;
-  p_shoot = get_shoot();
-  shoot_enable(p_shoot);
+    struct shoot* p_shoot;
+    p_shoot = get_shoot();
+    shoot_enable(p_shoot);
 
-  set_gimbal_sdk_mode(GIMBAL_SDK_ON);
+    set_gimbal_sdk_mode(GIMBAL_SDK_ON);
 
-  LED_B_OFF();
+    LED_B_OFF();
 }
 
 void gimbal_control_offline(void)

@@ -24,47 +24,47 @@
 #define OBJECT_NAME_MAX_LEN 50
 
 #if OBJECT_NAME_MAX_LEN < 16
-  #error "Macro OBJECT_NAME_MAX_LEN must be greater than 16."
+    #error "Macro OBJECT_NAME_MAX_LEN must be greater than 16."
 #endif
 
 enum device_can
 {
-  DEVICE_CAN1 = 0,
-  DEVICE_CAN2,
-	DEVICE_CAN_ALL,
-  DEVICE_CAN_NUM = DEVICE_CAN_ALL,
+    DEVICE_CAN1 = 0,
+    DEVICE_CAN2,
+    DEVICE_CAN_ALL,
+    DEVICE_CAN_NUM = DEVICE_CAN_ALL,
 };
 
 enum device_type
 {
-	DEVICE_INIT = 0,
-  DEVICE_MOTOR,
-	DEVICE_DBUS,
-	DEVICE_SINGLE_GYRO,
-	DEVICE_UNKNOW
+    DEVICE_INIT = 0,
+    DEVICE_MOTOR,
+    DEVICE_DBUS,
+    DEVICE_SINGLE_GYRO,
+    DEVICE_UNKNOW
 };
 
 struct device
 {
-  char name[OBJECT_NAME_MAX_LEN];
-  uint8_t type;
-  list_t  list;
-	void *param;
-	void *user_data;
+    char name[OBJECT_NAME_MAX_LEN];
+    uint8_t type;
+    list_t  list;
+    void* param;
+    void* user_data;
 
-	void (*device_init)(void *param);
+    void (*device_init)(void* param);
 };
 
-typedef struct device *device_t;
+typedef struct device* device_t;
 
 struct device_information
 {
-  list_t object_list;          /**< object list */
+    list_t object_list;          /**< object list */
 };
 
-device_t device_find(const char *name, uint8_t type);
-int32_t device_init(struct device *object, const char *name);
+device_t device_find(const char* name, uint8_t type);
+int32_t device_init(struct device* object, const char* name);
 void device_detach(device_t object);
-struct device_information *get_device_information(void);
+struct device_information* get_device_information(void);
 
 #endif // __DEVICE_H__

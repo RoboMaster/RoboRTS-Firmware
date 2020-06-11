@@ -31,63 +31,63 @@
 /********************DEFINE PRINTF**************************/
 
 #if (PROTOCOL_SEND_DBG_PRINTF_SET == PROTOCOL_ENABLE)
-#ifndef PROTOCOL_SEND_DBG_PRINTF
-#define PROTOCOL_SEND_DBG_PRINTF(...) protocol_log_d(__VA_ARGS__);
-#endif
+    #ifndef PROTOCOL_SEND_DBG_PRINTF
+        #define PROTOCOL_SEND_DBG_PRINTF(...) protocol_log_d(__VA_ARGS__);
+    #endif
 #else
-#ifndef PROTOCOL_SEND_DBG_PRINTF
-#define PROTOCOL_SEND_DBG_PRINTF(...)
-#endif
+    #ifndef PROTOCOL_SEND_DBG_PRINTF
+        #define PROTOCOL_SEND_DBG_PRINTF(...)
+    #endif
 #endif
 
 #if (PROTOCOL_SEND_ERR_PRINTF_SET == PROTOCOL_ENABLE)
-#ifndef PROTOCOL_SEND_ERR_PRINTF
-#define PROTOCOL_SEND_ERR_PRINTF(...) protocol_log_e(__VA_ARGS__);
-#endif
+    #ifndef PROTOCOL_SEND_ERR_PRINTF
+        #define PROTOCOL_SEND_ERR_PRINTF(...) protocol_log_e(__VA_ARGS__);
+    #endif
 #else
-#ifndef PROTOCOL_SEND_ERR_PRINTF
-#define PROTOCOL_SEND_ERR_PRINTF(...)
-#endif
+    #ifndef PROTOCOL_SEND_ERR_PRINTF
+        #define PROTOCOL_SEND_ERR_PRINTF(...)
+    #endif
 #endif
 
 #if (PROTOCOL_RCV_DBG_PRINTF_SET == PROTOCOL_ENABLE)
-#ifndef PROTOCOL_RCV_DBG_PRINTF
-#define PROTOCOL_RCV_DBG_PRINTF(...) protocol_log_d(__VA_ARGS__);
-#endif
+    #ifndef PROTOCOL_RCV_DBG_PRINTF
+        #define PROTOCOL_RCV_DBG_PRINTF(...) protocol_log_d(__VA_ARGS__);
+    #endif
 #else
-#ifndef PROTOCOL_RCV_DBG_PRINTF
-#define PROTOCOL_RCV_DBG_PRINTF(...)
-#endif
+    #ifndef PROTOCOL_RCV_DBG_PRINTF
+        #define PROTOCOL_RCV_DBG_PRINTF(...)
+    #endif
 #endif
 
 #if (PROTOCOL_RCV_ERR_PRINTF_SET == PROTOCOL_ENABLE)
-#ifndef PROTOCOL_RCV_ERR_PRINTF
-#define PROTOCOL_RCV_ERR_PRINTF(...) protocol_log_e(__VA_ARGS__);
-#endif
+    #ifndef PROTOCOL_RCV_ERR_PRINTF
+        #define PROTOCOL_RCV_ERR_PRINTF(...) protocol_log_e(__VA_ARGS__);
+    #endif
 #else
-#ifndef PROTOCOL_RCV_ERR_PRINTF
-#define PROTOCOL_RCV_ERR_PRINTF(...)
-#endif
+    #ifndef PROTOCOL_RCV_ERR_PRINTF
+        #define PROTOCOL_RCV_ERR_PRINTF(...)
+    #endif
 #endif
 
 #if (PROTOCOL_ERR_INFO_PRINTF_SET == PROTOCOL_ENABLE)
-#ifndef PROTOCOL_ERR_INFO_PRINTF
-#define PROTOCOL_ERR_INFO_PRINTF(STA, FILE, LINE) protocol_s_error_info_printf(STA, FILE, LINE);
-#endif
+    #ifndef PROTOCOL_ERR_INFO_PRINTF
+        #define PROTOCOL_ERR_INFO_PRINTF(STA, FILE, LINE) protocol_s_error_info_printf(STA, FILE, LINE);
+    #endif
 #else
-#ifndef PROTOCOL_ERR_INFO_PRINTF
-#define PROTOCOL_ERR_INFO_PRINTF(STA, FILE, LINE)
-#endif
+    #ifndef PROTOCOL_ERR_INFO_PRINTF
+        #define PROTOCOL_ERR_INFO_PRINTF(STA, FILE, LINE)
+    #endif
 #endif
 
 #if (PROTOCOL_OTHER_INFO_PRINTF_SET == PROTOCOL_ENABLE)
-#ifndef PROTOCOL_OTHER_INFO_PRINTF
-#define PROTOCOL_OTHER_INFO_PRINTF(...) protocol_log_i(__VA_ARGS__);
-#endif
+    #ifndef PROTOCOL_OTHER_INFO_PRINTF
+        #define PROTOCOL_OTHER_INFO_PRINTF(...) protocol_log_i(__VA_ARGS__);
+    #endif
 #else
-#ifndef PROTOCOL_OTHER_INFO_PRINTF
-#define PROTOCOL_OTHER_INFO_PRINTF(...)
-#endif
+    #ifndef PROTOCOL_OTHER_INFO_PRINTF
+        #define PROTOCOL_OTHER_INFO_PRINTF(...)
+    #endif
 #endif
 
 #endif // __PROTOCOL_LOG_H__

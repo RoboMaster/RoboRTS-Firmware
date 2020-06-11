@@ -15,10 +15,10 @@
     {                  \
         for(; ; );     \
     }                  \
-}                       
+}
 
 #ifndef TOTAL_HEAP_SIZE
-#define TOTAL_HEAP_SIZE (1024 * 20)
+    #define TOTAL_HEAP_SIZE (1024 * 20)
 #endif
 
 /* must be power of 2, at least 8 */
@@ -29,8 +29,8 @@
 /* A few bytes might be lost to byte aligning the heap start address. */
 #define ADJUSTED_HEAP_SIZE (TOTAL_HEAP_SIZE - BYTE_ALIGNMENT)
 
-void *heap_malloc(uint32_t wanted_size);
-void heap_free(void *pv);
+void* heap_malloc(uint32_t wanted_size);
+void heap_free(void* pv);
 uint32_t heap_get_free(void);
 uint32_t heap_get_ever_free(void);
 void heap_print_block(void);

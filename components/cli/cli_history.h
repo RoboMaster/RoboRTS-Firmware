@@ -35,11 +35,11 @@ typedef struct
 
 
 /* 将新输入字符串存入历史数据 */
-void history_save(cli_history_t* history, char *str);
+void history_save(cli_history_t* history, char* str);
 /* 读取上一个历史记录 */
-void history_get_last(cli_history_t* history, char *str, int *len);
+void history_get_last(cli_history_t* history, char* str, int* len);
 /* 读取下一个历史记录 */
-void history_get_next(cli_history_t* history, char *str, int *len);
+void history_get_next(cli_history_t* history, char* str, int* len);
 
 
 #endif

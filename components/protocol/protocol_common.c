@@ -30,9 +30,9 @@
   * @param  size
   * @retval memory block pointer
   */
-void *protocol_p_malloc(uint32_t size)
+void* protocol_p_malloc(uint32_t size)
 {
-  return heap_malloc(size);
+    return heap_malloc(size);
 }
 
 /**
@@ -40,9 +40,9 @@ void *protocol_p_malloc(uint32_t size)
   * @param
   * @retval void
   */
-void protocol_p_free(void *ptr)
+void protocol_p_free(void* ptr)
 {
-  heap_free(ptr);
+    heap_free(ptr);
 }
 
 /**
@@ -52,5 +52,5 @@ void protocol_p_free(void *ptr)
   */
 uint32_t protocol_p_get_time(void)
 {
-  return osKernelSysTick() / portTICK_PERIOD_MS;
+    return osKernelSysTick() / portTICK_PERIOD_MS;
 }

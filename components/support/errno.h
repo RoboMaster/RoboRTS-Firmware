@@ -20,11 +20,11 @@
 #define __ERRNO_H__
 
 #ifndef NULL
-  #define NULL ((void *)0)
+    #define NULL ((void *)0)
 #endif
 
 #ifndef E_OK
-#define  E_OK              0
+    #define  E_OK              0
 #endif
 
 #define E_ERROR             1

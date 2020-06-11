@@ -46,7 +46,7 @@ static headEvent_t headEvent;
 
 
 /* 定义订阅者之后，必须进行初始化才能使用 */
-int EventSubscribeInit(subscriber_t *pSubscriber, subscribeMode_t mode)
+int EventSubscribeInit(subscriber_t* pSubscriber, subscribeMode_t mode)
 {
     pSubscriber->pMsgHead = NULL;
     pSubscriber->pMsgTail = NULL;
@@ -55,7 +55,7 @@ int EventSubscribeInit(subscriber_t *pSubscriber, subscribeMode_t mode)
     // pSubscriber->mutex = xSemaphoreCreateMutex();
     // if(pSubscriber->mutex == NULL)
     // {
-        // return EVENT_ERR_MEMORY_LACK;
+    // return EVENT_ERR_MEMORY_LACK;
     // }
 #ifdef EVENT_USE_NOTIFY
     pSubscriber->taskHandler = xTaskGetCurrentTaskHandle();
@@ -65,7 +65,7 @@ int EventSubscribeInit(subscriber_t *pSubscriber, subscribeMode_t mode)
 
 
 /* 正常模式下，释放消息，用户使用完队列消息之后需要释放消息内存 */
-static int EventMsgFree(eventMsg_t *pMsg)
+static int EventMsgFree(eventMsg_t* pMsg)
 {
     if(pMsg == NULL)
     {
@@ -76,7 +76,7 @@ static int EventMsgFree(eventMsg_t *pMsg)
         // xSemaphoreHandle mutex = pMsg->pEvent->mutex;
         // xSemaphoreTake(mutex, portMAX_DELAY);
         EVENT_DISABLE_IRQ();
-        MemPutBlk(&(pMsg->pEvent->mmu), (void *)pMsg);
+        MemPutBlk(&(pMsg->pEvent->mmu), (void*)pMsg);
         EVENT_ENABLE_IRQ();
         // xSemaphoreGive(mutex);
 
@@ -88,9 +88,9 @@ static int EventMsgFree(eventMsg_t *pMsg)
 
 
 /* 内部调用，通过event id找到相应event */
-static event_t * GetEventFromID(uint32_t eventID)
+static event_t* GetEventFromID(uint32_t eventID)
 {
-    event_t * res = NULL;
+    event_t* res = NULL;
     eventHandler_t curEvent;
 
     for(curEvent = headEvent.next; curEvent != NULL; curEvent = curEvent->next)
@@ -105,9 +105,9 @@ static event_t * GetEventFromID(uint32_t eventID)
 }
 
 /* 内部调用，通过id寻找回调函数 */
-static void* GetHandlerFromID(subscriber_t *pSubscriber, uint32_t eventID)
+static void* GetHandlerFromID(subscriber_t* pSubscriber, uint32_t eventID)
 {
-    subsEvent_t *subsEvent;
+    subsEvent_t* subsEvent;
 
     for(subsEvent = (subsEvent_t*)&pSubscriber->eventListHead; subsEvent->next != NULL; subsEvent = subsEvent->next)
     {
@@ -122,19 +122,21 @@ static void* GetHandlerFromID(subscriber_t *pSubscriber, uint32_t eventID)
 
 
 /* 创建事件 */
-static int EventCreat(eventHandler_t *pOutHandler, uint32_t eventID, uint16_t msgSize)
+static int EventCreat(eventHandler_t* pOutHandler, uint32_t eventID, uint16_t msgSize)
 {
     eventHandler_t curEvent;
     uint32_t eventMsgSize = sizeof(eventMsg_t) + msgSize;
     eventHandler_t eventHandler;
 
-    if (pOutHandler == NULL)
+    if(pOutHandler == NULL)
+    {
         return EVENT_ERR_EMPTY_POINT;
+    }
 
     taskENTER_CRITICAL();
 
     eventHandler = GetEventFromID(eventID);
-    if (eventHandler == NULL)
+    if(eventHandler == NULL)
     {
         /* 申请事件结构内存 */
         eventHandler = (eventHandler_t)pvPortMalloc(sizeof(event_t));
@@ -147,8 +149,8 @@ static int EventCreat(eventHandler_t *pOutHandler, uint32_t eventID, uint16_t ms
         // eventHandler->mutex = xSemaphoreCreateMutex();
         // if(eventHandler->mutex == NULL)
         // {
-            // vPortFree(eventHandler);
-            // return EVENT_ERR_MEMORY_LACK;
+        // vPortFree(eventHandler);
+        // return EVENT_ERR_MEMORY_LACK;
         // }
 
         if(pOutHandler != NULL)
@@ -190,10 +192,10 @@ int EventSubscribe(subscriber_t* pSubscriber, uint32_t eventID, uint32_t msgSize
 {
     int res = EVENT_ERR_NONE;
     eventHandler_t targetEvent;
-    subsList_t *subsList;
-    subsList_t *subsListNewItem;
-    subsEvent_t *subsEvent;
-    subsEvent_t *subsEventNewItem;
+    subsList_t* subsList;
+    subsList_t* subsListNewItem;
+    subsEvent_t* subsEvent;
+    subsEvent_t* subsEventNewItem;
     // xSemaphoreHandle mutex;
     uint32_t eventMsgSize = sizeof(eventMsg_t) + msgSize;
 
@@ -209,11 +211,11 @@ int EventSubscribe(subscriber_t* pSubscriber, uint32_t eventID, uint32_t msgSize
 
     if(targetEvent != NULL)
     {
-        void *memoryPool = NULL;
+        void* memoryPool = NULL;
         // mutex = targetEvent->mutex;
 
         /* 申请订阅列表项空间 */
-        subsListNewItem = (subsList_t *)pvPortMalloc(sizeof(subsList_t));
+        subsListNewItem = (subsList_t*)pvPortMalloc(sizeof(subsList_t));
         if(subsListNewItem == NULL)
         {
             return EVENT_ERR_MEMORY_LACK;
@@ -260,7 +262,7 @@ int EventSubscribe(subscriber_t* pSubscriber, uint32_t eventID, uint32_t msgSize
                 MemAddBlksToPool(&targetEvent->mmu, memoryPool, msgAddNum, eventMsgSize);
             }
             /* 将新列表项加入到事件订阅列表中 */
-            for(subsList = (subsList_t *)&targetEvent->subsListHead; subsList->next != NULL; subsList = subsList->next)
+            for(subsList = (subsList_t*)&targetEvent->subsListHead; subsList->next != NULL; subsList = subsList->next)
             {
                 // nop
             }
@@ -289,7 +291,7 @@ int EventSubscribe(subscriber_t* pSubscriber, uint32_t eventID, uint32_t msgSize
             // xSemaphoreTake(mutex, portMAX_DELAY);
             EVENT_DISABLE_IRQ();
             /* 将新列表项加入到事件订阅列表中 */
-            for(subsList = (subsList_t *)&targetEvent->subsListHead; subsList->next != NULL; subsList = subsList->next)
+            for(subsList = (subsList_t*)&targetEvent->subsListHead; subsList->next != NULL; subsList = subsList->next)
             {
                 // nop
             }
@@ -310,8 +312,8 @@ int EventUnsubscribe(subscriber_t* pSubscriber, uint32_t eventID)
 {
     int res;
     eventHandler_t targetEvent;
-    subsList_t *subs;
-    subsEvent_t *subsEvent;
+    subsList_t* subs;
+    subsEvent_t* subsEvent;
     // xSemaphoreHandle mutex;
 
     targetEvent = GetEventFromID(eventID);
@@ -328,7 +330,9 @@ int EventUnsubscribe(subscriber_t* pSubscriber, uint32_t eventID)
             if(subsEvent->next->eventID == eventID)
             {
                 if(pSubscriber->subsMode == SUBS_MODE_NOLIST)
+                {
                     vPortFree(subsEvent->next->callBackOrMemory);
+                }
                 vPortFree(subsEvent->next);
                 subsEvent->next = subsEvent->next->next;
                 break;
@@ -339,7 +343,7 @@ int EventUnsubscribe(subscriber_t* pSubscriber, uint32_t eventID)
         // mutex = targetEvent->mutex;
         // xSemaphoreTake(mutex, portMAX_DELAY);
         EVENT_DISABLE_IRQ();
-        for(subs = (subsList_t *)&targetEvent->subsListHead; subs->next != NULL; subs = subs->next)
+        for(subs = (subsList_t*)&targetEvent->subsListHead; subs->next != NULL; subs = subs->next)
         {
             if(subs->next->subscriber == pSubscriber)
             {
@@ -358,7 +362,7 @@ int EventUnsubscribe(subscriber_t* pSubscriber, uint32_t eventID)
 }
 
 /* 注册成为发送者，实际上是得到事件句柄，如果已知事件句柄，则可以直接推送消息 */
-int EventPostInit(publisher_t *publisher, uint32_t eventID, uint32_t msgSize)
+int EventPostInit(publisher_t* publisher, uint32_t eventID, uint32_t msgSize)
 {
     int res = EVENT_ERR_NONE;
     eventHandler_t targetEvent;
@@ -382,27 +386,27 @@ int EventPostInit(publisher_t *publisher, uint32_t eventID, uint32_t msgSize)
 
 
 /* 发送消息 */
-int EventMsgPost(publisher_t *publisher, void *pMsgData, TickType_t waitTicks)
+int EventMsgPost(publisher_t* publisher, void* pMsgData, TickType_t waitTicks)
 {
     int res = EVENT_ERR_NONE;
     uint16_t size = (*publisher)->msgSize;
-    eventMsg_t *pEventMsg;
-    subsList_t *pSubsList;
+    eventMsg_t* pEventMsg;
+    subsList_t* pSubsList;
     // xSemaphoreHandle mutex;
 #ifdef EVENT_USE_TIMESTAMP
     uint32_t timeStamp = EVENT_GET_TIMESTAMP();
 #endif
 
-    pSubsList = (subsList_t *)(*publisher)->subsListHead.next;
+    pSubsList = (subsList_t*)(*publisher)->subsListHead.next;
     if((*publisher == NULL) || (pSubsList == NULL))
     {
         res = EVENT_ERR_EMPTY_POINT;
     }
     else
     {
-        for( ; pSubsList != NULL; pSubsList = pSubsList->next)
+        for(; pSubsList != NULL; pSubsList = pSubsList->next)
         {
-            subscriber_t *curSubs = pSubsList->subscriber;
+            subscriber_t* curSubs = pSubsList->subscriber;
 
             /* 队列模式下，申请新内存并挂到队列尾部 */
             if(curSubs->subsMode == SUBS_MODE_NORMAL)
@@ -421,7 +425,10 @@ int EventMsgPost(publisher_t *publisher, void *pMsgData, TickType_t waitTicks)
 
                 /* 如果申请内存失败，则重试 */
                 /* 设置延时1个tick时，实际上绝大部分时候都会不到1个tick，所以特殊处理 */
-                if(waitTicks == 1) waitTicks = 2;
+                if(waitTicks == 1)
+                {
+                    waitTicks = 2;
+                }
                 while((pEventMsg == NULL) && (waitTicks > 0))
                 {
                     waitTicks --;
@@ -430,7 +437,7 @@ int EventMsgPost(publisher_t *publisher, void *pMsgData, TickType_t waitTicks)
                     pEventMsg = MemGetBlk(&(*publisher)->mmu);
                     EVENT_ENABLE_IRQ();
                     // xSemaphoreGive(mutex);
-									  return -1;
+                    return -1;
                     //vTaskDelay(1);
                 }
 
@@ -469,7 +476,7 @@ int EventMsgPost(publisher_t *publisher, void *pMsgData, TickType_t waitTicks)
 #ifdef EVENT_USE_NOTIFY
                 xTaskNotifyGive(curSubs->taskHandler);
 #endif
-           }
+            }
             /* 非队列模式下，直接更新消息内存 */
             else
             {
@@ -502,10 +509,10 @@ int EventMsgPost(publisher_t *publisher, void *pMsgData, TickType_t waitTicks)
 
 
 /* 获取消息，如果队列中没有消息则返回NULL */
-static eventMsg_t *EventMsgPull(subscriber_t *pSubscriber, TickType_t waitTicks)
+static eventMsg_t* EventMsgPull(subscriber_t* pSubscriber, TickType_t waitTicks)
 {
-    eventMsg_t *pMsg = NULL;
-    eventMsg_t *pHeadMsg;
+    eventMsg_t* pMsg = NULL;
+    eventMsg_t* pHeadMsg;
     uint32_t notifyValue;
     // xSemaphoreHandle mutex = pSubscriber->mutex;
 #ifdef EVENT_USE_NOTIFY
@@ -535,14 +542,14 @@ static eventMsg_t *EventMsgPull(subscriber_t *pSubscriber, TickType_t waitTicks)
 
 
 /* 处理消息，自动调用回调，设置的等待时间是每次等待的时间，实际可能更长 */
-void EventMsgProcess(subscriber_t *pSubscriber, TickType_t waitTicks)
+void EventMsgProcess(subscriber_t* pSubscriber, TickType_t waitTicks)
 {
     uint32_t msgId;
-    eventMsg_t *pMsg;
+    eventMsg_t* pMsg;
     msgCallBack_f handlerFun;
 
     do
-	{
+    {
         pMsg = EventMsgPull(pSubscriber, waitTicks);
         if(pMsg != NULL)
         {
@@ -560,23 +567,30 @@ void EventMsgProcess(subscriber_t *pSubscriber, TickType_t waitTicks)
 
             EventMsgFree(pMsg);
         }
-	}while(pMsg != NULL);
+    }
+    while(pMsg != NULL);
 }
 
 
 /* 获取最新消息，只用于非队列模式 */
-int EventMsgGetLast(subscriber_t* pSubscriber, uint32_t eventID, void *pMsgAddr, uint32_t *pTimeStamp)
+int EventMsgGetLast(subscriber_t* pSubscriber, uint32_t eventID, void* pMsgAddr, uint32_t* pTimeStamp)
 {
-    eventMsg_t *pMsg;
+    eventMsg_t* pMsg;
     // xSemaphoreHandle mutex;
 
     if(pMsgAddr == NULL)
+    {
         return EVENT_ERR_EMPTY_POINT;
+    }
     pMsg = GetHandlerFromID(pSubscriber, eventID);
     if(pMsg == NULL)
+    {
         return EVENT_ERR_EVENT_UNSUBD;
+    }
     if(pMsg->pEvent == NULL)
+    {
         return EVENT_ERR_INVALIDE_EVENT;
+    }
 
     // mutex = pSubscriber->mutex;
     // xSemaphoreTake(mutex, portMAX_DELAY);

@@ -27,16 +27,16 @@
   * @param
   * @retval error code
   */
-int32_t single_gyro_init(struct single_gyro *gyro, char* name, uint16_t std_id)
+int32_t single_gyro_init(struct single_gyro* gyro, char* name, uint16_t std_id)
 {
-  device_assert(gyro != NULL);
+    device_assert(gyro != NULL);
 
-  gyro->std_id = std_id;
+    gyro->std_id = std_id;
 
-	((device_t)gyro)->type = DEVICE_SINGLE_GYRO;
+    ((device_t)gyro)->type = DEVICE_SINGLE_GYRO;
 
-	device_init( &(gyro->parent), name);
-	return E_OK;
+    device_init(&(gyro->parent), name);
+    return E_OK;
 }
 
 /**
@@ -44,23 +44,23 @@ int32_t single_gyro_init(struct single_gyro *gyro, char* name, uint16_t std_id)
   * @param
   * @retval error code
   */
-int32_t single_gyro_update(struct single_gyro *gyro, uint16_t std_id, uint8_t can_rx_data[])
+int32_t single_gyro_update(struct single_gyro* gyro, uint16_t std_id, uint8_t can_rx_data[])
 {
-  device_assert(gyro != NULL);
+    device_assert(gyro != NULL);
 
-  if (std_id == gyro->std_id)
-  {
-    gyro->yaw_gyro_angle = 0.001f * ((int32_t)(can_rx_data[0] << 24) |
-                                      (can_rx_data[1] << 16) |
-                                      (can_rx_data[2] << 8) |
-                                      (can_rx_data[3]));
+    if(std_id == gyro->std_id)
+    {
+        gyro->yaw_gyro_angle = 0.001f * ((int32_t)(can_rx_data[0] << 24) |
+                                         (can_rx_data[1] << 16) |
+                                         (can_rx_data[2] << 8) |
+                                         (can_rx_data[3]));
 
-    gyro->yaw_gyro_rate = 0.001f * ((int32_t)(can_rx_data[4] << 24) |
-                                     (can_rx_data[5] << 16) |
-                                     (can_rx_data[6] << 8) |
-                                     (can_rx_data[7]));
-    return E_OK;
-  }
-  return E_INVAL;
+        gyro->yaw_gyro_rate = 0.001f * ((int32_t)(can_rx_data[4] << 24) |
+                                        (can_rx_data[5] << 16) |
+                                        (can_rx_data[6] << 8) |
+                                        (can_rx_data[7]));
+        return E_OK;
+    }
+    return E_INVAL;
 }
 

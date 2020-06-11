@@ -28,11 +28,11 @@ static ref_send_handler_t ref_protocol_send;
 static ref_rx_complete_callabck_t  ref_rx_complete;
 static ref_cmd_callback_t ref_cmd_callback;
 
-static uint8_t  ref_get_crc8(uint8_t *p_msg, uint32_t len, uint8_t crc8) ;
-static uint32_t ref_verify_crc8(uint8_t *p_msg, uint32_t len);
-static void     ref_append_crc8(uint8_t *p_msg, uint32_t len);
-static uint16_t ref_get_crc16(uint8_t *p_msg, uint16_t len, uint16_t crc16);
-static uint32_t ref_verify_crc16(uint8_t *p_msg, uint32_t len);
+static uint8_t  ref_get_crc8(uint8_t* p_msg, uint32_t len, uint8_t crc8) ;
+static uint32_t ref_verify_crc8(uint8_t* p_msg, uint32_t len);
+static void     ref_append_crc8(uint8_t* p_msg, uint32_t len);
+static uint16_t ref_get_crc16(uint8_t* p_msg, uint16_t len, uint16_t crc16);
+static uint32_t ref_verify_crc16(uint8_t* p_msg, uint32_t len);
 static void     ref_append_crc16(uint8_t* p_msg, uint16_t len) ;
 
 /**
@@ -41,61 +41,61 @@ static void     ref_append_crc16(uint8_t* p_msg, uint16_t len) ;
   * @retval void
   */
 void referee_param_init(ref_send_handler_t send_t,
-	                      ref_rx_complete_callabck_t rx_callback,
-	                      ref_cmd_callback_t cmd_callback)
+                        ref_rx_complete_callabck_t rx_callback,
+                        ref_cmd_callback_t cmd_callback)
 {
-  fifo_s_init(&referee_rxdata_fifo, referee_rxdata_buf, REFEREE_FIFO_BUFLEN);
+    fifo_s_init(&referee_rxdata_fifo, referee_rxdata_buf, REFEREE_FIFO_BUFLEN);
 
-  /* initial judge data unpack object */
-  referee_unpack_obj.data_fifo = &referee_rxdata_fifo;
-  referee_unpack_obj.p_header = (frame_header_t *)referee_unpack_obj.protocol_packet;
-  referee_unpack_obj.index = 0;
-  referee_unpack_obj.data_len = 0;
-  referee_unpack_obj.unpack_step = STEP_HEADER_SOF;
+    /* initial judge data unpack object */
+    referee_unpack_obj.data_fifo = &referee_rxdata_fifo;
+    referee_unpack_obj.p_header = (frame_header_t*)referee_unpack_obj.protocol_packet;
+    referee_unpack_obj.index = 0;
+    referee_unpack_obj.data_len = 0;
+    referee_unpack_obj.unpack_step = STEP_HEADER_SOF;
 
-	ref_protocol_send = send_t;
-	ref_rx_complete = rx_callback;
-	ref_cmd_callback = cmd_callback;
+    ref_protocol_send = send_t;
+    ref_rx_complete = rx_callback;
+    ref_cmd_callback = cmd_callback;
 }
 
-uint32_t referee_uart_rx_data_handle(uint8_t *data, uint16_t len)
+uint32_t referee_uart_rx_data_handle(uint8_t* data, uint16_t len)
 {
-  fifo_s_puts(&referee_rxdata_fifo, (char *)data, len);
+    fifo_s_puts(&referee_rxdata_fifo, (char*)data, len);
 
-	if(ref_rx_complete != NULL)
-	{
-		ref_rx_complete(data, len);
-	}
+    if(ref_rx_complete != NULL)
+    {
+        ref_rx_complete(data, len);
+    }
 
-	return 0;
+    return 0;
 }
 
-void referee_data_handler(uint8_t *p_frame)
+void referee_data_handler(uint8_t* p_frame)
 {
-  frame_header_t *p_header = (frame_header_t*)p_frame;
-  memcpy(p_header, p_frame, REF_PROTOCOL_HEADER_SIZE);
+    frame_header_t* p_header = (frame_header_t*)p_frame;
+    memcpy(p_header, p_frame, REF_PROTOCOL_HEADER_SIZE);
 
-  uint16_t data_length = p_header->data_length;
-  uint16_t cmd_id      = *(uint16_t *)(p_frame + REF_PROTOCOL_HEADER_SIZE);
-  uint8_t *data_addr   = p_frame + REF_PROTOCOL_HEADER_SIZE + REF_PROTOCOL_CMD_SIZE;
+    uint16_t data_length = p_header->data_length;
+    uint16_t cmd_id      = *(uint16_t*)(p_frame + REF_PROTOCOL_HEADER_SIZE);
+    uint8_t* data_addr   = p_frame + REF_PROTOCOL_HEADER_SIZE + REF_PROTOCOL_CMD_SIZE;
 
-	if(ref_cmd_callback != NULL)
-	{
-		ref_cmd_callback(cmd_id, data_addr, data_length);
-	}
+    if(ref_cmd_callback != NULL)
+    {
+        ref_cmd_callback(cmd_id, data_addr, data_length);
+    }
 }
 
-static uint16_t referee_protocol_pack(uint8_t *p_out, uint8_t *p_in, uint16_t len, uint16_t cmd_id)
+static uint16_t referee_protocol_pack(uint8_t* p_out, uint8_t* p_in, uint16_t len, uint16_t cmd_id)
 {
-	uint16_t headSize = REF_PROTOCOL_HEADER_SIZE;
-	uint16_t frameSize = len + REF_HEADER_CRC_CMDID_LEN;
+    uint16_t headSize = REF_PROTOCOL_HEADER_SIZE;
+    uint16_t frameSize = len + REF_HEADER_CRC_CMDID_LEN;
 
-	memcpy(p_out + headSize, &cmd_id, sizeof(cmd_id));
-	ref_append_crc8(p_out, headSize);
-	memcpy(p_out + headSize + sizeof(cmd_id), p_in, len);
-	ref_append_crc16(p_out, frameSize);
+    memcpy(p_out + headSize, &cmd_id, sizeof(cmd_id));
+    ref_append_crc8(p_out, headSize);
+    memcpy(p_out + headSize + sizeof(cmd_id), p_in, len);
+    ref_append_crc16(p_out, frameSize);
 
-	return frameSize;
+    return frameSize;
 }
 
 /**
@@ -107,19 +107,19 @@ static uint16_t referee_protocol_pack(uint8_t *p_out, uint8_t *p_in, uint16_t le
 */
 void referee_protocol_tansmit(uint16_t cmd_id, void* p_buf, uint16_t len)
 {
-	uint8_t txBuf[REF_PROTOCOL_FRAME_MAX_SIZE]={0};
-	frame_header_t *pHeader = (frame_header_t *)txBuf;
-	uint16_t frameSize;
+    uint8_t txBuf[REF_PROTOCOL_FRAME_MAX_SIZE] = {0};
+    frame_header_t* pHeader = (frame_header_t*)txBuf;
+    uint16_t frameSize;
 
-	pHeader->sof                    = REF_PROTOCOL_HEADER;
-	pHeader->data_length            = len;
-	pHeader->seq                    = ref_seq_num++;
+    pHeader->sof                    = REF_PROTOCOL_HEADER;
+    pHeader->data_length            = len;
+    pHeader->seq                    = ref_seq_num++;
 
-	frameSize = referee_protocol_pack(txBuf, p_buf, len, cmd_id);
-	if(ref_protocol_send != NULL)
-	{
-		ref_protocol_send(txBuf, frameSize);
-	}
+    frameSize = referee_protocol_pack(txBuf, p_buf, len, cmd_id);
+    if(ref_protocol_send != NULL)
+    {
+        ref_protocol_send(txBuf, frameSize);
+    }
 }
 
 /**
@@ -129,100 +129,107 @@ void referee_protocol_tansmit(uint16_t cmd_id, void* p_buf, uint16_t len)
   */
 void referee_unpack_fifo_data(void)
 {
-  uint8_t byte = 0;
-  uint8_t sof = REF_PROTOCOL_HEADER;
-  unpack_data_t *p_obj = &referee_unpack_obj;
+    uint8_t byte = 0;
+    uint8_t sof = REF_PROTOCOL_HEADER;
+    unpack_data_t* p_obj = &referee_unpack_obj;
 
-  while ( fifo_s_used(p_obj->data_fifo) )
-  {
-    byte = fifo_s_get(p_obj->data_fifo);
-    switch(p_obj->unpack_step)
+    while(fifo_s_used(p_obj->data_fifo))
     {
-      case STEP_HEADER_SOF:
-      {
-        if(byte == sof)
+        byte = fifo_s_get(p_obj->data_fifo);
+        switch(p_obj->unpack_step)
         {
-          p_obj->unpack_step = STEP_LENGTH_LOW;
-          p_obj->protocol_packet[p_obj->index++] = byte;
+        case STEP_HEADER_SOF:
+        {
+            if(byte == sof)
+            {
+                p_obj->unpack_step = STEP_LENGTH_LOW;
+                p_obj->protocol_packet[p_obj->index++] = byte;
+            }
+            else
+            {
+                p_obj->index = 0;
+            }
         }
-        else
+        break;
+
+        case STEP_LENGTH_LOW:
         {
-          p_obj->index = 0;
+            p_obj->data_len = byte;
+            p_obj->protocol_packet[p_obj->index++] = byte;
+            p_obj->unpack_step = STEP_LENGTH_HIGH;
         }
-      }break;
+        break;
 
-      case STEP_LENGTH_LOW:
-      {
-        p_obj->data_len = byte;
-        p_obj->protocol_packet[p_obj->index++] = byte;
-        p_obj->unpack_step = STEP_LENGTH_HIGH;
-      }break;
-
-      case STEP_LENGTH_HIGH:
-      {
-        p_obj->data_len |= (byte << 8);
-        p_obj->protocol_packet[p_obj->index++] = byte;
-
-        if(p_obj->data_len < (REF_PROTOCOL_FRAME_MAX_SIZE - REF_HEADER_CRC_CMDID_LEN))
+        case STEP_LENGTH_HIGH:
         {
-          p_obj->unpack_step = STEP_FRAME_SEQ;
+            p_obj->data_len |= (byte << 8);
+            p_obj->protocol_packet[p_obj->index++] = byte;
+
+            if(p_obj->data_len < (REF_PROTOCOL_FRAME_MAX_SIZE - REF_HEADER_CRC_CMDID_LEN))
+            {
+                p_obj->unpack_step = STEP_FRAME_SEQ;
+            }
+            else
+            {
+                p_obj->unpack_step = STEP_HEADER_SOF;
+                p_obj->index = 0;
+            }
         }
-        else
+        break;
+
+        case STEP_FRAME_SEQ:
         {
-          p_obj->unpack_step = STEP_HEADER_SOF;
-          p_obj->index = 0;
+            p_obj->protocol_packet[p_obj->index++] = byte;
+            p_obj->unpack_step = STEP_HEADER_CRC8;
         }
-      }break;
+        break;
 
-      case STEP_FRAME_SEQ:
-      {
-        p_obj->protocol_packet[p_obj->index++] = byte;
-        p_obj->unpack_step = STEP_HEADER_CRC8;
-      }break;
-
-      case STEP_HEADER_CRC8:
-      {
-        p_obj->protocol_packet[p_obj->index++] = byte;
-
-        if (p_obj->index == REF_PROTOCOL_HEADER_SIZE)
+        case STEP_HEADER_CRC8:
         {
-          if ( ref_verify_crc8(p_obj->protocol_packet, REF_PROTOCOL_HEADER_SIZE) )
-          {
-            p_obj->unpack_step = STEP_DATA_CRC16;
-          }
-          else
-          {
+            p_obj->protocol_packet[p_obj->index++] = byte;
+
+            if(p_obj->index == REF_PROTOCOL_HEADER_SIZE)
+            {
+                if(ref_verify_crc8(p_obj->protocol_packet, REF_PROTOCOL_HEADER_SIZE))
+                {
+                    p_obj->unpack_step = STEP_DATA_CRC16;
+                }
+                else
+                {
+                    p_obj->unpack_step = STEP_HEADER_SOF;
+                    p_obj->index = 0;
+                }
+            }
+        }
+        break;
+
+        case STEP_DATA_CRC16:
+        {
+            if(p_obj->index < (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
+            {
+                p_obj->protocol_packet[p_obj->index++] = byte;
+            }
+            if(p_obj->index >= (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
+            {
+                p_obj->unpack_step = STEP_HEADER_SOF;
+                p_obj->index = 0;
+
+                if(ref_verify_crc16(p_obj->protocol_packet, REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
+                {
+                    referee_data_handler(p_obj->protocol_packet);
+                }
+            }
+        }
+        break;
+
+        default:
+        {
             p_obj->unpack_step = STEP_HEADER_SOF;
             p_obj->index = 0;
-          }
         }
-      }break;
-
-      case STEP_DATA_CRC16:
-      {
-        if (p_obj->index < (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
-        {
-           p_obj->protocol_packet[p_obj->index++] = byte;
+        break;
         }
-        if (p_obj->index >= (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
-        {
-          p_obj->unpack_step = STEP_HEADER_SOF;
-          p_obj->index = 0;
-
-          if ( ref_verify_crc16(p_obj->protocol_packet, REF_HEADER_CRC_CMDID_LEN + p_obj->data_len) )
-          {
-            referee_data_handler(p_obj->protocol_packet);
-          }
-        }
-      }break;
-
-      default:
-      {
-        p_obj->unpack_step = STEP_HEADER_SOF;
-        p_obj->index = 0;
-      }break;
     }
-  }
 }
 
 static const uint8_t ref_crc8_init = 0xff;
@@ -247,13 +254,13 @@ static const uint8_t ref_crc8_tab[256] =
 };
 
 
-static uint8_t ref_get_crc8(uint8_t *p_msg, uint32_t len, uint8_t crc8)
+static uint8_t ref_get_crc8(uint8_t* p_msg, uint32_t len, uint8_t crc8)
 {
     uint8_t uc_index;
 
-    while (len--)
+    while(len--)
     {
-        uc_index = crc8^(*p_msg++);
+        uc_index = crc8 ^ (*p_msg++);
         crc8  = ref_crc8_tab[uc_index];
     }
 
@@ -266,15 +273,18 @@ static uint8_t ref_get_crc8(uint8_t *p_msg, uint32_t len, uint8_t crc8)
 **  Input:        Data to Verify,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-static uint32_t ref_verify_crc8(uint8_t *p_msg, uint32_t len)
+static uint32_t ref_verify_crc8(uint8_t* p_msg, uint32_t len)
 {
     uint8_t uc_expected = 0;
 
-    if ((p_msg == 0) || (len <= 2)) return 0;
+    if((p_msg == 0) || (len <= 2))
+    {
+        return 0;
+    }
 
-    uc_expected = ref_get_crc8 (p_msg, len-1, ref_crc8_init);
+    uc_expected = ref_get_crc8(p_msg, len - 1, ref_crc8_init);
 
-    return ( uc_expected == p_msg[len-1] );
+    return (uc_expected == p_msg[len - 1]);
 }
 
 
@@ -283,53 +293,56 @@ static uint32_t ref_verify_crc8(uint8_t *p_msg, uint32_t len)
 **  Input:        Data to CRC and append,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-static void ref_append_crc8(uint8_t *p_msg, uint32_t len)
+static void ref_append_crc8(uint8_t* p_msg, uint32_t len)
 {
     uint8_t crc8 = 0;
 
-    if ((p_msg == 0) || (len <= 2)) return;
+    if((p_msg == 0) || (len <= 2))
+    {
+        return;
+    }
 
-    crc8 = ref_get_crc8 ( (uint8_t *)p_msg, len-1, ref_crc8_init);
+    crc8 = ref_get_crc8((uint8_t*)p_msg, len - 1, ref_crc8_init);
 
-    p_msg[len-1] = crc8;
+    p_msg[len - 1] = crc8;
 }
 
 
 static uint16_t ref_crc16_init = 0xffff;
 static const uint16_t ref_crc16_tab[256] =
-    {
-        0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
-        0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5, 0xe97e, 0xf8f7,
-        0x1081, 0x0108, 0x3393, 0x221a, 0x56a5, 0x472c, 0x75b7, 0x643e,
-        0x9cc9, 0x8d40, 0xbfdb, 0xae52, 0xdaed, 0xcb64, 0xf9ff, 0xe876,
-        0x2102, 0x308b, 0x0210, 0x1399, 0x6726, 0x76af, 0x4434, 0x55bd,
-        0xad4a, 0xbcc3, 0x8e58, 0x9fd1, 0xeb6e, 0xfae7, 0xc87c, 0xd9f5,
-        0x3183, 0x200a, 0x1291, 0x0318, 0x77a7, 0x662e, 0x54b5, 0x453c,
-        0xbdcb, 0xac42, 0x9ed9, 0x8f50, 0xfbef, 0xea66, 0xd8fd, 0xc974,
-        0x4204, 0x538d, 0x6116, 0x709f, 0x0420, 0x15a9, 0x2732, 0x36bb,
-        0xce4c, 0xdfc5, 0xed5e, 0xfcd7, 0x8868, 0x99e1, 0xab7a, 0xbaf3,
-        0x5285, 0x430c, 0x7197, 0x601e, 0x14a1, 0x0528, 0x37b3, 0x263a,
-        0xdecd, 0xcf44, 0xfddf, 0xec56, 0x98e9, 0x8960, 0xbbfb, 0xaa72,
-        0x6306, 0x728f, 0x4014, 0x519d, 0x2522, 0x34ab, 0x0630, 0x17b9,
-        0xef4e, 0xfec7, 0xcc5c, 0xddd5, 0xa96a, 0xb8e3, 0x8a78, 0x9bf1,
-        0x7387, 0x620e, 0x5095, 0x411c, 0x35a3, 0x242a, 0x16b1, 0x0738,
-        0xffcf, 0xee46, 0xdcdd, 0xcd54, 0xb9eb, 0xa862, 0x9af9, 0x8b70,
-        0x8408, 0x9581, 0xa71a, 0xb693, 0xc22c, 0xd3a5, 0xe13e, 0xf0b7,
-        0x0840, 0x19c9, 0x2b52, 0x3adb, 0x4e64, 0x5fed, 0x6d76, 0x7cff,
-        0x9489, 0x8500, 0xb79b, 0xa612, 0xd2ad, 0xc324, 0xf1bf, 0xe036,
-        0x18c1, 0x0948, 0x3bd3, 0x2a5a, 0x5ee5, 0x4f6c, 0x7df7, 0x6c7e,
-        0xa50a, 0xb483, 0x8618, 0x9791, 0xe32e, 0xf2a7, 0xc03c, 0xd1b5,
-        0x2942, 0x38cb, 0x0a50, 0x1bd9, 0x6f66, 0x7eef, 0x4c74, 0x5dfd,
-        0xb58b, 0xa402, 0x9699, 0x8710, 0xf3af, 0xe226, 0xd0bd, 0xc134,
-        0x39c3, 0x284a, 0x1ad1, 0x0b58, 0x7fe7, 0x6e6e, 0x5cf5, 0x4d7c,
-        0xc60c, 0xd785, 0xe51e, 0xf497, 0x8028, 0x91a1, 0xa33a, 0xb2b3,
-        0x4a44, 0x5bcd, 0x6956, 0x78df, 0x0c60, 0x1de9, 0x2f72, 0x3efb,
-        0xd68d, 0xc704, 0xf59f, 0xe416, 0x90a9, 0x8120, 0xb3bb, 0xa232,
-        0x5ac5, 0x4b4c, 0x79d7, 0x685e, 0x1ce1, 0x0d68, 0x3ff3, 0x2e7a,
-        0xe70e, 0xf687, 0xc41c, 0xd595, 0xa12a, 0xb0a3, 0x8238, 0x93b1,
-        0x6b46, 0x7acf, 0x4854, 0x59dd, 0x2d62, 0x3ceb, 0x0e70, 0x1ff9,
-        0xf78f, 0xe606, 0xd49d, 0xc514, 0xb1ab, 0xa022, 0x92b9, 0x8330,
-        0x7bc7, 0x6a4e, 0x58d5, 0x495c, 0x3de3, 0x2c6a, 0x1ef1, 0x0f78
+{
+    0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
+    0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5, 0xe97e, 0xf8f7,
+    0x1081, 0x0108, 0x3393, 0x221a, 0x56a5, 0x472c, 0x75b7, 0x643e,
+    0x9cc9, 0x8d40, 0xbfdb, 0xae52, 0xdaed, 0xcb64, 0xf9ff, 0xe876,
+    0x2102, 0x308b, 0x0210, 0x1399, 0x6726, 0x76af, 0x4434, 0x55bd,
+    0xad4a, 0xbcc3, 0x8e58, 0x9fd1, 0xeb6e, 0xfae7, 0xc87c, 0xd9f5,
+    0x3183, 0x200a, 0x1291, 0x0318, 0x77a7, 0x662e, 0x54b5, 0x453c,
+    0xbdcb, 0xac42, 0x9ed9, 0x8f50, 0xfbef, 0xea66, 0xd8fd, 0xc974,
+    0x4204, 0x538d, 0x6116, 0x709f, 0x0420, 0x15a9, 0x2732, 0x36bb,
+    0xce4c, 0xdfc5, 0xed5e, 0xfcd7, 0x8868, 0x99e1, 0xab7a, 0xbaf3,
+    0x5285, 0x430c, 0x7197, 0x601e, 0x14a1, 0x0528, 0x37b3, 0x263a,
+    0xdecd, 0xcf44, 0xfddf, 0xec56, 0x98e9, 0x8960, 0xbbfb, 0xaa72,
+    0x6306, 0x728f, 0x4014, 0x519d, 0x2522, 0x34ab, 0x0630, 0x17b9,
+    0xef4e, 0xfec7, 0xcc5c, 0xddd5, 0xa96a, 0xb8e3, 0x8a78, 0x9bf1,
+    0x7387, 0x620e, 0x5095, 0x411c, 0x35a3, 0x242a, 0x16b1, 0x0738,
+    0xffcf, 0xee46, 0xdcdd, 0xcd54, 0xb9eb, 0xa862, 0x9af9, 0x8b70,
+    0x8408, 0x9581, 0xa71a, 0xb693, 0xc22c, 0xd3a5, 0xe13e, 0xf0b7,
+    0x0840, 0x19c9, 0x2b52, 0x3adb, 0x4e64, 0x5fed, 0x6d76, 0x7cff,
+    0x9489, 0x8500, 0xb79b, 0xa612, 0xd2ad, 0xc324, 0xf1bf, 0xe036,
+    0x18c1, 0x0948, 0x3bd3, 0x2a5a, 0x5ee5, 0x4f6c, 0x7df7, 0x6c7e,
+    0xa50a, 0xb483, 0x8618, 0x9791, 0xe32e, 0xf2a7, 0xc03c, 0xd1b5,
+    0x2942, 0x38cb, 0x0a50, 0x1bd9, 0x6f66, 0x7eef, 0x4c74, 0x5dfd,
+    0xb58b, 0xa402, 0x9699, 0x8710, 0xf3af, 0xe226, 0xd0bd, 0xc134,
+    0x39c3, 0x284a, 0x1ad1, 0x0b58, 0x7fe7, 0x6e6e, 0x5cf5, 0x4d7c,
+    0xc60c, 0xd785, 0xe51e, 0xf497, 0x8028, 0x91a1, 0xa33a, 0xb2b3,
+    0x4a44, 0x5bcd, 0x6956, 0x78df, 0x0c60, 0x1de9, 0x2f72, 0x3efb,
+    0xd68d, 0xc704, 0xf59f, 0xe416, 0x90a9, 0x8120, 0xb3bb, 0xa232,
+    0x5ac5, 0x4b4c, 0x79d7, 0x685e, 0x1ce1, 0x0d68, 0x3ff3, 0x2e7a,
+    0xe70e, 0xf687, 0xc41c, 0xd595, 0xa12a, 0xb0a3, 0x8238, 0x93b1,
+    0x6b46, 0x7acf, 0x4854, 0x59dd, 0x2d62, 0x3ceb, 0x0e70, 0x1ff9,
+    0xf78f, 0xe606, 0xd49d, 0xc514, 0xb1ab, 0xa022, 0x92b9, 0x8330,
+    0x7bc7, 0x6a4e, 0x58d5, 0x495c, 0x3de3, 0x2c6a, 0x1ef1, 0x0f78
 };
 
 
@@ -339,11 +352,11 @@ static const uint16_t ref_crc16_tab[256] =
 **  Input:        Data to check,Stream length, initialized checksum
 **  Output:       CRC checksum
 */
-uint16_t ref_get_crc16(uint8_t *p_msg, uint16_t len, uint16_t crc16)
+uint16_t ref_get_crc16(uint8_t* p_msg, uint16_t len, uint16_t crc16)
 {
     uint8_t data;
 
-    if (p_msg == NULL)
+    if(p_msg == NULL)
     {
         return 0xFFFF;
     }
@@ -362,15 +375,15 @@ uint16_t ref_get_crc16(uint8_t *p_msg, uint16_t len, uint16_t crc16)
 **  Input:        Data to Verify,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-uint32_t ref_verify_crc16(uint8_t *p_msg, uint32_t len)
+uint32_t ref_verify_crc16(uint8_t* p_msg, uint32_t len)
 {
     uint16_t w_expected = 0;
 
-    if ((p_msg == NULL) || (len <= 2))
+    if((p_msg == NULL) || (len <= 2))
     {
         return 1;
     }
-    w_expected = ref_get_crc16 ( p_msg, len - 2, ref_crc16_init);
+    w_expected = ref_get_crc16(p_msg, len - 2, ref_crc16_init);
 
     return ((w_expected & 0xff) == p_msg[len - 2] && ((w_expected >> 8) & 0xff) == p_msg[len - 1]);
 }
@@ -384,12 +397,12 @@ void ref_append_crc16(uint8_t* p_msg, uint16_t len)
 {
     uint16_t crc16 = 0;
 
-    if ((p_msg == NULL) || (len <= 2))
+    if((p_msg == NULL) || (len <= 2))
     {
         return;
     }
-    crc16 = ref_get_crc16 ( (uint8_t *)p_msg, len-2, ref_crc16_init );
+    crc16 = ref_get_crc16((uint8_t*)p_msg, len - 2, ref_crc16_init);
 
-    p_msg[len-2] = (uint8_t)(crc16 & 0x00ff);
-    p_msg[len-1] = (uint8_t)((crc16 >> 8)& 0x00ff);
+    p_msg[len - 2] = (uint8_t)(crc16 & 0x00ff);
+    p_msg[len - 1] = (uint8_t)((crc16 >> 8) & 0x00ff);
 }

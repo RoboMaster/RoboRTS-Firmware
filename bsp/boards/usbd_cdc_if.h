@@ -24,7 +24,7 @@
 #define __USBD_CDC_IF_H__
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -38,18 +38,18 @@
   * @brief For Usb device.
   * @{
   */
-  
+
 /** @defgroup USBD_CDC_IF USBD_CDC_IF
   * @brief Usb VCP device module
   * @{
-  */ 
+  */
 
 /** @defgroup USBD_CDC_IF_Exported_Defines USBD_CDC_IF_Exported_Defines
   * @brief Defines.
   * @{
   */
 /* USER CODE BEGIN EXPORTED_DEFINES */
-typedef  int32_t(*usb_vcp_call_back_f)(uint8_t *buf, uint32_t len);
+typedef  int32_t(*usb_vcp_call_back_f)(uint8_t* buf, uint32_t len);
 int32_t usb_vcp_rx_callback_register(usb_vcp_call_back_f fun);
 /* USER CODE END EXPORTED_DEFINES */
 
@@ -93,7 +93,7 @@ extern USBD_CDC_ItfTypeDef USBD_Interface_fops_FS;
 
 /* USER CODE BEGIN EXPORTED_VARIABLES */
 int32_t usb_tx_flush(void* argc);
-uint32_t usb_interface_send(uint8_t *p_data, uint16_t len);
+uint32_t usb_interface_send(uint8_t* p_data, uint16_t len);
 /* USER CODE END EXPORTED_VARIABLES */
 
 /**

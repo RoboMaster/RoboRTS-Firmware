@@ -24,11 +24,11 @@
 
 struct period
 {
-  uint8_t used;
-  float start_time;
+    uint8_t used;
+    float start_time;
 };
 
-int32_t get_period_start(uint32_t *id);
+int32_t get_period_start(uint32_t* id);
 float get_period_end(uint32_t id);
 
 #endif // __PERIOD_H__

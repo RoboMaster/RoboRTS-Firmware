@@ -18,7 +18,7 @@
 #include "cli_history.h"
 
 /* 将新输入字符串存入历史数据 */
-void history_save(cli_history_t* history, char *str)
+void history_save(cli_history_t* history, char* str)
 {
     int tmp_idx;
 
@@ -47,7 +47,7 @@ void history_save(cli_history_t* history, char *str)
 }
 
 /* 读取上一个历史记录 */
-void history_get_last(cli_history_t* history, char *str, int *len)
+void history_get_last(cli_history_t* history, char* str, int* len)
 {
     int tmp_idx;
 
@@ -56,7 +56,10 @@ void history_get_last(cli_history_t* history, char *str, int *len)
     {
         history->read_cnt ++;
         tmp_idx = history->write_idx - history->read_cnt;
-        if(tmp_idx < 0) tmp_idx += history->valid_cnt;
+        if(tmp_idx < 0)
+        {
+            tmp_idx += history->valid_cnt;
+        }
         *len = strlen(history->str_buf[tmp_idx]);
         strcpy(str, history->str_buf[tmp_idx]);
     }
@@ -64,7 +67,7 @@ void history_get_last(cli_history_t* history, char *str, int *len)
 
 
 /* 读取下一个历史记录 */
-void history_get_next(cli_history_t* history, char *str, int *len)
+void history_get_next(cli_history_t* history, char* str, int* len)
 {
     int tmp_idx;
 
@@ -80,7 +83,10 @@ void history_get_next(cli_history_t* history, char *str, int *len)
             return;
         }
         tmp_idx = history->write_idx - history->read_cnt;
-        if(tmp_idx < 0) tmp_idx += history->valid_cnt;
+        if(tmp_idx < 0)
+        {
+            tmp_idx += history->valid_cnt;
+        }
         *len = strlen(history->str_buf[tmp_idx]);
         strcpy(str, history->str_buf[tmp_idx]);
     }

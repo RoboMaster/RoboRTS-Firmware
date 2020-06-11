@@ -7,7 +7,7 @@
   ****************************(C) COPYRIGHT 2016 DJI****************************
   * @file       AHRS_MiddleWare.c/h
   * @brief      姿态解算中间层，为姿态解算提供相关函数
-  * @note       
+  * @note
   * @history
   *  Version    Date            Author          Modification
   *  V1.0.0     Dec-26-2018     RM              1. 完成
@@ -37,26 +37,26 @@
 
 //定义 NULL
 #ifndef NULL
-#define NULL 0
+    #define NULL 0
 #endif
 
 //定义PI 值
 #ifndef PI
-#define PI 3.14159265358979f
+    #define PI 3.14159265358979f
 #endif
 
 //定义 角度(度)转换到 弧度的比例
 #ifndef ANGLE_TO_RAD
-#define ANGLE_TO_RAD 0.01745329251994329576923690768489f
+    #define ANGLE_TO_RAD 0.01745329251994329576923690768489f
 #endif
 
 //定义 弧度 转换到 角度的比例
 #ifndef RAD_TO_ANGLE
-#define RAD_TO_ANGLE 57.295779513082320876798154814105f
+    #define RAD_TO_ANGLE 57.295779513082320876798154814105f
 #endif
 
-extern void AHRS_get_height(fp32 *high);
-extern void AHRS_get_latitude(fp32 *latitude);
+extern void AHRS_get_height(fp32* high);
+extern void AHRS_get_latitude(fp32* latitude);
 extern fp32 AHRS_invSqrt(fp32 num);
 extern fp32 AHRS_sinf(fp32 angle);
 extern fp32 AHRS_cosf(fp32 angle);

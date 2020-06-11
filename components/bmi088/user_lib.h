@@ -27,16 +27,16 @@ typedef struct
 extern fp32 invSqrt(fp32 num);
 
 //斜波函数初始化
-void ramp_init(ramp_function_source_t *ramp_source_type, fp32 frame_period, fp32 max, fp32 min);
+void ramp_init(ramp_function_source_t* ramp_source_type, fp32 frame_period, fp32 max, fp32 min);
 
 //斜波函数计算
-void ramp_calc(ramp_function_source_t *ramp_source_type, fp32 input);
+void ramp_calc(ramp_function_source_t* ramp_source_type, fp32 input);
 //一阶滤波初始化
-extern void first_order_filter_init(first_order_filter_type_t *first_order_filter_type, fp32 frame_period, const fp32 num[1]);
+extern void first_order_filter_init(first_order_filter_type_t* first_order_filter_type, fp32 frame_period, const fp32 num[1]);
 //一阶滤波计算
-extern void first_order_filter_cali(first_order_filter_type_t *first_order_filter_type, fp32 input);
+extern void first_order_filter_cali(first_order_filter_type_t* first_order_filter_type, fp32 input);
 //绝对限制
-extern void abs_limit(fp32 *num, fp32 Limit);
+extern void abs_limit(fp32* num, fp32 Limit);
 //判断符号位
 extern fp32 sign(fp32 value);
 //浮点死区

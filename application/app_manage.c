@@ -19,9 +19,9 @@
 
 struct app_manage current_app;
 
-struct app_manage *get_current_app(void)
+struct app_manage* get_current_app(void)
 {
-  return &current_app;
+    return &current_app;
 }
 
 /**
@@ -31,57 +31,57 @@ struct app_manage *get_current_app(void)
   */
 void app_protocol_init(void)
 {
-  struct offline_manage_obj obj;
+    struct offline_manage_obj obj;
 
-  protocol_set_local_address(current_app.local_addr);
+    protocol_set_local_address(current_app.local_addr);
 
-  if (current_app.recv_cmd_table != NULL)
-  {
-    for (int i = 0; i < current_app.recv_cmd_tab_size; i++)
+    if(current_app.recv_cmd_table != NULL)
     {
-      protocol_rcv_cmd_register(current_app.recv_cmd_table[i].cmd,
-                                current_app.recv_cmd_table[i].rcv_callback);
+        for(int i = 0; i < current_app.recv_cmd_tab_size; i++)
+        {
+            protocol_rcv_cmd_register(current_app.recv_cmd_table[i].cmd,
+                                      current_app.recv_cmd_table[i].rcv_callback);
+        }
     }
-  }
 
-  if (current_app.send_cfg_table != NULL)
-  {
-    for (int i = 0; i < current_app.send_cfg_tab_size; i++)
+    if(current_app.send_cfg_table != NULL)
     {
-      protocol_send_cmd_config(current_app.send_cfg_table[i].cmd,
-                               current_app.send_cfg_table[i].resend_times,
-                               current_app.send_cfg_table[i].resend_timeout,
-                               current_app.send_cfg_table[i].ack_enable,
-                               current_app.send_cfg_table[i].ack_callback,
-                               current_app.send_cfg_table[i].no_ack_callback);
+        for(int i = 0; i < current_app.send_cfg_tab_size; i++)
+        {
+            protocol_send_cmd_config(current_app.send_cfg_table[i].cmd,
+                                     current_app.send_cfg_table[i].resend_times,
+                                     current_app.send_cfg_table[i].resend_timeout,
+                                     current_app.send_cfg_table[i].ack_enable,
+                                     current_app.send_cfg_table[i].ack_callback,
+                                     current_app.send_cfg_table[i].no_ack_callback);
+        }
     }
-  }
 
-  if (current_app.offline_table != NULL)
-  {
-    for (int i = 0; i < current_app.offline_tab_size; i++)
+    if(current_app.offline_table != NULL)
     {
-      obj.event = current_app.offline_table[i].event;
-      obj.enable = current_app.offline_table[i].enable;
-      obj.error_level = current_app.offline_table[i].level;
+        for(int i = 0; i < current_app.offline_tab_size; i++)
+        {
+            obj.event = current_app.offline_table[i].event;
+            obj.enable = current_app.offline_table[i].enable;
+            obj.error_level = current_app.offline_table[i].level;
 
-      obj.online_first_func = current_app.offline_table[i].online_first_func;
-      obj.offline_first_func = current_app.offline_table[i].offline_first_func;
-      obj.online_func = current_app.offline_table[i].online_func;
-      obj.offline_func = current_app.offline_table[i].offline_func;
+            obj.online_first_func = current_app.offline_table[i].online_first_func;
+            obj.offline_first_func = current_app.offline_table[i].offline_first_func;
+            obj.online_func = current_app.offline_table[i].online_func;
+            obj.offline_func = current_app.offline_table[i].offline_func;
 
-      obj.beep_times = current_app.offline_table[i].beep_times;
-      obj.offline_time = current_app.offline_table[i].offline_time;
-      offline_event_init(obj);
+            obj.beep_times = current_app.offline_table[i].beep_times;
+            obj.offline_time = current_app.offline_table[i].offline_time;
+            offline_event_init(obj);
+        }
     }
-  }
 
-  if (current_app.route_table != NULL)
-  {
-    for (int i = 0; i < current_app.route_tab_size; i++)
+    if(current_app.route_table != NULL)
     {
-      protocol_set_route(current_app.route_table[i].address,
-                         current_app.route_table[i].interface);
+        for(int i = 0; i < current_app.route_tab_size; i++)
+        {
+            protocol_set_route(current_app.route_table[i].address,
+                               current_app.route_table[i].interface);
+        }
     }
-  }
 }

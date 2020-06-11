@@ -25,10 +25,10 @@
 void set_chassis_sdk_mode(uint8_t state);
 uint8_t get_chassis_sdk_mode(void);
 
-int32_t chassis_manifold_heart(uint8_t *buff, uint16_t len);
-int32_t chassis_info_push(void *argc);
-int32_t chassis_spd_acc_ctrl(uint8_t *buff, uint16_t len);
-int32_t chassis_speed_ctrl(uint8_t *buff, uint16_t len);
-int32_t student_data_transmit(uint8_t *buff, uint16_t len);
+int32_t chassis_manifold_heart(uint8_t* buff, uint16_t len);
+int32_t chassis_info_push(void* argc);
+int32_t chassis_spd_acc_ctrl(uint8_t* buff, uint16_t len);
+int32_t chassis_speed_ctrl(uint8_t* buff, uint16_t len);
+int32_t student_data_transmit(uint8_t* buff, uint16_t len);
 
 #endif

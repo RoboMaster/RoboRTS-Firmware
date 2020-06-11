@@ -33,6 +33,7 @@ JLinkLog.txt
 *.udb
 *.ini
 *.sct
+*.orig
 *.uvguix.*
 build/*
 MDK-ARM/DebugConfig/*

@@ -19,9 +19,9 @@
 #define __MECANUM_H__
 
 #ifdef MECANUM_H_GLOBAL
-#define MECANUM_H_EXTERN
+    #define MECANUM_H_EXTERN
 #else
-#define MECANUM_H_EXTERN extern
+    #define MECANUM_H_EXTERN extern
 #endif
 
 /************************ chassis parameter ****************************/
@@ -57,52 +57,52 @@
   */
 struct mecanum_structure
 {
-  float wheel_perimeter; /* the perimeter(mm) of wheel */
-  float wheeltrack;      /* wheel track distance(mm) */
-  float wheelbase;       /* wheelbase distance(mm) */
-  float rotate_x_offset; /* rotate offset(mm) relative to the x-axis of the chassis center */
-  float rotate_y_offset; /* rotate offset(mm) relative to the y-axis of the chassis center */
+    float wheel_perimeter; /* the perimeter(mm) of wheel */
+    float wheeltrack;      /* wheel track distance(mm) */
+    float wheelbase;       /* wheelbase distance(mm) */
+    float rotate_x_offset; /* rotate offset(mm) relative to the x-axis of the chassis center */
+    float rotate_y_offset; /* rotate offset(mm) relative to the y-axis of the chassis center */
 };
 
 struct mecanum_position
 {
-  float v_x_mm;
-  float v_y_mm;
-  float rate_deg;
-  float position_x_mm;
-  float position_y_mm;
-  float angle_deg;
+    float v_x_mm;
+    float v_y_mm;
+    float rate_deg;
+    float position_x_mm;
+    float position_y_mm;
+    float angle_deg;
 };
 
 struct mecanum_speed
 {
-  float vx; // forward/back
-  float vy; // left/right
-  float vw; // anticlockwise/clockwise
+    float vx; // forward/back
+    float vy; // left/right
+    float vw; // anticlockwise/clockwise
 };
 
 struct mecanum_gyro
 {
-  float yaw_gyro_angle;
-  float yaw_gyro_rate;
+    float yaw_gyro_angle;
+    float yaw_gyro_rate;
 };
 
 struct mecanum
 {
-  struct mecanum_structure param;
-  struct mecanum_speed speed;
-  struct mecanum_position position;
-  struct mecanum_gyro gyro;
-  float  wheel_rpm[4];
+    struct mecanum_structure param;
+    struct mecanum_speed speed;
+    struct mecanum_position position;
+    struct mecanum_gyro gyro;
+    float  wheel_rpm[4];
 };
 
 struct mecanum_motor_fdb
 {
-  float total_ecd;
-  float speed_rpm;
+    float total_ecd;
+    float speed_rpm;
 };
 
-void mecanum_calculate(struct mecanum *mec);
-void mecanum_position_measure(struct mecanum *mec, struct mecanum_motor_fdb wheel_fdb[]);
+void mecanum_calculate(struct mecanum* mec);
+void mecanum_position_measure(struct mecanum* mec, struct mecanum_motor_fdb wheel_fdb[]);
 
 #endif // __MECANUM_H__

@@ -22,10 +22,10 @@
   * @param[in]
   * @retval    void
   */
-void ramp_v0_init(ramp_v0_t *ramp, int32_t scale)
+void ramp_v0_init(ramp_v0_t* ramp, int32_t scale)
 {
-  ramp->count = 0;
-  ramp->scale = scale;
+    ramp->count = 0;
+    ramp->scale = scale;
 }
 
 /**
@@ -33,15 +33,19 @@ void ramp_v0_init(ramp_v0_t *ramp, int32_t scale)
   * @param[in] ramp: a ramp filter pointer
   * @retval    output
   */
-float ramp_v0_calculate(ramp_v0_t *ramp)
+float ramp_v0_calculate(ramp_v0_t* ramp)
 {
-  if (ramp->scale <= 0)
-    return 0;
+    if(ramp->scale <= 0)
+    {
+        return 0;
+    }
 
-  if (ramp->count++ >= ramp->scale)
-    ramp->count = ramp->scale;
+    if(ramp->count++ >= ramp->scale)
+    {
+        ramp->count = ramp->scale;
+    }
 
-  ramp->out = ramp->count / ((float)ramp->scale);
-  return ramp->out;
+    ramp->out = ramp->count / ((float)ramp->scale);
+    return ramp->out;
 }
 

@@ -19,7 +19,7 @@
 #define __SHELL_H__
 
 int thread_cli_init(void);
-void shell_interupt(uint8_t *buff, uint16_t len);
+void shell_interupt(uint8_t* buff, uint16_t len);
 
 #endif
 

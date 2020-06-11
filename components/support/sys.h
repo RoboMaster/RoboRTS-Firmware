@@ -36,23 +36,23 @@
 
 /* boolean type definitions */
 #ifndef TRUE
-#define TRUE                         1               /**< boolean true  */
+    #define TRUE                         1               /**< boolean true  */
 #endif
 
 #ifndef FALSE
-#define FALSE                        0               /**< boolean fails */
+    #define FALSE                        0               /**< boolean fails */
 #endif
 
 #ifndef ENABLE
-#define ENABLE                       1
+    #define ENABLE                       1
 #endif
 
 #ifndef DISABLE
-#define DISABLE                      0
+    #define DISABLE                      0
 #endif
 
 #ifndef RAD_TO_DEG
-#define RAD_TO_DEG 57.29f
+    #define RAD_TO_DEG 57.29f
 #endif
 
 #define INT_STATE              uint32_t
@@ -68,7 +68,7 @@
         MASTER_INT_DISABLE();
 
 #define CRITICAL_SETCION_EXIT()        \
-				MASTER_INT_RESTORE(cpu_state); \
+        MASTER_INT_RESTORE(cpu_state); \
     }                                  \
     while (0)
 

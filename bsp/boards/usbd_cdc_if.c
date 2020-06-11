@@ -134,7 +134,7 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 static int8_t CDC_Init_FS(void);
 static int8_t CDC_DeInit_FS(void);
 static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length);
-static int8_t CDC_Receive_FS(uint8_t* pbuf, uint32_t *Len);
+static int8_t CDC_Receive_FS(uint8_t* pbuf, uint32_t* Len);
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
 
@@ -146,10 +146,10 @@ static int8_t CDC_Receive_FS(uint8_t* pbuf, uint32_t *Len);
 
 USBD_CDC_ItfTypeDef USBD_Interface_fops_FS =
 {
-  CDC_Init_FS,
-  CDC_DeInit_FS,
-  CDC_Control_FS,
-  CDC_Receive_FS
+    CDC_Init_FS,
+    CDC_DeInit_FS,
+    CDC_Control_FS,
+    CDC_Receive_FS
 };
 
 /* Private functions ---------------------------------------------------------*/
@@ -159,15 +159,15 @@ USBD_CDC_ItfTypeDef USBD_Interface_fops_FS =
   */
 static int8_t CDC_Init_FS(void)
 {
-  /* USER CODE BEGIN 3 */
-  /* Set Application Buffers */
-  USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, 0);
-  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS);
-	
-	fifo_s_init(&usb_tx_fifo, usb_tx_fifo_buff, APP_TX_DATA_SIZE);
-	
-  return (USBD_OK);
-  /* USER CODE END 3 */
+    /* USER CODE BEGIN 3 */
+    /* Set Application Buffers */
+    USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, 0);
+    USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS);
+
+    fifo_s_init(&usb_tx_fifo, usb_tx_fifo_buff, APP_TX_DATA_SIZE);
+
+    return (USBD_OK);
+    /* USER CODE END 3 */
 }
 
 /**
@@ -176,9 +176,9 @@ static int8_t CDC_Init_FS(void)
   */
 static int8_t CDC_DeInit_FS(void)
 {
-  /* USER CODE BEGIN 4 */
-  return (USBD_OK);
-  /* USER CODE END 4 */
+    /* USER CODE BEGIN 4 */
+    return (USBD_OK);
+    /* USER CODE END 4 */
 }
 
 /**
@@ -190,68 +190,68 @@ static int8_t CDC_DeInit_FS(void)
   */
 static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 {
-  /* USER CODE BEGIN 5 */
-  switch(cmd)
-  {
+    /* USER CODE BEGIN 5 */
+    switch(cmd)
+    {
     case CDC_SEND_ENCAPSULATED_COMMAND:
 
-    break;
+        break;
 
     case CDC_GET_ENCAPSULATED_RESPONSE:
 
-    break;
+        break;
 
     case CDC_SET_COMM_FEATURE:
 
-    break;
+        break;
 
     case CDC_GET_COMM_FEATURE:
 
-    break;
+        break;
 
     case CDC_CLEAR_COMM_FEATURE:
 
-    break;
+        break;
 
-  /*******************************************************************************/
-  /* Line Coding Structure                                                       */
-  /*-----------------------------------------------------------------------------*/
-  /* Offset | Field       | Size | Value  | Description                          */
-  /* 0      | dwDTERate   |   4  | Number |Data terminal rate, in bits per second*/
-  /* 4      | bCharFormat |   1  | Number | Stop bits                            */
-  /*                                        0 - 1 Stop bit                       */
-  /*                                        1 - 1.5 Stop bits                    */
-  /*                                        2 - 2 Stop bits                      */
-  /* 5      | bParityType |  1   | Number | Parity                               */
-  /*                                        0 - None                             */
-  /*                                        1 - Odd                              */
-  /*                                        2 - Even                             */
-  /*                                        3 - Mark                             */
-  /*                                        4 - Space                            */
-  /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
-  /*******************************************************************************/
+    /*******************************************************************************/
+    /* Line Coding Structure                                                       */
+    /*-----------------------------------------------------------------------------*/
+    /* Offset | Field       | Size | Value  | Description                          */
+    /* 0      | dwDTERate   |   4  | Number |Data terminal rate, in bits per second*/
+    /* 4      | bCharFormat |   1  | Number | Stop bits                            */
+    /*                                        0 - 1 Stop bit                       */
+    /*                                        1 - 1.5 Stop bits                    */
+    /*                                        2 - 2 Stop bits                      */
+    /* 5      | bParityType |  1   | Number | Parity                               */
+    /*                                        0 - None                             */
+    /*                                        1 - Odd                              */
+    /*                                        2 - Even                             */
+    /*                                        3 - Mark                             */
+    /*                                        4 - Space                            */
+    /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
+    /*******************************************************************************/
     case CDC_SET_LINE_CODING:
 
-    break;
+        break;
 
     case CDC_GET_LINE_CODING:
 
-    break;
+        break;
 
     case CDC_SET_CONTROL_LINE_STATE:
 
-    break;
+        break;
 
     case CDC_SEND_BREAK:
 
-    break;
+        break;
 
-  default:
-    break;
-  }
+    default:
+        break;
+    }
 
-  return (USBD_OK);
-  /* USER CODE END 5 */
+    return (USBD_OK);
+    /* USER CODE END 5 */
 }
 
 /**
@@ -268,19 +268,19 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   * @param  Len: Number of data received (in bytes)
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
+static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t* Len)
 {
-  /* USER CODE BEGIN 6 */
+    /* USER CODE BEGIN 6 */
 
-	if(usb_vcp_call_back != NULL)
-	{
-			(*usb_vcp_call_back)(Buf, *Len);
-	}
+    if(usb_vcp_call_back != NULL)
+    {
+        (*usb_vcp_call_back)(Buf, *Len);
+    }
 
-  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
-  return (USBD_OK);
-  /* USER CODE END 6 */
+    USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+    USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+    return (USBD_OK);
+    /* USER CODE END 6 */
 }
 
 /**
@@ -296,61 +296,62 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   */
 uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 {
-  uint8_t result = USBD_OK;
-  /* USER CODE BEGIN 7 */
-	fifo_s_puts(&usb_tx_fifo, (char*)Buf, Len);
-//  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
-//  if (hcdc->TxState != 0){
-//    return USBD_BUSY;
-//  }
-//  USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
-//  result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
-  /* USER CODE END 7 */
-  return result;
+    uint8_t result = USBD_OK;
+    /* USER CODE BEGIN 7 */
+    fifo_s_puts(&usb_tx_fifo, (char*)Buf, Len);
+    //  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
+    //  if (hcdc->TxState != 0){
+    //    return USBD_BUSY;
+    //  }
+    //  USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
+    //  result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+    /* USER CODE END 7 */
+    return result;
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 int32_t usb_tx_flush(void* argc)
 {
-	var_cpu_sr();
-	
-	uint8_t result = USBD_OK;
-	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
-	
-	if (hcdc->TxState != 0){
-    return USBD_BUSY;
-  }
-	else
-	{
-		uint32_t send_num;
+    var_cpu_sr();
 
-    enter_critical(); 
-		send_num = usb_tx_fifo.used_num;
-		fifo_s_gets_noprotect(&usb_tx_fifo, (char*)UserTxBufferFS, send_num);
-		exit_critical(); 
+    uint8_t result = USBD_OK;
+    USBD_CDC_HandleTypeDef* hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
 
-		USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, send_num);
-    result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
-		return result;
-	}
+    if(hcdc->TxState != 0)
+    {
+        return USBD_BUSY;
+    }
+    else
+    {
+        uint32_t send_num;
+
+        enter_critical();
+        send_num = usb_tx_fifo.used_num;
+        fifo_s_gets_noprotect(&usb_tx_fifo, (char*)UserTxBufferFS, send_num);
+        exit_critical();
+
+        USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, send_num);
+        result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+        return result;
+    }
 }
 
 int32_t usb_vcp_rx_callback_register(usb_vcp_call_back_f fun)
 {
-	if(usb_vcp_call_back == NULL)
-	{
-		usb_vcp_call_back = fun;
-		return USBD_OK;
-	}
-    
-  return USBD_FAIL;
+    if(usb_vcp_call_back == NULL)
+    {
+        usb_vcp_call_back = fun;
+        return USBD_OK;
+    }
+
+    return USBD_FAIL;
 }
 
-uint32_t usb_interface_send(uint8_t *p_data, uint16_t len)
+uint32_t usb_interface_send(uint8_t* p_data, uint16_t len)
 {
-  CDC_Transmit_FS(p_data, len);
-  return 0;
+    CDC_Transmit_FS(p_data, len);
+    return 0;
 }
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */

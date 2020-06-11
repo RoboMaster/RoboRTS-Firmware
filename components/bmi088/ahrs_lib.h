@@ -7,7 +7,7 @@
   * @brief          根据加速度的数据，磁力计的数据进行四元数初始化
   * @author         luopin
   * @param[in]      需要初始化的四元数数组
-  * @param[in]      用于初始化的加速度计,(x,y,z)不为空 单位 m/s2 
+  * @param[in]      用于初始化的加速度计,(x,y,z)不为空 单位 m/s2
   * @param[in]      用于初始化的磁力计计,(x,y,z)不为空 单位 uT
   * @retval         返回空
   */
@@ -19,7 +19,7 @@ extern void AHRS_init(fp32 quat[4], const fp32 accel[3], const fp32 mag[3]);
   * @param[in]      需要更新的四元数数组
   * @param[in]      更新定时时间，固定定时调用，例如1000Hz，传入的数据为0.001f,
   * @param[in]      用于更新的陀螺仪数据,数组顺序(x,y,z) 单位 rad
-  * @param[in]      用于初始化的加速度数据,数组顺序(x,y,z) 单位 m/s2 
+  * @param[in]      用于初始化的加速度数据,数组顺序(x,y,z) 单位 m/s2
   * @param[in]      用于初始化的磁力计数据,数组顺序(x,y,z) 单位 uT
   * @retval         返回空
   */
@@ -56,7 +56,7 @@ extern fp32 get_roll(const fp32 quat[4]);
   * @param[in]      返回的俯仰角pitch  单位 rad
   * @param[in]      返回的横滚角roll 单位 rad
   */
-extern void get_angle(const fp32 quat[4], fp32 *yaw, fp32 *pitch, fp32 *roll);
+extern void get_angle(const fp32 quat[4], fp32* yaw, fp32* pitch, fp32* roll);
 /**
   * @brief          返回当前的重力加速度
   * @author         luopin

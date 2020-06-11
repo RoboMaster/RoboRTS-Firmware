@@ -18,16 +18,20 @@
 #include "sys.h"
 #include "pid.h"
 
-static void abs_limit(float *a, float ABS_MAX)
+static void abs_limit(float* a, float ABS_MAX)
 {
-  if (*a > ABS_MAX)
-    *a = ABS_MAX;
-  if (*a < -ABS_MAX)
-    *a = -ABS_MAX;
+    if(*a > ABS_MAX)
+    {
+        *a = ABS_MAX;
+    }
+    if(*a < -ABS_MAX)
+    {
+        *a = -ABS_MAX;
+    }
 }
 
 static void pid_param_init(
-    struct pid *pid,
+    struct pid* pid,
     float maxout,
     float integral_limit,
     float kp,
@@ -35,12 +39,12 @@ static void pid_param_init(
     float kd)
 {
 
-  pid->param.integral_limit = integral_limit;
-  pid->param.max_out = maxout;
+    pid->param.integral_limit = integral_limit;
+    pid->param.max_out = maxout;
 
-  pid->param.p = kp;
-  pid->param.i = ki;
-  pid->param.d = kd;
+    pid->param.p = kp;
+    pid->param.i = ki;
+    pid->param.d = kd;
 }
 
 /**
@@ -49,16 +53,16 @@ static void pid_param_init(
   * @param[in] p/i/d: pid parameter
   * @retval    none
   */
-static void pid_reset(struct pid *pid, float kp, float ki, float kd)
+static void pid_reset(struct pid* pid, float kp, float ki, float kd)
 {
-  pid->param.p = kp;
-  pid->param.i = ki;
-  pid->param.d = kd;
+    pid->param.p = kp;
+    pid->param.i = ki;
+    pid->param.d = kd;
 
-  pid->pout = 0;
-  pid->iout = 0;
-  pid->dout = 0;
-  pid->out = 0;
+    pid->pout = 0;
+    pid->iout = 0;
+    pid->dout = 0;
+    pid->out = 0;
 }
 
 /**
@@ -68,35 +72,37 @@ static void pid_reset(struct pid *pid, float kp, float ki, float kd)
   * @param[in] set: target value
   * @retval    pid calculate output
   */
-float pid_calculate(struct pid *pid, float get, float set)
+float pid_calculate(struct pid* pid, float get, float set)
 {
-  pid->get = get;
-  pid->set = set;
-  pid->err = set - get;
-  if ((pid->param.input_max_err != 0) && (fabs(pid->err) > pid->param.input_max_err))
-    return 0;
+    pid->get = get;
+    pid->set = set;
+    pid->err = set - get;
+    if((pid->param.input_max_err != 0) && (fabs(pid->err) > pid->param.input_max_err))
+    {
+        return 0;
+    }
 
-  pid->pout = pid->param.p * pid->err;
-  pid->iout += pid->param.i * pid->err;
-  pid->dout = pid->param.d * (pid->err - pid->last_err);
+    pid->pout = pid->param.p * pid->err;
+    pid->iout += pid->param.i * pid->err;
+    pid->dout = pid->param.d * (pid->err - pid->last_err);
 
-  abs_limit(&(pid->iout), pid->param.integral_limit);
-  pid->out = pid->pout + pid->iout + pid->dout;
-  abs_limit(&(pid->out), pid->param.max_out);
+    abs_limit(&(pid->iout), pid->param.integral_limit);
+    pid->out = pid->pout + pid->iout + pid->dout;
+    abs_limit(&(pid->out), pid->param.max_out);
 
-	if(pid->enable == 0)
-	{
-		pid->out = 0;
-	}
+    if(pid->enable == 0)
+    {
+        pid->out = 0;
+    }
 
-  return pid->out;
+    return pid->out;
 }
 /**
   * @brief     initialize pid parameter
   * @retval    none
   */
 void pid_struct_init(
-    struct pid *pid,
+    struct pid* pid,
     float maxout,
     float integral_limit,
 
@@ -104,10 +110,10 @@ void pid_struct_init(
     float ki,
     float kd)
 {
-	pid->enable = 1;
-  pid->f_param_init = pid_param_init;
-  pid->f_pid_reset = pid_reset;
+    pid->enable = 1;
+    pid->f_param_init = pid_param_init;
+    pid->f_pid_reset = pid_reset;
 
-  pid->f_param_init(pid, maxout, integral_limit, kp, ki, kd);
-  pid->f_pid_reset(pid, kp, ki, kd);
+    pid->f_param_init(pid, maxout, integral_limit, kp, ki, kd);
+    pid->f_pid_reset(pid, kp, ki, kd);
 }

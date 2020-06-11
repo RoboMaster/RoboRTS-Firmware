@@ -58,11 +58,11 @@ TimerElem_t SoftTimer[TIMER_ELEMENT_NUM_MAX + 1];
 //******************************************************************************************
 void TimerISR_Hook(void)
 {
-    for (uint8_t i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
+    for(uint8_t i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
     {
-        if (SoftTimer[i].handle != 0)
+        if(SoftTimer[i].handle != 0)
         {
-            if (SoftTimer[i].delay)
+            if(SoftTimer[i].delay)
             {
                 SoftTimer[i].delay--;
             }
@@ -88,7 +88,7 @@ uint16_t soft_timer_init(void)
     uint8_t i = 0;
 
     // Clear All Elements
-    for (i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
+    for(i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
     {
         SoftTimer[i].handle = 0;
         SoftTimer[i].delay = 0;
@@ -102,7 +102,7 @@ uint16_t soft_timer_destory(void)
     uint8_t i = 0;
 
     // Clear All Elements
-    for (i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
+    for(i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
     {
         SoftTimer[i].handle = 0;
         SoftTimer[i].delay = 0;
@@ -129,9 +129,9 @@ uint16_t soft_timer_req(uint32_t Tick)
 {
     uint8_t i = 0;
 
-    for (i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
+    for(i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
     {
-        if (SoftTimer[i].handle == 0)
+        if(SoftTimer[i].handle == 0)
         {
             CRITICAL_SETCION_ENTER();
 
@@ -160,9 +160,9 @@ uint16_t soft_timer_req(uint32_t Tick)
 //******************************************************************************************
 uint16_t soft_timer_update(uint32_t Id, uint32_t Tick)
 {
-    for (uint8_t i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
+    for(uint8_t i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
     {
-        if (SoftTimer[i].handle == Id)
+        if(SoftTimer[i].handle == Id)
         {
             CRITICAL_SETCION_ENTER();
 
@@ -201,9 +201,9 @@ uint16_t soft_timer_check(uint16_t Handle)
     uint16_t retval = SOFT_TIMER_ERR;
 
     CRITICAL_SETCION_ENTER();
-    if (SoftTimer[Handle].handle == Handle)
+    if(SoftTimer[Handle].handle == Handle)
     {
-        if (SoftTimer[Handle].delay)
+        if(SoftTimer[Handle].delay)
         {
             retval = SOFT_TIMER_ING;
         }

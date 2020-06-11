@@ -19,21 +19,21 @@
 #define __DRV_DR16_H__
 
 #ifdef DRV_DR16_H_GLOBAL
-  #define DRV_DR16_H_EXTERN
+    #define DRV_DR16_H_EXTERN
 #else
-  #define DRV_DR16_H_EXTERN extern
+    #define DRV_DR16_H_EXTERN extern
 #endif
 
 #include "fifo.h"
 
-typedef int32_t (*dr16_rx_callback_t)(uint8_t *buff, uint16_t len);
+typedef int32_t (*dr16_rx_callback_t)(uint8_t* buff, uint16_t len);
 
 #define DR16_RX_BUFFER_SIZE      (50u)
 #define DR16_DATA_LEN            (18u)
 
 void dr16_uart_init(dr16_rx_callback_t rx_fn,
-	                  dr16_rx_callback_t forword_fn);
+                    dr16_rx_callback_t forword_fn);
 
-uint32_t dr16_uart_rx_data_handle(UART_HandleTypeDef *huart);
+uint32_t dr16_uart_rx_data_handle(UART_HandleTypeDef* huart);
 
 #endif // __DRV_DR16_H__

@@ -45,93 +45,95 @@
 #define CMD_PUSH_CHASSIS_INFO               (0x0201u)
 struct cmd_chassis_info
 {
-  int16_t gyro_angle;
-  int16_t gyro_palstance;
-  int32_t position_x_mm;
-  int32_t position_y_mm;
-  int16_t angle_deg;
-  int16_t v_x_mm;
-  int16_t v_y_mm;
+    int16_t gyro_angle;
+    int16_t gyro_palstance;
+    int32_t position_x_mm;
+    int32_t position_y_mm;
+    int16_t angle_deg;
+    int16_t v_x_mm;
+    int16_t v_y_mm;
 };
 
 #define CMD_SET_CHASSIS_MODE                (0x0202u)
 #define CMD_SET_CHASSIS_SPEED               (0x0203u)
 struct cmd_chassis_speed
 {
-  int16_t vx; // forward/back
-  int16_t vy; // left/right
-  int16_t vw; // anticlockwise/clockwise
-  int16_t rotate_x_offset;
-  int16_t rotate_y_offset;
+    int16_t vx; // forward/back
+    int16_t vy; // left/right
+    int16_t vw; // anticlockwise/clockwise
+    int16_t rotate_x_offset;
+    int16_t rotate_y_offset;
 };
 
 #define CMD_GET_CHASSIS_PARAM               (0x0204u)
 struct cmd_chassis_param
 {
-  uint16_t wheel_perimeter; /* the perimeter(mm) of wheel */
-  uint16_t wheel_track;     /* wheel track distance(mm) */
-  uint16_t wheel_base;      /* wheelbase distance(mm) */
-  int16_t rotate_x_offset;
-  int16_t rotate_y_offset;
+    uint16_t wheel_perimeter; /* the perimeter(mm) of wheel */
+    uint16_t wheel_track;     /* wheel track distance(mm) */
+    uint16_t wheel_base;      /* wheelbase distance(mm) */
+    int16_t rotate_x_offset;
+    int16_t rotate_y_offset;
 };
 
 #define CMD_SET_CHASSIS_SPD_ACC             (0x0205u)
 struct cmd_chassis_spd_acc
 {
-  int16_t   vx;
-  int16_t   vy;
-  int16_t   vw;
+    int16_t   vx;
+    int16_t   vy;
+    int16_t   vw;
 
-  int16_t   ax;
-  int16_t   ay;
-  int16_t   wz;
+    int16_t   ax;
+    int16_t   ay;
+    int16_t   wz;
 
-  int16_t rotate_x_offset;
-  int16_t rotate_y_offset;
+    int16_t rotate_x_offset;
+    int16_t rotate_y_offset;
 };
 
 #define CMD_PUSH_GIMBAL_INFO                (0x0301u)
 struct cmd_gimbal_info
 {
-  uint8_t   mode;
-  /* unit: degree */
-  int16_t pitch_ecd_angle;
-  int16_t yaw_ecd_angle;
-  int16_t pitch_gyro_angle;
-  int16_t yaw_gyro_angle;
-  /* uint: degree/s */
-  int16_t yaw_rate;
-  int16_t pitch_rate;
+    uint8_t   mode;
+    /* unit: degree */
+    int16_t pitch_ecd_angle;
+    int16_t yaw_ecd_angle;
+    int16_t pitch_gyro_angle;
+    int16_t yaw_gyro_angle;
+    /* uint: degree/s */
+    int16_t yaw_rate;
+    int16_t pitch_rate;
 };
 
 #define CMD_SET_GIMBAL_MODE                 (0x0302u)
 #define CMD_SET_GIMBAL_ANGLE                (0x0303u)
 struct cmd_gimbal_angle
 {
-  union{
-    uint8_t flag;
-    struct{
-        uint8_t yaw_mode:1;  // 0 code angle
-        uint8_t pitch_mode:1;
-    }bit;
-  } ctrl;
-  int16_t pitch;
-  int16_t yaw;
+    union
+    {
+        uint8_t flag;
+        struct
+        {
+            uint8_t yaw_mode: 1; // 0 code angle
+            uint8_t pitch_mode: 1;
+        } bit;
+    } ctrl;
+    int16_t pitch;
+    int16_t yaw;
 };
 
 #define CMD_SET_FRICTION_SPEED              (0x0304u)
 struct cmd_firction_speed
 {
-  uint16_t left;
-  uint16_t right;
+    uint16_t left;
+    uint16_t right;
 };
 
 #define CMD_SET_SHOOT_FREQUENTCY            (0x0305u)
 struct cmd_shoot_num
 {
-  uint8_t  shoot_cmd;
-  uint32_t shoot_add_num;
-  uint16_t shoot_freq;
+    uint8_t  shoot_cmd;
+    uint32_t shoot_add_num;
+    uint16_t shoot_freq;
 };
 
 #define CMD_RC_DATA_FORWORD                 (0x0401u)

@@ -88,10 +88,10 @@ extern bool_t bmi088_gyro_self_test(void);
 extern bool_t bmi088_accel_init(void);
 extern bool_t bmi088_gyro_init(void);
 
-extern void BMI088_accel_read_over(uint8_t *rx_buf, fp32 accel[3], fp32 *time);
-extern void BMI088_gyro_read_over(uint8_t *rx_buf, fp32 gyro[3]);
-extern void BMI088_temperature_read_over(uint8_t *rx_buf, fp32 *temperate);
-extern void BMI088_Read(fp32 gyro[3], fp32 accel[3], fp32 *temperate);
+extern void BMI088_accel_read_over(uint8_t* rx_buf, fp32 accel[3], fp32* time);
+extern void BMI088_gyro_read_over(uint8_t* rx_buf, fp32 gyro[3]);
+extern void BMI088_temperature_read_over(uint8_t* rx_buf, fp32* temperate);
+extern void BMI088_Read(fp32 gyro[3], fp32 accel[3], fp32* temperate);
 extern uint32_t get_BMI088_sensor_time(void);
 extern fp32 get_BMI088_temperate(void);
 extern void get_BMI088_gyro(int16_t gyro[3]);

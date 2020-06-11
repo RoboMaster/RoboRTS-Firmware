@@ -75,7 +75,7 @@ typedef struct
 {
     uint16_t handle;                                       // Timer Resource Handle
     uint32_t delay;                                        // Delay Value
-}TimerElem_t;
+} TimerElem_t;
 
 //******************************************************************************************
 //!                           PUBLIC API

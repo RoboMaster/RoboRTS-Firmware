@@ -26,31 +26,31 @@
 
 struct ahrs_sensor
 {
-  float ax;
-  float ay;
-  float az;
+    float ax;
+    float ay;
+    float az;
 
-  float gx;
-  float gy;
-  float gz;
+    float gx;
+    float gy;
+    float gz;
 
-  float mx;
-  float my;
-  float mz;
+    float mx;
+    float my;
+    float mz;
 
-  float roll;
-  float pitch;
-  float yaw;
+    float roll;
+    float pitch;
+    float yaw;
 };
 
 struct uwb_data
 {
-  int16_t   x;
-  int16_t   y;
-  uint16_t  yaw;
-  int16_t   distance[6];
-  uint16_t  error;
-  uint16_t  res;
+    int16_t   x;
+    int16_t   y;
+    uint16_t  yaw;
+    int16_t   distance[6];
+    uint16_t  error;
+    uint16_t  res;
 };
 
 #endif // __AHRS_H__

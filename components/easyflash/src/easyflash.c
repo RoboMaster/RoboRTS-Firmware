@@ -50,11 +50,11 @@
 #include <easyflash.h>
 
 #if !defined(EF_START_ADDR)
-#error "Please configure backup area start address (in ef_cfg.h)"
+    #error "Please configure backup area start address (in ef_cfg.h)"
 #endif
 
 #if !defined(EF_ERASE_MIN_SIZE)
-#error "Please configure minimum size of flash erasure (in ef_cfg.h)"
+    #error "Please configure minimum size of flash erasure (in ef_cfg.h)"
 #endif
 
 /**
@@ -62,39 +62,46 @@
  *
  * @return result
  */
-EfErrCode easyflash_init(void) {
-    extern EfErrCode ef_port_init(ef_env const **default_env, size_t *default_env_size);
-    extern EfErrCode ef_env_init(ef_env const *default_env, size_t default_env_size);
+EfErrCode easyflash_init(void)
+{
+    extern EfErrCode ef_port_init(ef_env const** default_env, size_t* default_env_size);
+    extern EfErrCode ef_env_init(ef_env const * default_env, size_t default_env_size);
     extern EfErrCode ef_iap_init(void);
     extern EfErrCode ef_log_init(void);
 
     size_t default_env_set_size = 0;
-    const ef_env *default_env_set;
+    const ef_env* default_env_set;
     EfErrCode result = EF_NO_ERR;
 
     result = ef_port_init(&default_env_set, &default_env_set_size);
 
 #ifdef EF_USING_ENV
-    if (result == EF_NO_ERR) {
+    if(result == EF_NO_ERR)
+    {
         result = ef_env_init(default_env_set, default_env_set_size);
     }
 #endif
 
 #ifdef EF_USING_IAP
-    if (result == EF_NO_ERR) {
+    if(result == EF_NO_ERR)
+    {
         result = ef_iap_init();
     }
 #endif
 
 #ifdef EF_USING_LOG
-    if (result == EF_NO_ERR) {
+    if(result == EF_NO_ERR)
+    {
         result = ef_log_init();
     }
 #endif
 
-    if (result == EF_NO_ERR) {
+    if(result == EF_NO_ERR)
+    {
         EF_INFO("EasyFlash V%s is initialize success.", EF_SW_VERSION);
-    } else {
+    }
+    else
+    {
         EF_INFO("EasyFlash V%s is initialize fail.", EF_SW_VERSION);
     }
     EF_INFO("You can get the latest version on https://github.com/armink/EasyFlash .");

@@ -19,9 +19,9 @@
 #define __SINGLE_GYRO_H__
 
 #ifdef SINGLE_GYRO_H_GLOBAL
-  #define SINGLE_GYRO_H_EXTERN
+    #define SINGLE_GYRO_H_EXTERN
 #else
-  #define SINGLE_GYRO_H_EXTERN extern
+    #define SINGLE_GYRO_H_EXTERN extern
 #endif
 
 #include "stdint.h"
@@ -29,16 +29,16 @@
 
 struct single_gyro
 {
-	struct device parent;
-  uint32_t std_id;
-  float yaw_gyro_angle;
-  float yaw_gyro_rate;
+    struct device parent;
+    uint32_t std_id;
+    float yaw_gyro_angle;
+    float yaw_gyro_rate;
 };
 
-typedef int32_t (*gyro_can_send_t)(uint32_t std_id, uint8_t *can_rx_data);
+typedef int32_t (*gyro_can_send_t)(uint32_t std_id, uint8_t* can_rx_data);
 
-int32_t single_gyro_init(struct single_gyro *gyro, char* name, uint16_t std_id);
-int32_t single_gyro_update(struct single_gyro *gyro, uint16_t std_id, uint8_t can_rx_data[]);
+int32_t single_gyro_init(struct single_gyro* gyro, char* name, uint16_t std_id);
+int32_t single_gyro_update(struct single_gyro* gyro, uint16_t std_id, uint8_t can_rx_data[]);
 
 
 #endif // __SINGLE_GYRO_H__

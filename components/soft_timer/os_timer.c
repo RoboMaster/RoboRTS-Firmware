@@ -28,8 +28,8 @@ osThreadId timer_task_t;
   */
 void soft_timer_FreeRTOS_init(void)
 {
-  osThreadDef(TIMER_1MS, timer_task, OS_TIMER_PRIORITY, 0, OS_TIMER_STACK_SIZE);
-  timer_task_t = osThreadCreate(osThread(TIMER_1MS), NULL);
+    osThreadDef(TIMER_1MS, timer_task, OS_TIMER_PRIORITY, 0, OS_TIMER_STACK_SIZE);
+    timer_task_t = osThreadCreate(osThread(TIMER_1MS), NULL);
 }
 
 /**
@@ -37,44 +37,44 @@ void soft_timer_FreeRTOS_init(void)
   * @param[in] call_back_fucn/param/period
   * @retval    timer id
   */
-int32_t soft_timer_register(soft_timer_callback callback_t, void *argc, uint32_t ticks)
+int32_t soft_timer_register(soft_timer_callback callback_t, void* argc, uint32_t ticks)
 {
-  for (int i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
-  {
-    if (soft_timer[i].id == 0)
+    for(int i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
     {
-      soft_timer[i].id = soft_timer_req(ticks);
-      soft_timer[i].ticks = ticks;
-      soft_timer[i].argc = argc;
-      soft_timer[i].callback = callback_t;
-      return i;
+        if(soft_timer[i].id == 0)
+        {
+            soft_timer[i].id = soft_timer_req(ticks);
+            soft_timer[i].ticks = ticks;
+            soft_timer[i].argc = argc;
+            soft_timer[i].callback = callback_t;
+            return i;
+        }
     }
-  }
-  return 0;
+    return 0;
 }
 
 /* FreeRTOS soft timer thread */
-void timer_task(void const *argument)
+void timer_task(void const* argument)
 {
-  uint32_t period = osKernelSysTick();
+    uint32_t period = osKernelSysTick();
 
-  while (1)
-  {
-    TimerISR_Hook();
-
-    for (int i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
+    while(1)
     {
-      if ((soft_timer[i].id != 0) && (soft_timer[i].callback != NULL))
-      {
-        if (soft_timer_check(soft_timer[i].id) == SOFT_TIMER_TIMEOUT)
+        TimerISR_Hook();
+
+        for(int i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
         {
-          soft_timer[i].callback(soft_timer[i].argc);
+            if((soft_timer[i].id != 0) && (soft_timer[i].callback != NULL))
+            {
+                if(soft_timer_check(soft_timer[i].id) == SOFT_TIMER_TIMEOUT)
+                {
+                    soft_timer[i].callback(soft_timer[i].argc);
 
-          soft_timer_update(soft_timer[i].id, soft_timer[i].ticks);
+                    soft_timer_update(soft_timer[i].id, soft_timer[i].ticks);
+                }
+            }
         }
-      }
-    }
 
-    osDelayUntil(&period, 1);
-  }
+        osDelayUntil(&period, 1);
+    }
 }

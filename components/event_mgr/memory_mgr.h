@@ -4,7 +4,7 @@
 *  @date 2017-08-28
 *
 *  @brief
-*   0.9: 基本功能，固定大小的内存块复用   
+*   0.9: 基本功能，固定大小的内存块复用
 *
 *  @attention
 *   没有做线程安全，使用时必须加锁
@@ -21,20 +21,20 @@
 
 
 #ifndef NULL
-#define NULL    (void*)0
+    #define NULL    (void*)0
 #endif
 
 typedef struct
 {
-    void *freeList;
+    void* freeList;
     uint16_t freeNum;
     uint16_t blkSize;
-}memUint_t;
+} memUint_t;
 
-void MemPoolInit(memUint_t *pMemUint, void *memAddr, int blkNum, int blkSize);
-void MemAddBlksToPool(memUint_t *pMemUint, void *memAddr, int blkAddNum, int blkSize);
-void *MemGetBlk(memUint_t *pMemUint);
-int MemPutBlk(memUint_t *pMemUint, void *pMem);
+void MemPoolInit(memUint_t* pMemUint, void* memAddr, int blkNum, int blkSize);
+void MemAddBlksToPool(memUint_t* pMemUint, void* memAddr, int blkAddNum, int blkSize);
+void* MemGetBlk(memUint_t* pMemUint);
+int MemPutBlk(memUint_t* pMemUint, void* pMem);
 
 
 #endif

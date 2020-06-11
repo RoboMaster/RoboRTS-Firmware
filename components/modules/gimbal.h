@@ -27,11 +27,11 @@
 /************************** gimbal parameter *****************************/
 /* the ratio of motor encoder value translate to degree */
 #ifndef ENCODER_ANGLE_RATIO
-  #define ENCODER_ANGLE_RATIO    (8192.0f/360.0f)
+    #define ENCODER_ANGLE_RATIO    (8192.0f/360.0f)
 #endif
 
 #ifndef RAD_TO_DEG
-#define RAD_TO_DEG 57.29f
+    #define RAD_TO_DEG 57.29f
 #endif
 
 /* the deceleration ratio of pitch axis motor */
@@ -61,105 +61,106 @@
 #define YAW_CLOCKWISE (1u)
 #define YAW_ANTICLOCKWISE (2u)
 
-typedef struct gimbal *gimbal_t;
+typedef struct gimbal* gimbal_t;
 
 struct gimbal_param
 {
-  uint16_t pitch_ecd_center;
-  uint16_t yaw_ecd_center;
+    uint16_t pitch_ecd_center;
+    uint16_t yaw_ecd_center;
 };
 
 struct gimbal_p_y
 {
-  /* unit: degree */
-  float yaw;
-  float pitch;
+    /* unit: degree */
+    float yaw;
+    float pitch;
 };
 
 struct gimbal_rate
 {
-  /* unit: degree/s */
-  float yaw_rate;
-  float pitch_rate;
+    /* unit: degree/s */
+    float yaw_rate;
+    float pitch_rate;
 };
 
 struct gimbal_sensor
 {
-  struct gimbal_p_y gyro_angle;
-  struct gimbal_rate rate;
+    struct gimbal_p_y gyro_angle;
+    struct gimbal_rate rate;
 };
 
 struct gimbal
 {
-  struct device parent;
-  struct gimbal_param param;
+    struct device parent;
+    struct gimbal_param param;
 
-  union {
-    uint8_t state;
-    struct
+    union
     {
-      uint8_t yaw_mode : 1;
-      uint8_t pitch_mode : 1;
-    } bit;
-  } mode;
+        uint8_t state;
+        struct
+        {
+            uint8_t yaw_mode : 1;
+            uint8_t pitch_mode : 1;
+        } bit;
+    } mode;
 
-  struct gimbal_sensor sensor;
-  struct gimbal_p_y ecd_angle;
+    struct gimbal_sensor sensor;
+    struct gimbal_p_y ecd_angle;
 
-  struct gimbal_p_y gyro_target_angle;
-  struct gimbal_p_y ecd_target_angle;
+    struct gimbal_p_y gyro_target_angle;
+    struct gimbal_p_y ecd_target_angle;
 
-  struct motor_device yaw_motor;
-	struct pid yaw_inter_pid;
-	struct pid yaw_outer_pid;
+    struct motor_device yaw_motor;
+    struct pid yaw_inter_pid;
+    struct pid yaw_outer_pid;
 
-	struct motor_device pitch_motor;
-  struct pid pitch_inter_pid;
-	struct pid pitch_outer_pid;
+    struct motor_device pitch_motor;
+    struct pid pitch_inter_pid;
+    struct pid pitch_outer_pid;
 };
 
 struct gimbal_info
 {
-  uint8_t mode;
-  float yaw_ecd_angle;
-  float pitch_ecd_angle;
-  float yaw_gyro_angle;
-  float pitch_gyro_angle;
-  float yaw_rate;
-  float pitch_rate;
+    uint8_t mode;
+    float yaw_ecd_angle;
+    float pitch_ecd_angle;
+    float yaw_gyro_angle;
+    float pitch_gyro_angle;
+    float yaw_rate;
+    float pitch_rate;
 };
 
-int32_t gimbal_cascade_init(struct gimbal *gimbal, const char *name,
-														struct pid_param yaw_inter_param,
-														struct pid_param yaw_outer_param,
-														struct pid_param pitch_inter_param,
-														struct pid_param pitch_outer_param,
-														enum device_can can);
+int32_t gimbal_cascade_init(struct gimbal* gimbal, const char* name,
+                            struct pid_param yaw_inter_param,
+                            struct pid_param yaw_outer_param,
+                            struct pid_param pitch_inter_param,
+                            struct pid_param pitch_outer_param,
+                            enum device_can can);
 
-int32_t gimbal_pid_init(struct gimbal *gimbal, const char *name, enum device_can can);
-int32_t gimbal_cascade_calculate(struct gimbal *gimbal);
+int32_t gimbal_pid_init(struct gimbal* gimbal, const char* name, enum device_can can);
+int32_t gimbal_cascade_calculate(struct gimbal* gimbal);
 
-int32_t gimbal_yaw_gyro_update(struct gimbal *gimbal, float yaw);
-int32_t gimbal_pitch_gyro_update(struct gimbal *gimbal, float pitch);
-int32_t gimbal_rate_update(struct gimbal *gimbal, float yaw_rate, float pitch_rate);
+int32_t gimbal_yaw_gyro_update(struct gimbal* gimbal, float yaw);
+int32_t gimbal_pitch_gyro_update(struct gimbal* gimbal, float pitch);
+int32_t gimbal_rate_update(struct gimbal* gimbal, float yaw_rate, float pitch_rate);
 
-int32_t gimbal_set_pitch_mode(struct gimbal *gimbal, uint8_t mode);
-int32_t gimbal_set_yaw_mode(struct gimbal *gimbal, uint8_t mode);
+int32_t gimbal_set_pitch_mode(struct gimbal* gimbal, uint8_t mode);
+int32_t gimbal_set_yaw_mode(struct gimbal* gimbal, uint8_t mode);
 
-int32_t gimbal_set_pitch_delta(struct gimbal *gimbal, float pitch);
-int32_t gimbal_set_yaw_delta(struct gimbal *gimbal, float yaw);
-int32_t gimbal_set_pitch_speed(struct gimbal *gimbal, float pitch);
-int32_t gimbal_set_yaw_speed(struct gimbal *gimbal, float yaw);
-int32_t gimbal_set_pitch_angle(struct gimbal *gimbal, float pitch);
-int32_t gimbal_set_yaw_angle(struct gimbal *gimbal, float yaw, uint8_t mode);
+int32_t gimbal_set_pitch_delta(struct gimbal* gimbal, float pitch);
+int32_t gimbal_set_yaw_delta(struct gimbal* gimbal, float yaw);
+int32_t gimbal_set_pitch_speed(struct gimbal* gimbal, float pitch);
+int32_t gimbal_set_yaw_speed(struct gimbal* gimbal, float yaw);
+int32_t gimbal_set_pitch_angle(struct gimbal* gimbal, float pitch);
+int32_t gimbal_set_yaw_angle(struct gimbal* gimbal, float yaw, uint8_t mode);
 
-int32_t gimbal_set_offset(struct gimbal *gimbal, uint16_t yaw_ecd, uint16_t pitch_ecd);
+int32_t gimbal_set_offset(struct gimbal* gimbal, uint16_t yaw_ecd, uint16_t pitch_ecd);
 
-int32_t gimbal_pitch_enable(struct gimbal *gimbal);
-int32_t gimbal_pitch_disable(struct gimbal *gimbal);
-int32_t gimbal_yaw_enable(struct gimbal *gimbal);
-int32_t gimbal_yaw_disable(struct gimbal *gimbal);
+int32_t gimbal_pitch_enable(struct gimbal* gimbal);
+int32_t gimbal_pitch_disable(struct gimbal* gimbal);
+int32_t gimbal_yaw_enable(struct gimbal* gimbal);
+int32_t gimbal_yaw_disable(struct gimbal* gimbal);
 
-int32_t gimbal_get_info(struct gimbal *gimbal, struct gimbal_info *info);
+int32_t gimbal_get_info(struct gimbal* gimbal, struct gimbal_info* info);
 
 #endif // __GIMBAL_H__

@@ -62,28 +62,28 @@ struct app_manage
 {
     uint8_t local_addr;
 
-    struct protocol_recv_cmd_obj *recv_cmd_table;
+    struct protocol_recv_cmd_obj* recv_cmd_table;
     uint16_t recv_cmd_tab_size;
 
-    struct protocol_send_cfg_obj *send_cfg_table;
+    struct protocol_send_cfg_obj* send_cfg_table;
     uint16_t send_cfg_tab_size;
 
-    struct offline_obj *offline_table;
+    struct offline_obj* offline_table;
     uint16_t offline_tab_size;
 
-    struct route_obj *route_table;
+    struct route_obj* route_table;
     uint16_t route_tab_size;
 
-    void (*referee_cmd_callback)(uint16_t cmd_id, uint8_t *pdata, uint16_t len);
+    void (*referee_cmd_callback)(uint16_t cmd_id, uint8_t* pdata, uint16_t len);
     void (*dbus_rx_complete)(void);
 
     void (*user_key_callback)(void);
     void (*user_input_callback)(void);
 
-    void (*can1_msg_callback)(uint16_t std_id, uint8_t *data, uint8_t dlc);
-    void (*can2_msg_callback)(uint16_t std_id, uint8_t *data, uint8_t dlc);
+    void (*can1_msg_callback)(uint16_t std_id, uint8_t* data, uint8_t dlc);
+    void (*can2_msg_callback)(uint16_t std_id, uint8_t* data, uint8_t dlc);
 };
 
-struct app_manage *get_current_app(void);
+struct app_manage* get_current_app(void);
 void app_protocol_init(void);
 #endif

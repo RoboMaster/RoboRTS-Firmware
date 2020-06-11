@@ -19,12 +19,12 @@
 #define __SHOOT_TASK_H__
 
 #ifdef SHOOT_TASK_H_GLOBAL
-  #define SHOOT_TASK_H_EXTERN
+    #define SHOOT_TASK_H_EXTERN
 #else
-  #define SHOOT_TASK_H_EXTERN extern
+    #define SHOOT_TASK_H_EXTERN extern
 #endif
 
-void shoot_task(void const * argument);
-struct shoot *get_shoot(void);
+void shoot_task(void const* argument);
+struct shoot* get_shoot(void);
 
 #endif // __SHOOT_TASK_H__
