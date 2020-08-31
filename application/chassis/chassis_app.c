@@ -41,6 +41,8 @@ void chassis_control_offline(void);
 void gimbal_info_offline(void);
 void gimbal_info_online(void);
 
+void referee_data_send2pc(uint16_t cmd_id, uint8_t* pdata, uint16_t len);
+
 /* no send cmd need ack */
 struct protocol_send_cfg_obj chassis_send_cfg_table[] = {0};
 
@@ -109,6 +111,8 @@ void chassis_app_init(void)
 
     app->user_input_callback = chassis_input_handle;
     app->user_key_callback = chassis_user_key_handle;
+
+    app->referee_cmd_callback = referee_data_send2pc;
 
     soft_timer_register(chassis_info_push, p_chassis, 10);
 
@@ -233,4 +237,7 @@ void gimbal_info_online(void)
     return;
 }
 
-
+void referee_data_send2pc(uint16_t cmd_id, uint8_t* pdata, uint16_t len)
+{
+    protocol_send(MANIFOLD2_ADDRESS, cmd_id + 0x4000, pdata, len);
+}
