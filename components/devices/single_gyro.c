@@ -27,7 +27,7 @@
   * @param
   * @retval error code
   */
-int32_t single_gyro_init(struct single_gyro* gyro, char* name, uint16_t std_id)
+int32_t single_gyro_init(struct single_gyro *gyro, char *name, uint16_t std_id)
 {
     device_assert(gyro != NULL);
 
@@ -44,11 +44,11 @@ int32_t single_gyro_init(struct single_gyro* gyro, char* name, uint16_t std_id)
   * @param
   * @retval error code
   */
-int32_t single_gyro_update(struct single_gyro* gyro, uint16_t std_id, uint8_t can_rx_data[])
+int32_t single_gyro_update(struct single_gyro *gyro, uint16_t std_id, uint8_t can_rx_data[])
 {
     device_assert(gyro != NULL);
 
-    if(std_id == gyro->std_id)
+    if (std_id == gyro->std_id)
     {
         gyro->yaw_gyro_angle = 0.001f * ((int32_t)(can_rx_data[0] << 24) |
                                          (can_rx_data[1] << 16) |

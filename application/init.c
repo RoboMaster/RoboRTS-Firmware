@@ -45,7 +45,7 @@ void task_init(void)
 {
     uint8_t app = 0;
     app = get_sys_cfg();
-    if(app == CHASSIS_APP)
+    if (app == CHASSIS_APP)
     {
         chassis_app_init();
     }
@@ -65,10 +65,10 @@ void sys_task(void)
     sensor_task_init();
 }
 
-void vApplicationStackOverflowHook(xTaskHandle xTask, signed char* pcTaskName)
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
 {
     debug_raw_printf("\r\n %s Stack Over flow! \r\n", pcTaskName);
-    while(1)
+    while (1)
         ;
 }
 
@@ -82,7 +82,7 @@ void vApplicationMallocFailedHook(void)
   * @param
   * @retval void
   */
-void services_task(void const* argument)
+void services_task(void const *argument)
 {
     /* init code for USB_DEVICE */
     MX_USB_DEVICE_Init();
@@ -94,7 +94,7 @@ void services_task(void const* argument)
     log_printf("\r\nRoboMaster>");
     /* USER CODE BEGIN services_task */
     /* Infinite loop */
-    for(;;)
+    for (;;)
     {
         osDelay(100);
     }

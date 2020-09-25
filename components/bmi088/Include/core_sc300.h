@@ -1391,7 +1391,7 @@ __STATIC_INLINE void NVIC_DisableIRQ(IRQn_Type IRQn)
  */
 __STATIC_INLINE uint32_t NVIC_GetPendingIRQ(IRQn_Type IRQn)
 {
-    return((uint32_t)(((NVIC->ISPR[(((uint32_t)(int32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)(int32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
+    return ((uint32_t)(((NVIC->ISPR[(((uint32_t)(int32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)(int32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
 }
 
 
@@ -1430,7 +1430,7 @@ __STATIC_INLINE void NVIC_ClearPendingIRQ(IRQn_Type IRQn)
  */
 __STATIC_INLINE uint32_t NVIC_GetActive(IRQn_Type IRQn)
 {
-    return((uint32_t)(((NVIC->IABR[(((uint32_t)(int32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)(int32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
+    return ((uint32_t)(((NVIC->IABR[(((uint32_t)(int32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)(int32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
 }
 
 
@@ -1445,7 +1445,7 @@ __STATIC_INLINE uint32_t NVIC_GetActive(IRQn_Type IRQn)
  */
 __STATIC_INLINE void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
 {
-    if((int32_t)IRQn < 0)
+    if ((int32_t)IRQn < 0)
     {
         SCB->SHP[(((uint32_t)(int32_t)IRQn) & 0xFUL) - 4UL] = (uint8_t)((priority << (8 - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL);
     }
@@ -1470,13 +1470,13 @@ __STATIC_INLINE void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
 __STATIC_INLINE uint32_t NVIC_GetPriority(IRQn_Type IRQn)
 {
 
-    if((int32_t)IRQn < 0)
+    if ((int32_t)IRQn < 0)
     {
-        return(((uint32_t)SCB->SHP[(((uint32_t)(int32_t)IRQn) & 0xFUL) - 4UL] >> (8 - __NVIC_PRIO_BITS)));
+        return (((uint32_t)SCB->SHP[(((uint32_t)(int32_t)IRQn) & 0xFUL) - 4UL] >> (8 - __NVIC_PRIO_BITS)));
     }
     else
     {
-        return(((uint32_t)NVIC->IP[((uint32_t)(int32_t)IRQn)]               >> (8 - __NVIC_PRIO_BITS)));
+        return (((uint32_t)NVIC->IP[((uint32_t)(int32_t)IRQn)]               >> (8 - __NVIC_PRIO_BITS)));
     }
 }
 
@@ -1521,7 +1521,7 @@ __STATIC_INLINE uint32_t NVIC_EncodePriority(uint32_t PriorityGroup, uint32_t Pr
     \param [out] pPreemptPriority  Preemptive priority value (starting from 0).
     \param [out]     pSubPriority  Subpriority value (starting from 0).
  */
-__STATIC_INLINE void NVIC_DecodePriority(uint32_t Priority, uint32_t PriorityGroup, uint32_t* pPreemptPriority, uint32_t* pSubPriority)
+__STATIC_INLINE void NVIC_DecodePriority(uint32_t Priority, uint32_t PriorityGroup, uint32_t *pPreemptPriority, uint32_t *pSubPriority)
 {
     uint32_t PriorityGroupTmp = (PriorityGroup & (uint32_t)0x07UL);   /* only values 0..7 are used          */
     uint32_t PreemptPriorityBits;
@@ -1547,7 +1547,7 @@ __STATIC_INLINE void NVIC_SystemReset(void)
                              (SCB->AIRCR & SCB_AIRCR_PRIGROUP_Msk) |
                              SCB_AIRCR_SYSRESETREQ_Msk);             /* Keep priority group unchanged */
     __DSB();                                                          /* Ensure completion of memory access */
-    while(1)
+    while (1)
     {
         __NOP();  /* wait until reset */
     }
@@ -1583,7 +1583,7 @@ __STATIC_INLINE void NVIC_SystemReset(void)
  */
 __STATIC_INLINE uint32_t SysTick_Config(uint32_t ticks)
 {
-    if((ticks - 1UL) > SysTick_LOAD_RELOAD_Msk)
+    if ((ticks - 1UL) > SysTick_LOAD_RELOAD_Msk)
     {
         return (1UL);  /* Reload value impossible */
     }
@@ -1626,10 +1626,10 @@ extern volatile int32_t ITM_RxBuffer;                    /*!< External variable 
  */
 __STATIC_INLINE uint32_t ITM_SendChar(uint32_t ch)
 {
-    if(((ITM->TCR & ITM_TCR_ITMENA_Msk) != 0UL) &&       /* ITM enabled */
+    if (((ITM->TCR & ITM_TCR_ITMENA_Msk) != 0UL) &&      /* ITM enabled */
             ((ITM->TER & 1UL) != 0UL))                       /* ITM Port #0 enabled */
     {
-        while(ITM->PORT[0].u32 == 0UL)
+        while (ITM->PORT[0].u32 == 0UL)
         {
             __NOP();
         }
@@ -1650,7 +1650,7 @@ __STATIC_INLINE int32_t ITM_ReceiveChar(void)
 {
     int32_t ch = -1;                           /* no character available */
 
-    if(ITM_RxBuffer != ITM_RXBUFFER_EMPTY)
+    if (ITM_RxBuffer != ITM_RXBUFFER_EMPTY)
     {
         ch = ITM_RxBuffer;
         ITM_RxBuffer = ITM_RXBUFFER_EMPTY;       /* ready for next character */
@@ -1670,7 +1670,7 @@ __STATIC_INLINE int32_t ITM_ReceiveChar(void)
 __STATIC_INLINE int32_t ITM_CheckChar(void)
 {
 
-    if(ITM_RxBuffer == ITM_RXBUFFER_EMPTY)
+    if (ITM_RxBuffer == ITM_RXBUFFER_EMPTY)
     {
         return (0);                                 /* no character available */
     }

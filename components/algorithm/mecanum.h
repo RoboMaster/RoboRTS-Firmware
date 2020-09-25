@@ -102,7 +102,7 @@ struct mecanum_motor_fdb
     float speed_rpm;
 };
 
-void mecanum_calculate(struct mecanum* mec);
-void mecanum_position_measure(struct mecanum* mec, struct mecanum_motor_fdb wheel_fdb[]);
+void mecanum_calculate(struct mecanum *mec);
+void mecanum_position_measure(struct mecanum *mec, struct mecanum_motor_fdb wheel_fdb[]);
 
 #endif // __MECANUM_H__

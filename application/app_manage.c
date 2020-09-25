@@ -19,7 +19,7 @@
 
 struct app_manage current_app;
 
-struct app_manage* get_current_app(void)
+struct app_manage *get_current_app(void)
 {
     return &current_app;
 }
@@ -35,18 +35,18 @@ void app_protocol_init(void)
 
     protocol_set_local_address(current_app.local_addr);
 
-    if(current_app.recv_cmd_table != NULL)
+    if (current_app.recv_cmd_table != NULL)
     {
-        for(int i = 0; i < current_app.recv_cmd_tab_size; i++)
+        for (int i = 0; i < current_app.recv_cmd_tab_size; i++)
         {
             protocol_rcv_cmd_register(current_app.recv_cmd_table[i].cmd,
                                       current_app.recv_cmd_table[i].rcv_callback);
         }
     }
 
-    if(current_app.send_cfg_table != NULL)
+    if (current_app.send_cfg_table != NULL)
     {
-        for(int i = 0; i < current_app.send_cfg_tab_size; i++)
+        for (int i = 0; i < current_app.send_cfg_tab_size; i++)
         {
             protocol_send_cmd_config(current_app.send_cfg_table[i].cmd,
                                      current_app.send_cfg_table[i].resend_times,
@@ -57,9 +57,9 @@ void app_protocol_init(void)
         }
     }
 
-    if(current_app.offline_table != NULL)
+    if (current_app.offline_table != NULL)
     {
-        for(int i = 0; i < current_app.offline_tab_size; i++)
+        for (int i = 0; i < current_app.offline_tab_size; i++)
         {
             obj.event = current_app.offline_table[i].event;
             obj.enable = current_app.offline_table[i].enable;
@@ -76,9 +76,9 @@ void app_protocol_init(void)
         }
     }
 
-    if(current_app.route_table != NULL)
+    if (current_app.route_table != NULL)
     {
-        for(int i = 0; i < current_app.route_tab_size; i++)
+        for (int i = 0; i < current_app.route_tab_size; i++)
         {
             protocol_set_route(current_app.route_table[i].address,
                                current_app.route_table[i].interface);

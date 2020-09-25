@@ -25,7 +25,7 @@
 
 osThreadId chassis_task_t;
 
-static void chassis_can2_callback(uint16_t std_id, uint8_t* data, uint8_t dlc);
+static void chassis_can2_callback(uint16_t std_id, uint8_t *data, uint8_t dlc);
 static void chassis_user_key_handle(void);
 static void chassis_offline(void);
 static void chassis_online(void);
@@ -41,7 +41,7 @@ void chassis_control_offline(void);
 void gimbal_info_offline(void);
 void gimbal_info_online(void);
 
-void referee_data_send2pc(uint16_t cmd_id, uint8_t* pdata, uint16_t len);
+void referee_data_send2pc(uint16_t cmd_id, uint8_t *pdata, uint16_t len);
 
 /* no send cmd need ack */
 struct protocol_send_cfg_obj chassis_send_cfg_table[] = {0};
@@ -86,7 +86,7 @@ struct route_obj chassis_route_table[] =
   */
 void chassis_app_init(void)
 {
-    struct app_manage* app;
+    struct app_manage *app;
     chassis_t p_chassis;
 
     protocol_can_interface_register("can1_0x500_to_0x600", 1024, 1, CAN1_PORT, GIMBAL_CAN_ID, CHASSIS_CAN_ID, can1_std_transmit);
@@ -125,9 +125,9 @@ void chassis_app_init(void)
   * @param
   * @retval void
   */
-void chassis_can2_callback(uint16_t std_id, uint8_t* data, uint8_t dlc)
+void chassis_can2_callback(uint16_t std_id, uint8_t *data, uint8_t dlc)
 {
-    switch(std_id)
+    switch (std_id)
     {
     case 0x201:
         offline_event_time_update(OFFLINE_CHASSIS_MOTOR1);
@@ -237,7 +237,7 @@ void gimbal_info_online(void)
     return;
 }
 
-void referee_data_send2pc(uint16_t cmd_id, uint8_t* pdata, uint16_t len)
+void referee_data_send2pc(uint16_t cmd_id, uint8_t *pdata, uint16_t len)
 {
     protocol_send(MANIFOLD2_ADDRESS, cmd_id + 0x4000, pdata, len);
 }

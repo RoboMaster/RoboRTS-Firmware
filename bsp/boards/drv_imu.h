@@ -29,13 +29,13 @@
 
 #define BMI088_PARAM_KEY "BMI088_PARAM"
 
-void bmi088_get_data(struct ahrs_sensor* sensor);
-void bmi088_get_temp(float* tmp);
+void bmi088_get_data(struct ahrs_sensor *sensor);
+void bmi088_get_temp(float *tmp);
 uint8_t bmi088_device_init(void);
 
-int ahrs_update(struct ahrs_sensor* atti, uint8_t period_ms);
+int ahrs_update(struct ahrs_sensor *atti, uint8_t period_ms);
 
-int32_t imu_temp_keep(void* argc);
+int32_t imu_temp_keep(void *argc);
 void imu_temp_ctrl_init(void);
 uint8_t bmi088_set_offset(void);
 uint8_t bmi088_get_offset(void);

@@ -32,14 +32,14 @@ struct pid_param turn_motor_param =
     .integral_limit = 10000,
 };
 
-static void shoot_dr16_data_update(uint32_t eventID, void* pMsgData, uint32_t timeStamp);
+static void shoot_dr16_data_update(uint32_t eventID, void *pMsgData, uint32_t timeStamp);
 
 struct shoot shoot;
 struct rc_device shoot_rc;
 
 int32_t shoot_firction_toggle(shoot_t p_shoot);
 
-void shoot_task(void const* argument)
+void shoot_task(void const *argument)
 {
     uint32_t shoot_time = 0;
 
@@ -50,37 +50,37 @@ void shoot_task(void const* argument)
 
     rc_device_register(&shoot_rc, "Shoot RC");
 
-    soft_timer_register((soft_timer_callback)shoot_pid_calculate, (void*)&shoot, 5);
+    soft_timer_register((soft_timer_callback)shoot_pid_calculate, (void *)&shoot, 5);
 
     shoot_pid_init(&shoot, "Shoot", turn_motor_param, DEVICE_CAN2);
 
-    while(1)
+    while (1)
     {
         /* dr16 data update */
         EventMsgProcess(&listSubs, 0);
 
-        if(rc_device_get_state(&shoot_rc, RC_S1_MID2UP) == E_OK)
+        if (rc_device_get_state(&shoot_rc, RC_S1_MID2UP) == E_OK)
         {
             shoot_firction_toggle(&shoot);
         }
 
-        if(rc_device_get_state(&shoot_rc, RC_S1_MID2DOWN) == E_OK)
+        if (rc_device_get_state(&shoot_rc, RC_S1_MID2DOWN) == E_OK)
         {
             shoot_set_cmd(&shoot, SHOOT_ONCE_CMD, 1);
             shoot_time = get_time_ms();
         }
 
-        if(rc_device_get_state(&shoot_rc, RC_S2_DOWN) != E_OK)
+        if (rc_device_get_state(&shoot_rc, RC_S2_DOWN) != E_OK)
         {
-            if(rc_device_get_state(&shoot_rc, RC_S1_DOWN) == E_OK)
+            if (rc_device_get_state(&shoot_rc, RC_S1_DOWN) == E_OK)
             {
-                if(get_time_ms() - shoot_time > 2500)
+                if (get_time_ms() - shoot_time > 2500)
                 {
                     shoot_set_cmd(&shoot, SHOOT_CONTINUOUS_CMD, 0);
                 }
             }
 
-            if(rc_device_get_state(&shoot_rc, RC_S1_MID) == E_OK)
+            if (rc_device_get_state(&shoot_rc, RC_S1_MID) == E_OK)
             {
                 shoot_set_cmd(&shoot, SHOOT_STOP_CMD, 0);
             }
@@ -92,7 +92,7 @@ void shoot_task(void const* argument)
 int32_t shoot_firction_toggle(shoot_t p_shoot)
 {
     static uint8_t toggle = 0;
-    if(toggle)
+    if (toggle)
     {
         shoot_set_fric_speed(p_shoot, 1000, 1000);
     }
@@ -104,7 +104,7 @@ int32_t shoot_firction_toggle(shoot_t p_shoot)
     return 0;
 }
 
-struct shoot* get_shoot(void)
+struct shoot *get_shoot(void)
 {
     return &shoot;
 }
@@ -114,7 +114,7 @@ struct shoot* get_shoot(void)
   * @param
   * @retval void
   */
-static void shoot_dr16_data_update(uint32_t eventID, void* pMsgData, uint32_t timeStamp)
+static void shoot_dr16_data_update(uint32_t eventID, void *pMsgData, uint32_t timeStamp)
 {
     rc_device_date_update(&shoot_rc, pMsgData);
 }

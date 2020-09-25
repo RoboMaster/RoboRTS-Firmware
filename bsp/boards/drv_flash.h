@@ -24,7 +24,7 @@
 #define FLASH_USER_START_ADDR ADDR_FLASH_SECTOR_2      /* Start @ of user Flash area */
 #define FLASH_USER_END_ADDR ADDR_FLASH_SECTOR_9       /* End @ of user Flash area */
 
-uint8_t BSP_FLASH_Write(uint8_t* pbuff, uint32_t len);
+uint8_t BSP_FLASH_Write(uint8_t *pbuff, uint32_t len);
 uint32_t GetSector(uint32_t Address);
 
 #endif // __DRV_FLASH_H__

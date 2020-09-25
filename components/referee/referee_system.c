@@ -28,12 +28,12 @@ static ref_send_handler_t ref_protocol_send;
 static ref_rx_complete_callabck_t  ref_rx_complete;
 static ref_cmd_callback_t ref_cmd_callback;
 
-static uint8_t  ref_get_crc8(uint8_t* p_msg, uint32_t len, uint8_t crc8) ;
-static uint32_t ref_verify_crc8(uint8_t* p_msg, uint32_t len);
-static void     ref_append_crc8(uint8_t* p_msg, uint32_t len);
-static uint16_t ref_get_crc16(uint8_t* p_msg, uint16_t len, uint16_t crc16);
-static uint32_t ref_verify_crc16(uint8_t* p_msg, uint32_t len);
-static void     ref_append_crc16(uint8_t* p_msg, uint16_t len) ;
+static uint8_t  ref_get_crc8(uint8_t *p_msg, uint32_t len, uint8_t crc8) ;
+static uint32_t ref_verify_crc8(uint8_t *p_msg, uint32_t len);
+static void     ref_append_crc8(uint8_t *p_msg, uint32_t len);
+static uint16_t ref_get_crc16(uint8_t *p_msg, uint16_t len, uint16_t crc16);
+static uint32_t ref_verify_crc16(uint8_t *p_msg, uint32_t len);
+static void     ref_append_crc16(uint8_t *p_msg, uint16_t len) ;
 
 /**
   * @brief  referee system rx fifo init
@@ -48,7 +48,7 @@ void referee_param_init(ref_send_handler_t send_t,
 
     /* initial judge data unpack object */
     referee_unpack_obj.data_fifo = &referee_rxdata_fifo;
-    referee_unpack_obj.p_header = (frame_header_t*)referee_unpack_obj.protocol_packet;
+    referee_unpack_obj.p_header = (frame_header_t *)referee_unpack_obj.protocol_packet;
     referee_unpack_obj.index = 0;
     referee_unpack_obj.data_len = 0;
     referee_unpack_obj.unpack_step = STEP_HEADER_SOF;
@@ -58,11 +58,11 @@ void referee_param_init(ref_send_handler_t send_t,
     ref_cmd_callback = cmd_callback;
 }
 
-uint32_t referee_uart_rx_data_handle(uint8_t* data, uint16_t len)
+uint32_t referee_uart_rx_data_handle(uint8_t *data, uint16_t len)
 {
-    fifo_s_puts(&referee_rxdata_fifo, (char*)data, len);
+    fifo_s_puts(&referee_rxdata_fifo, (char *)data, len);
 
-    if(ref_rx_complete != NULL)
+    if (ref_rx_complete != NULL)
     {
         ref_rx_complete(data, len);
     }
@@ -70,22 +70,22 @@ uint32_t referee_uart_rx_data_handle(uint8_t* data, uint16_t len)
     return 0;
 }
 
-void referee_data_handler(uint8_t* p_frame)
+void referee_data_handler(uint8_t *p_frame)
 {
-    frame_header_t* p_header = (frame_header_t*)p_frame;
+    frame_header_t *p_header = (frame_header_t *)p_frame;
     memcpy(p_header, p_frame, REF_PROTOCOL_HEADER_SIZE);
 
     uint16_t data_length = p_header->data_length;
-    uint16_t cmd_id      = *(uint16_t*)(p_frame + REF_PROTOCOL_HEADER_SIZE);
-    uint8_t* data_addr   = p_frame + REF_PROTOCOL_HEADER_SIZE + REF_PROTOCOL_CMD_SIZE;
+    uint16_t cmd_id      = *(uint16_t *)(p_frame + REF_PROTOCOL_HEADER_SIZE);
+    uint8_t *data_addr   = p_frame + REF_PROTOCOL_HEADER_SIZE + REF_PROTOCOL_CMD_SIZE;
 
-    if(ref_cmd_callback != NULL)
+    if (ref_cmd_callback != NULL)
     {
         ref_cmd_callback(cmd_id, data_addr, data_length);
     }
 }
 
-static uint16_t referee_protocol_pack(uint8_t* p_out, uint8_t* p_in, uint16_t len, uint16_t cmd_id)
+static uint16_t referee_protocol_pack(uint8_t *p_out, uint8_t *p_in, uint16_t len, uint16_t cmd_id)
 {
     uint16_t headSize = REF_PROTOCOL_HEADER_SIZE;
     uint16_t frameSize = len + REF_HEADER_CRC_CMDID_LEN;
@@ -105,10 +105,10 @@ static uint16_t referee_protocol_pack(uint8_t* p_out, uint8_t* p_in, uint16_t le
 *           pdata: the point about data buffer
 *           len: the length of the data buffer
 */
-void referee_protocol_tansmit(uint16_t cmd_id, void* p_buf, uint16_t len)
+void referee_protocol_tansmit(uint16_t cmd_id, void *p_buf, uint16_t len)
 {
     uint8_t txBuf[REF_PROTOCOL_FRAME_MAX_SIZE] = {0};
-    frame_header_t* pHeader = (frame_header_t*)txBuf;
+    frame_header_t *pHeader = (frame_header_t *)txBuf;
     uint16_t frameSize;
 
     pHeader->sof                    = REF_PROTOCOL_HEADER;
@@ -116,7 +116,7 @@ void referee_protocol_tansmit(uint16_t cmd_id, void* p_buf, uint16_t len)
     pHeader->seq                    = ref_seq_num++;
 
     frameSize = referee_protocol_pack(txBuf, p_buf, len, cmd_id);
-    if(ref_protocol_send != NULL)
+    if (ref_protocol_send != NULL)
     {
         ref_protocol_send(txBuf, frameSize);
     }
@@ -131,16 +131,16 @@ void referee_unpack_fifo_data(void)
 {
     uint8_t byte = 0;
     uint8_t sof = REF_PROTOCOL_HEADER;
-    unpack_data_t* p_obj = &referee_unpack_obj;
+    unpack_data_t *p_obj = &referee_unpack_obj;
 
-    while(fifo_s_used(p_obj->data_fifo))
+    while (fifo_s_used(p_obj->data_fifo))
     {
         byte = fifo_s_get(p_obj->data_fifo);
-        switch(p_obj->unpack_step)
+        switch (p_obj->unpack_step)
         {
         case STEP_HEADER_SOF:
         {
-            if(byte == sof)
+            if (byte == sof)
             {
                 p_obj->unpack_step = STEP_LENGTH_LOW;
                 p_obj->protocol_packet[p_obj->index++] = byte;
@@ -165,7 +165,7 @@ void referee_unpack_fifo_data(void)
             p_obj->data_len |= (byte << 8);
             p_obj->protocol_packet[p_obj->index++] = byte;
 
-            if(p_obj->data_len < (REF_PROTOCOL_FRAME_MAX_SIZE - REF_HEADER_CRC_CMDID_LEN))
+            if (p_obj->data_len < (REF_PROTOCOL_FRAME_MAX_SIZE - REF_HEADER_CRC_CMDID_LEN))
             {
                 p_obj->unpack_step = STEP_FRAME_SEQ;
             }
@@ -188,9 +188,9 @@ void referee_unpack_fifo_data(void)
         {
             p_obj->protocol_packet[p_obj->index++] = byte;
 
-            if(p_obj->index == REF_PROTOCOL_HEADER_SIZE)
+            if (p_obj->index == REF_PROTOCOL_HEADER_SIZE)
             {
-                if(ref_verify_crc8(p_obj->protocol_packet, REF_PROTOCOL_HEADER_SIZE))
+                if (ref_verify_crc8(p_obj->protocol_packet, REF_PROTOCOL_HEADER_SIZE))
                 {
                     p_obj->unpack_step = STEP_DATA_CRC16;
                 }
@@ -205,16 +205,16 @@ void referee_unpack_fifo_data(void)
 
         case STEP_DATA_CRC16:
         {
-            if(p_obj->index < (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
+            if (p_obj->index < (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
             {
                 p_obj->protocol_packet[p_obj->index++] = byte;
             }
-            if(p_obj->index >= (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
+            if (p_obj->index >= (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
             {
                 p_obj->unpack_step = STEP_HEADER_SOF;
                 p_obj->index = 0;
 
-                if(ref_verify_crc16(p_obj->protocol_packet, REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
+                if (ref_verify_crc16(p_obj->protocol_packet, REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
                 {
                     referee_data_handler(p_obj->protocol_packet);
                 }
@@ -254,17 +254,17 @@ static const uint8_t ref_crc8_tab[256] =
 };
 
 
-static uint8_t ref_get_crc8(uint8_t* p_msg, uint32_t len, uint8_t crc8)
+static uint8_t ref_get_crc8(uint8_t *p_msg, uint32_t len, uint8_t crc8)
 {
     uint8_t uc_index;
 
-    while(len--)
+    while (len--)
     {
         uc_index = crc8 ^ (*p_msg++);
         crc8  = ref_crc8_tab[uc_index];
     }
 
-    return(crc8);
+    return (crc8);
 }
 
 
@@ -273,11 +273,11 @@ static uint8_t ref_get_crc8(uint8_t* p_msg, uint32_t len, uint8_t crc8)
 **  Input:        Data to Verify,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-static uint32_t ref_verify_crc8(uint8_t* p_msg, uint32_t len)
+static uint32_t ref_verify_crc8(uint8_t *p_msg, uint32_t len)
 {
     uint8_t uc_expected = 0;
 
-    if((p_msg == 0) || (len <= 2))
+    if ((p_msg == 0) || (len <= 2))
     {
         return 0;
     }
@@ -293,16 +293,16 @@ static uint32_t ref_verify_crc8(uint8_t* p_msg, uint32_t len)
 **  Input:        Data to CRC and append,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-static void ref_append_crc8(uint8_t* p_msg, uint32_t len)
+static void ref_append_crc8(uint8_t *p_msg, uint32_t len)
 {
     uint8_t crc8 = 0;
 
-    if((p_msg == 0) || (len <= 2))
+    if ((p_msg == 0) || (len <= 2))
     {
         return;
     }
 
-    crc8 = ref_get_crc8((uint8_t*)p_msg, len - 1, ref_crc8_init);
+    crc8 = ref_get_crc8((uint8_t *)p_msg, len - 1, ref_crc8_init);
 
     p_msg[len - 1] = crc8;
 }
@@ -352,16 +352,16 @@ static const uint16_t ref_crc16_tab[256] =
 **  Input:        Data to check,Stream length, initialized checksum
 **  Output:       CRC checksum
 */
-uint16_t ref_get_crc16(uint8_t* p_msg, uint16_t len, uint16_t crc16)
+uint16_t ref_get_crc16(uint8_t *p_msg, uint16_t len, uint16_t crc16)
 {
     uint8_t data;
 
-    if(p_msg == NULL)
+    if (p_msg == NULL)
     {
         return 0xFFFF;
     }
 
-    while(len--)
+    while (len--)
     {
         data = *p_msg++;
         (crc16) = ((uint16_t)(crc16) >> 8)  ^ ref_crc16_tab[((uint16_t)(crc16) ^ (uint16_t)(data)) & 0x00ff];
@@ -375,11 +375,11 @@ uint16_t ref_get_crc16(uint8_t* p_msg, uint16_t len, uint16_t crc16)
 **  Input:        Data to Verify,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-uint32_t ref_verify_crc16(uint8_t* p_msg, uint32_t len)
+uint32_t ref_verify_crc16(uint8_t *p_msg, uint32_t len)
 {
     uint16_t w_expected = 0;
 
-    if((p_msg == NULL) || (len <= 2))
+    if ((p_msg == NULL) || (len <= 2))
     {
         return 1;
     }
@@ -393,15 +393,15 @@ uint32_t ref_verify_crc16(uint8_t* p_msg, uint32_t len)
 **  Input:        Data to CRC and append,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-void ref_append_crc16(uint8_t* p_msg, uint16_t len)
+void ref_append_crc16(uint8_t *p_msg, uint16_t len)
 {
     uint16_t crc16 = 0;
 
-    if((p_msg == NULL) || (len <= 2))
+    if ((p_msg == NULL) || (len <= 2))
     {
         return;
     }
-    crc16 = ref_get_crc16((uint8_t*)p_msg, len - 2, ref_crc16_init);
+    crc16 = ref_get_crc16((uint8_t *)p_msg, len - 2, ref_crc16_init);
 
     p_msg[len - 2] = (uint8_t)(crc16 & 0x00ff);
     p_msg[len - 1] = (uint8_t)((crc16 >> 8) & 0x00ff);

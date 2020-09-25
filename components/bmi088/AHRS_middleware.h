@@ -55,8 +55,8 @@
     #define RAD_TO_ANGLE 57.295779513082320876798154814105f
 #endif
 
-extern void AHRS_get_height(fp32* high);
-extern void AHRS_get_latitude(fp32* latitude);
+extern void AHRS_get_height(fp32 *high);
+extern void AHRS_get_latitude(fp32 *latitude);
 extern fp32 AHRS_invSqrt(fp32 num);
 extern fp32 AHRS_sinf(fp32 angle);
 extern fp32 AHRS_cosf(fp32 angle);

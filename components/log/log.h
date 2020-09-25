@@ -29,7 +29,7 @@
 #define LOG_INFO     4
 #define LOG_DEBUG    5
 
-extern char* LOG_LEVEL_TAGS[];
+extern char *LOG_LEVEL_TAGS[];
 
 #if LOG_OUTPUT_MAX_LEN < 80
     #error "LOG_OUTPUT_MAX_LEN >= 80"
@@ -94,7 +94,7 @@ extern char* LOG_LEVEL_TAGS[];
 void set_global_log_level(uint8_t level);
 uint8_t get_global_log_level(void);
 
-void log_printf(char* fmt, ...);
-int  log_printf_to_buffer(char* buff, int size, char* fmt, ...);
+void log_printf(char *fmt, ...);
+int  log_printf_to_buffer(char *buff, int size, char *fmt, ...);
 
 #endif

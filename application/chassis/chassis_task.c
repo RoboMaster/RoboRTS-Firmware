@@ -34,8 +34,8 @@ struct pid_param chassis_motor_param =
     .integral_limit = 500,
 };
 
-static void chassis_dr16_data_update(uint32_t eventID, void* pMsgData, uint32_t timeStamp);
-static int32_t chassis_angle_broadcast(void* argv);
+static void chassis_dr16_data_update(uint32_t eventID, void *pMsgData, uint32_t timeStamp);
+static int32_t chassis_angle_broadcast(void *argv);
 
 struct chassis chassis;
 struct rc_device chassis_rc;
@@ -48,7 +48,7 @@ static float vx, vy, wz;
 struct pid pid_follow = {0};
 float follow_relative_angle;
 
-void chassis_task(void const* argument)
+void chassis_task(void const *argument)
 {
     rc_info_t p_rc_info;
 
@@ -66,12 +66,12 @@ void chassis_task(void const* argument)
 
     chassis_pid_init(&chassis, "Chassis", chassis_motor_param, DEVICE_CAN2);
 
-    soft_timer_register((soft_timer_callback)chassis_pid_calculate, (void*)&chassis, 5);
-    soft_timer_register((soft_timer_callback)chassis_angle_broadcast, (void*)NULL, 10);
+    soft_timer_register((soft_timer_callback)chassis_pid_calculate, (void *)&chassis, 5);
+    soft_timer_register((soft_timer_callback)chassis_angle_broadcast, (void *)NULL, 10);
 
     pid_struct_init(&pid_follow, MAX_CHASSIS_VW_SPEED, 50, 8.0f, 0.0f, 2.0f);
 
-    while(1)
+    while (1)
     {
         /* dr16 data update */
         EventMsgProcess(&listSubs, 0);
@@ -80,7 +80,7 @@ void chassis_task(void const* argument)
 
         chassis_gyro_updata(&chassis, chassis_gyro.yaw * RAD_TO_DEG, chassis_gyro.gz * RAD_TO_DEG);
 
-        if(rc_device_get_state(&chassis_rc, RC_S2_UP) == E_OK)
+        if (rc_device_get_state(&chassis_rc, RC_S2_UP) == E_OK)
         {
             vx = (float)p_rc_info->ch2 / 660 * MAX_CHASSIS_VX_SPEED;
             vy = -(float)p_rc_info->ch1 / 660 * MAX_CHASSIS_VY_SPEED;
@@ -90,7 +90,7 @@ void chassis_task(void const* argument)
             chassis_set_speed(&chassis, vx, vy, wz);
         }
 
-        if(rc_device_get_state(&chassis_rc, RC_S2_MID) == E_OK)
+        if (rc_device_get_state(&chassis_rc, RC_S2_MID) == E_OK)
         {
             vx = (float)p_rc_info->ch2 / 660 * MAX_CHASSIS_VX_SPEED;
             vy = -(float)p_rc_info->ch1 / 660 * MAX_CHASSIS_VY_SPEED;
@@ -100,29 +100,29 @@ void chassis_task(void const* argument)
             chassis_set_speed(&chassis, vx, vy, wz);
         }
 
-        if(rc_device_get_state(&chassis_rc, RC_S2_MID2DOWN) == E_OK)
+        if (rc_device_get_state(&chassis_rc, RC_S2_MID2DOWN) == E_OK)
         {
             chassis_set_speed(&chassis, 0, 0, 0);
             chassis_set_acc(&chassis, 0, 0, 0);
         }
 
-        if(rc_device_get_state(&chassis_rc, RC_S2_MID2UP) == E_OK)
+        if (rc_device_get_state(&chassis_rc, RC_S2_MID2UP) == E_OK)
         {
             chassis_set_speed(&chassis, 0, 0, 0);
             chassis_set_acc(&chassis, 0, 0, 0);
         }
 
-        if(rc_device_get_state(&chassis_rc, RC_S2_DOWN) == E_OK)
+        if (rc_device_get_state(&chassis_rc, RC_S2_DOWN) == E_OK)
         {
             offline_event_enable(OFFLINE_MANIFOLD2_HEART);
             offline_event_enable(OFFLINE_CONTROL_CMD);
 
-            if((p_rc_info->ch1 < -400) && (p_rc_info->ch2 < -400) && (p_rc_info->ch3 > 400) && (p_rc_info->ch4 < -400))
+            if ((p_rc_info->ch1 < -400) && (p_rc_info->ch2 < -400) && (p_rc_info->ch3 > 400) && (p_rc_info->ch4 < -400))
             {
                 static int cnt = 0;
                 cnt++;
                 /* 2 second */
-                if(cnt > 400)
+                if (cnt > 400)
                 {
                     motor_auto_set_id(DEVICE_CAN2);
                 }
@@ -145,7 +145,7 @@ void chassis_task(void const* argument)
   * @param
   * @retval void
   */
-int32_t chassis_angle_broadcast(void* argv)
+int32_t chassis_angle_broadcast(void *argv)
 {
     int32_t s_yaw, s_yaw_rate;
 
@@ -166,7 +166,7 @@ int32_t chassis_angle_broadcast(void* argv)
     return 0;
 }
 
-struct chassis* get_chassis(void)
+struct chassis *get_chassis(void)
 {
     return &chassis;
 }
@@ -176,7 +176,7 @@ struct chassis* get_chassis(void)
   * @param
   * @retval void
   */
-static void chassis_dr16_data_update(uint32_t eventID, void* pMsgData, uint32_t timeStamp)
+static void chassis_dr16_data_update(uint32_t eventID, void *pMsgData, uint32_t timeStamp)
 {
     rc_device_date_update(&chassis_rc, pMsgData);
 }
@@ -186,10 +186,10 @@ static void chassis_dr16_data_update(uint32_t eventID, void* pMsgData, uint32_t 
   * @param
   * @retval void
   */
-int32_t follow_angle_info_rcv(uint8_t* buff, uint16_t len)
+int32_t follow_angle_info_rcv(uint8_t *buff, uint16_t len)
 {
-    struct cmd_gimbal_info* info;
-    info = (struct cmd_gimbal_info*)buff;
+    struct cmd_gimbal_info *info;
+    info = (struct cmd_gimbal_info *)buff;
     follow_relative_angle = info->yaw_ecd_angle / 10.0f;
     offline_event_time_update(OFFLINE_GIMBAL_INFO);
     return 0;

@@ -40,11 +40,11 @@ local_info_t protocol_local_info =
   * @param[in] cmd code
   * @retval    send_cmd_info pointer
   */
-struct send_cmd_info* protocol_get_send_cmd_info(uint16_t cmd)
+struct send_cmd_info *protocol_get_send_cmd_info(uint16_t cmd)
 {
-    for(int i = 0; i < PROTOCOL_SEND_CMD_MAX_NUM; i++)
+    for (int i = 0; i < PROTOCOL_SEND_CMD_MAX_NUM; i++)
     {
-        if((protocol_local_info.send_cmd_info[i].cmd == cmd) && (protocol_local_info.send_cmd_info[i].used == 1))
+        if ((protocol_local_info.send_cmd_info[i].cmd == cmd) && (protocol_local_info.send_cmd_info[i].used == 1))
         {
             return &protocol_local_info.send_cmd_info[i];
         }
@@ -57,20 +57,20 @@ struct send_cmd_info* protocol_get_send_cmd_info(uint16_t cmd)
   * @param[in]
   * @retval    void
   */
-static void protocol_rcv_pack_handle(uint8_t* pack_data, uint16_t cmd, uint8_t session, uint8_t source_add)
+static void protocol_rcv_pack_handle(uint8_t *pack_data, uint16_t cmd, uint8_t session, uint8_t source_add)
 {
-    protocol_pack_desc_t* pack;
+    protocol_pack_desc_t *pack;
     uint16_t rcv_seq;
     int32_t err;
-    pack = (protocol_pack_desc_t*)(pack_data);
+    pack = (protocol_pack_desc_t *)(pack_data);
     rcv_seq = pack->seq_num;
 
-    for(int i = 0; i < PROTOCOL_RECV_CMD_MAX_NUM; i++)
+    for (int i = 0; i < PROTOCOL_RECV_CMD_MAX_NUM; i++)
     {
-        if((protocol_local_info.rcv_cmd_info[i].cmd == cmd) && (protocol_local_info.rcv_cmd_info[i].rcv_callback != NULL) && (protocol_local_info.rcv_cmd_info[i].used == 1))
+        if ((protocol_local_info.rcv_cmd_info[i].cmd == cmd) && (protocol_local_info.rcv_cmd_info[i].rcv_callback != NULL) && (protocol_local_info.rcv_cmd_info[i].used == 1))
         {
             err = protocol_local_info.rcv_cmd_info[i].rcv_callback(pack->pdata + 2, pack->data_len - PACK_HEADER_TAIL_LEN);
-            if(session != 0)
+            if (session != 0)
             {
                 protocol_ack(source_add, session, &err, sizeof(err), rcv_seq);
             }
@@ -88,9 +88,9 @@ static void protocol_rcv_pack_handle(uint8_t* pack_data, uint16_t cmd, uint8_t s
   */
 int32_t protocol_rcv_cmd_register(uint16_t cmd, rcv_handle_fn_t rcv_callback)
 {
-    for(int i = 0; i < PROTOCOL_RECV_CMD_MAX_NUM; i++)
+    for (int i = 0; i < PROTOCOL_RECV_CMD_MAX_NUM; i++)
     {
-        if(protocol_local_info.rcv_cmd_info[i].used == 0)
+        if (protocol_local_info.rcv_cmd_info[i].used == 0)
         {
             protocol_local_info.rcv_cmd_info[i].used = 1;
             protocol_local_info.rcv_cmd_info[i].cmd = cmd;
@@ -116,9 +116,9 @@ int32_t protocol_send_cmd_config(uint16_t cmd,
                                  ack_handle_fn_t ack_callback,
                                  no_ack_handle_fn_t no_ack_callback)
 {
-    for(int i = 0; i < PROTOCOL_SEND_CMD_MAX_NUM; i++)
+    for (int i = 0; i < PROTOCOL_SEND_CMD_MAX_NUM; i++)
     {
-        if(protocol_local_info.send_cmd_info[i].used == 0)
+        if (protocol_local_info.send_cmd_info[i].used == 0)
         {
             protocol_local_info.send_cmd_info[i].used = 1;
             protocol_local_info.send_cmd_info[i].cmd = cmd;
@@ -160,13 +160,13 @@ uint32_t protocol_local_object_init(void)
 
     /* little endian */
     const uint16_t endian_test = 0xAABB;
-    if(*((uint8_t*)(&endian_test)) == 0xAA)
+    if (*((uint8_t *)(&endian_test)) == 0xAA)
     {
         /* big endian is not support */
         status = PROTOCOL_ERR_UNSUPPORT_CPU;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
 
-        while(1)
+        while (1)
             ;
     }
 
@@ -175,7 +175,7 @@ uint32_t protocol_local_object_init(void)
     memset(protocol_local_info.route_table, 0xFF, PROTOCOL_ROUTE_TABLE_MAX_NUM);
 
 #if (PROTOCOL_AUTO_LOOPBACK == PROTOCOL_ENABLE)
-    struct perph_interface* interface;
+    struct perph_interface *interface;
 
     interface = &protocol_local_info.interface[0];
 
@@ -183,8 +183,8 @@ uint32_t protocol_local_object_init(void)
 
     strcpy(interface->object_name, "Local Loop Interface");
 
-    uint8_t* rcv_buf = protocol_p_malloc(PROTOCOL_LOOPBACK_SIZE);
-    if(rcv_buf == NULL)
+    uint8_t *rcv_buf = protocol_p_malloc(PROTOCOL_LOOPBACK_SIZE);
+    if (rcv_buf == NULL)
     {
         status = PROTOCOL_ERR_NOT_ENOUGH_MEM;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
@@ -201,13 +201,13 @@ uint32_t protocol_local_object_init(void)
     interface->is_valid = 1;
 #endif
 
-    for(int i = 0; i < PROTOCOL_SEND_CMD_MAX_NUM; i++)
+    for (int i = 0; i < PROTOCOL_SEND_CMD_MAX_NUM; i++)
     {
         /* initalization cmd is 0xFFFF */
         memset(&protocol_local_info.send_cmd_info[i].cmd, 0xFFFF, 2);
     }
 
-    for(int i = 0; i < PROTOCOL_RECV_CMD_MAX_NUM; i++)
+    for (int i = 0; i < PROTOCOL_RECV_CMD_MAX_NUM; i++)
     {
         /* initalization cmd is 0xFFFF */
         memset(&protocol_local_info.rcv_cmd_info[i].cmd, 0xFFFF, 2);
@@ -231,46 +231,46 @@ uint32_t protocol_local_object_init(void)
   *            session 0:no ack 1~31: need ack
   *  @retval   error code
   */
-uint32_t protocol_send(uint8_t reciver, uint16_t cmd, void* p_data, uint32_t data_len)
+uint32_t protocol_send(uint8_t reciver, uint16_t cmd, void *p_data, uint32_t data_len)
 {
     uint32_t status;
     uint8_t session = 0;
     uint8_t ack = 0;
 
-    struct send_cmd_info* cmd_info;
+    struct send_cmd_info *cmd_info;
     cmd_info = protocol_get_send_cmd_info(cmd);
 
-    struct perph_interface* int_obj;
+    struct perph_interface *int_obj;
     int_obj = protocol_s_get_route(reciver);
 
-    if(cmd_info != NULL)
+    if (cmd_info != NULL)
     {
         ack = cmd_info->ack_enable;
     }
 
-    if(reciver == PROTOCOL_BROADCAST_ADDR)
+    if (reciver == PROTOCOL_BROADCAST_ADDR)
     {
         status = protocol_s_broadcast_add_node(p_data, data_len, cmd);
     }
     else
     {
-        if(ack == 1)
+        if (ack == 1)
         {
             session = protocol_get_session(int_obj);
         }
         status = protocol_s_add_sendnode(reciver, session, PROTOCOL_PACK_NOR, p_data,
                                          data_len, cmd, 0);
     }
-    if(status == PROTOCOL_SUCCESS)
+    if (status == PROTOCOL_SUCCESS)
     {
-        if(protocol_local_info.send_list_add_callBack != NULL)
+        if (protocol_local_info.send_list_add_callBack != NULL)
         {
             protocol_local_info.send_list_add_callBack();
         }
     }
     else
     {
-        if(ack == 1)
+        if (ack == 1)
         {
             protocol_release_session(int_obj, session);
         }
@@ -284,14 +284,14 @@ uint32_t protocol_send(uint8_t reciver, uint16_t cmd, void* p_data, uint32_t dat
   *            session: this function is called when receiver session is not zero.
   * @retval    error code
   */
-uint32_t protocol_ack(uint8_t reciver, uint8_t session, void* p_data, uint32_t data_len, uint16_t ack_seq)
+uint32_t protocol_ack(uint8_t reciver, uint8_t session, void *p_data, uint32_t data_len, uint16_t ack_seq)
 {
     uint32_t status;
     status = protocol_s_add_sendnode(reciver, session, PROTOCOL_PACK_ACK, p_data,
                                      data_len, 0, ack_seq);
-    if(status == PROTOCOL_SUCCESS)
+    if (status == PROTOCOL_SUCCESS)
     {
-        if(protocol_local_info.send_list_add_callBack != NULL)
+        if (protocol_local_info.send_list_add_callBack != NULL)
         {
             protocol_local_info.send_list_add_callBack();
         }
@@ -306,24 +306,24 @@ uint32_t protocol_ack(uint8_t reciver, uint8_t session, void* p_data, uint32_t d
   */
 uint32_t protocol_send_flush(void)
 {
-    for(uint8_t i = 0; i < PROTOCOL_INTERFACE_MAX; i++)
+    for (uint8_t i = 0; i < PROTOCOL_INTERFACE_MAX; i++)
     {
-        if(protocol_local_info.interface[i].is_valid)
+        if (protocol_local_info.interface[i].is_valid)
         {
-            if(protocol_local_info.interface[i].send.normal_node_num > 0)
+            if (protocol_local_info.interface[i].send.normal_node_num > 0)
             {
                 protocol_s_interface_normal_send_flush(protocol_local_info.interface + i);
             }
-            if(protocol_local_info.interface[i].send.ack_node_num > 0)
+            if (protocol_local_info.interface[i].send.ack_node_num > 0)
             {
                 protocol_s_interface_ack_send_flush(protocol_local_info.interface + i);
             }
         }
     }
 
-    if(broadcast_object.is_valid)
+    if (broadcast_object.is_valid)
     {
-        if(broadcast_object.send_node_num > 0)
+        if (broadcast_object.send_node_num > 0)
         {
             protocol_s_broadcast_send_flush();
         }
@@ -338,9 +338,9 @@ uint32_t protocol_send_flush(void)
   */
 uint32_t protocol_unpack_flush(void)
 {
-    for(uint8_t i = 0; i < PROTOCOL_INTERFACE_MAX; i++)
+    for (uint8_t i = 0; i < PROTOCOL_INTERFACE_MAX; i++)
     {
-        if(protocol_local_info.interface[i].is_valid)
+        if (protocol_local_info.interface[i].is_valid)
         {
             protocol_s_extract(&(protocol_local_info.interface[i]));
         }
@@ -353,9 +353,9 @@ uint32_t protocol_unpack_flush(void)
   * @param[in] perph interface index
   * @retval    error code
   */
-uint32_t protocol_rcv_data(void* p_data, uint32_t data_len, struct perph_interface* perph)
+uint32_t protocol_rcv_data(void *p_data, uint32_t data_len, struct perph_interface *perph)
 {
-    struct perph_interface* obj;
+    struct perph_interface *obj;
     uint32_t rcv_length;
     uint32_t status;
 
@@ -363,7 +363,7 @@ uint32_t protocol_rcv_data(void* p_data, uint32_t data_len, struct perph_interfa
 
     status = PROTOCOL_SUCCESS;
 
-    if(protocol_local_info.is_valid == 0)
+    if (protocol_local_info.is_valid == 0)
     {
         status = PROTOCOL_ERR_PROTOCOL_NOT_INIT;
         //Interrupt On
@@ -374,7 +374,7 @@ uint32_t protocol_rcv_data(void* p_data, uint32_t data_len, struct perph_interfa
 
     rcv_length = fifo_s_puts_noprotect(&(obj->rcvd.fifo), p_data, data_len);
 
-    if(rcv_length < data_len)
+    if (rcv_length < data_len)
     {
         status = PROTOCOL_ERR_FIFO_FULL;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);

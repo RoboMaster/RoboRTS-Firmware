@@ -57,51 +57,51 @@ uint32_t GetSector(uint32_t Address)
 {
     uint32_t sector = 0;
 
-    if((Address < ADDR_FLASH_SECTOR_1) && (Address >= ADDR_FLASH_SECTOR_0))
+    if ((Address < ADDR_FLASH_SECTOR_1) && (Address >= ADDR_FLASH_SECTOR_0))
     {
         sector = FLASH_SECTOR_0;
     }
-    else if((Address < ADDR_FLASH_SECTOR_2) && (Address >= ADDR_FLASH_SECTOR_1))
+    else if ((Address < ADDR_FLASH_SECTOR_2) && (Address >= ADDR_FLASH_SECTOR_1))
     {
         sector = FLASH_SECTOR_1;
     }
-    else if((Address < ADDR_FLASH_SECTOR_3) && (Address >= ADDR_FLASH_SECTOR_2))
+    else if ((Address < ADDR_FLASH_SECTOR_3) && (Address >= ADDR_FLASH_SECTOR_2))
     {
         sector = FLASH_SECTOR_2;
     }
-    else if((Address < ADDR_FLASH_SECTOR_4) && (Address >= ADDR_FLASH_SECTOR_3))
+    else if ((Address < ADDR_FLASH_SECTOR_4) && (Address >= ADDR_FLASH_SECTOR_3))
     {
         sector = FLASH_SECTOR_3;
     }
-    else if((Address < ADDR_FLASH_SECTOR_5) && (Address >= ADDR_FLASH_SECTOR_4))
+    else if ((Address < ADDR_FLASH_SECTOR_5) && (Address >= ADDR_FLASH_SECTOR_4))
     {
         sector = FLASH_SECTOR_4;
     }
-    else if((Address < ADDR_FLASH_SECTOR_6) && (Address >= ADDR_FLASH_SECTOR_5))
+    else if ((Address < ADDR_FLASH_SECTOR_6) && (Address >= ADDR_FLASH_SECTOR_5))
     {
         sector = FLASH_SECTOR_5;
     }
-    else if((Address < ADDR_FLASH_SECTOR_7) && (Address >= ADDR_FLASH_SECTOR_6))
+    else if ((Address < ADDR_FLASH_SECTOR_7) && (Address >= ADDR_FLASH_SECTOR_6))
     {
         sector = FLASH_SECTOR_6;
     }
-    else if((Address < ADDR_FLASH_SECTOR_8) && (Address >= ADDR_FLASH_SECTOR_7))
+    else if ((Address < ADDR_FLASH_SECTOR_8) && (Address >= ADDR_FLASH_SECTOR_7))
     {
         sector = FLASH_SECTOR_7;
     }
-    else if((Address < ADDR_FLASH_SECTOR_9) && (Address >= ADDR_FLASH_SECTOR_8))
+    else if ((Address < ADDR_FLASH_SECTOR_9) && (Address >= ADDR_FLASH_SECTOR_8))
     {
         sector = FLASH_SECTOR_8;
     }
-    else if((Address < ADDR_FLASH_SECTOR_10) && (Address >= ADDR_FLASH_SECTOR_9))
+    else if ((Address < ADDR_FLASH_SECTOR_10) && (Address >= ADDR_FLASH_SECTOR_9))
     {
         sector = FLASH_SECTOR_9;
     }
-    else if((Address < ADDR_FLASH_SECTOR_11) && (Address >= ADDR_FLASH_SECTOR_10))
+    else if ((Address < ADDR_FLASH_SECTOR_11) && (Address >= ADDR_FLASH_SECTOR_10))
     {
         sector = FLASH_SECTOR_10;
     }
-    else if((Address < ADDR_FLASH_SECTOR_12) && (Address >= ADDR_FLASH_SECTOR_11))
+    else if ((Address < ADDR_FLASH_SECTOR_12) && (Address >= ADDR_FLASH_SECTOR_11))
     {
         sector = FLASH_SECTOR_11;
     }
@@ -162,7 +162,7 @@ uint32_t GetSector(uint32_t Address)
   * @retval flash write status
   */
 uint32_t SectorError;
-uint8_t BSP_FLASH_Write(uint8_t* pbuff, uint32_t len)
+uint8_t BSP_FLASH_Write(uint8_t *pbuff, uint32_t len)
 {
     FLASH_EraseInitTypeDef EraseInitStruct;
     /*erase flash before program */
@@ -174,11 +174,11 @@ uint8_t BSP_FLASH_Write(uint8_t* pbuff, uint32_t len)
     EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
     EraseInitStruct.Sector = WriteSector;
     EraseInitStruct.NbSectors = 1;
-    while(HAL_OK != HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError))
+    while (HAL_OK != HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError))
         ;
 
     /*start program flash*/
-    while(len--)
+    while (len--)
     {
         HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, start_addr, *pbuff);
         start_addr++;

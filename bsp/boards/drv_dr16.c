@@ -20,7 +20,7 @@
 
 extern UART_HandleTypeDef huart3;
 
-int UART_Receive_DMA_No_IT(UART_HandleTypeDef* huart, uint8_t* pData, uint32_t Size);
+int UART_Receive_DMA_No_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint32_t Size);
 
 dr16_rx_callback_t dr16_rx_callback = NULL;
 dr16_rx_callback_t dr16_forword_callback = NULL;
@@ -42,9 +42,9 @@ void dr16_uart_init(dr16_rx_callback_t rx_fn,
   * @param
   * @retval error code
   */
-uint32_t dr16_uart_rx_data_handle(UART_HandleTypeDef* huart)
+uint32_t dr16_uart_rx_data_handle(UART_HandleTypeDef *huart)
 {
-    if(__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE))
+    if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE))
     {
         /* clear idle it flag avoid idle interrupt all the time */
         __HAL_UART_CLEAR_IDLEFLAG(huart);
@@ -53,14 +53,14 @@ uint32_t dr16_uart_rx_data_handle(UART_HandleTypeDef* huart)
         __HAL_DMA_DISABLE(huart->hdmarx);
 
         /* handle dbus data dbus_buf from DMA */
-        if((DR16_RX_BUFFER_SIZE - huart->hdmarx->Instance->NDTR) == DR16_DATA_LEN)
+        if ((DR16_RX_BUFFER_SIZE - huart->hdmarx->Instance->NDTR) == DR16_DATA_LEN)
         {
-            if(dr16_rx_callback != NULL)
+            if (dr16_rx_callback != NULL)
             {
                 dr16_rx_callback(dr16_uart_rx_buff, DR16_DATA_LEN);
             }
 
-            if(dr16_forword_callback != NULL)
+            if (dr16_forword_callback != NULL)
             {
                 dr16_forword_callback(dr16_uart_rx_buff, DR16_DATA_LEN);
             }
@@ -78,14 +78,14 @@ uint32_t dr16_uart_rx_data_handle(UART_HandleTypeDef* huart)
   * @param
   * @retval error code
   */
-int UART_Receive_DMA_No_IT(UART_HandleTypeDef* huart, uint8_t* pData, uint32_t Size)
+int UART_Receive_DMA_No_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint32_t Size)
 {
     uint32_t tmp = 0;
 
     tmp = huart->RxState;
-    if(tmp == HAL_UART_STATE_READY)
+    if (tmp == HAL_UART_STATE_READY)
     {
-        if((pData == NULL) || (Size == 0))
+        if ((pData == NULL) || (Size == 0))
         {
             return HAL_ERROR;
         }

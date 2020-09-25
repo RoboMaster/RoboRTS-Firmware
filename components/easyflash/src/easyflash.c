@@ -64,39 +64,39 @@
  */
 EfErrCode easyflash_init(void)
 {
-    extern EfErrCode ef_port_init(ef_env const** default_env, size_t* default_env_size);
+    extern EfErrCode ef_port_init(ef_env const **default_env, size_t *default_env_size);
     extern EfErrCode ef_env_init(ef_env const * default_env, size_t default_env_size);
     extern EfErrCode ef_iap_init(void);
     extern EfErrCode ef_log_init(void);
 
     size_t default_env_set_size = 0;
-    const ef_env* default_env_set;
+    const ef_env *default_env_set;
     EfErrCode result = EF_NO_ERR;
 
     result = ef_port_init(&default_env_set, &default_env_set_size);
 
 #ifdef EF_USING_ENV
-    if(result == EF_NO_ERR)
+    if (result == EF_NO_ERR)
     {
         result = ef_env_init(default_env_set, default_env_set_size);
     }
 #endif
 
 #ifdef EF_USING_IAP
-    if(result == EF_NO_ERR)
+    if (result == EF_NO_ERR)
     {
         result = ef_iap_init();
     }
 #endif
 
 #ifdef EF_USING_LOG
-    if(result == EF_NO_ERR)
+    if (result == EF_NO_ERR)
     {
         result = ef_log_init();
     }
 #endif
 
-    if(result == EF_NO_ERR)
+    if (result == EF_NO_ERR)
     {
         EF_INFO("EasyFlash V%s is initialize success.", EF_SW_VERSION);
     }

@@ -33,8 +33,8 @@
 osThreadId gimbal_task_t;
 osThreadId shoot_task_t;
 
-static void gimbal_can1_callback(uint16_t std_id, uint8_t* data, uint8_t dlc);
-static void gimbal_can2_callback(uint16_t std_id, uint8_t* data, uint8_t dlc);
+static void gimbal_can1_callback(uint16_t std_id, uint8_t *data, uint8_t dlc);
+static void gimbal_can2_callback(uint16_t std_id, uint8_t *data, uint8_t dlc);
 
 void gimbal_user_key_handle(void);
 static void gimbal_dbus_rx_complete(void);
@@ -88,7 +88,7 @@ struct route_obj gimbal_route_table[] =
   */
 void gimbal_app_init(void)
 {
-    struct app_manage* app;
+    struct app_manage *app;
     gimbal_t p_gimbal;
 
     app = get_current_app();
@@ -124,7 +124,7 @@ void gimbal_app_init(void)
     gimbal_task_t = osThreadCreate(osThread(SHOOT_TASK), NULL);
 }
 
-void gimbal_can1_callback(uint16_t std_id, uint8_t* data, uint8_t dlc)
+void gimbal_can1_callback(uint16_t std_id, uint8_t *data, uint8_t dlc)
 {
     gimbal_gyro_yaw_update(std_id, data);
 }
@@ -134,9 +134,9 @@ void gimbal_can1_callback(uint16_t std_id, uint8_t* data, uint8_t dlc)
   * @param
   * @retval void
   */
-void gimbal_can2_callback(uint16_t std_id, uint8_t* data, uint8_t dlc)
+void gimbal_can2_callback(uint16_t std_id, uint8_t *data, uint8_t dlc)
 {
-    switch(std_id)
+    switch (std_id)
     {
     case 0x205:
         offline_event_time_update(OFFLINE_GIMBAL_YAW);
@@ -183,8 +183,8 @@ void gimbal_dbus_rx_complete(void)
 
 void gimbal_online(void)
 {
-    struct shoot* p_shoot;
-    struct gimbal* p_gimbal;
+    struct shoot *p_shoot;
+    struct gimbal *p_gimbal;
     p_shoot = get_shoot();
     p_gimbal = get_gimbal();
 
@@ -200,8 +200,8 @@ void gimbal_dbus_online(void)
 
 void gimbal_offline(void)
 {
-    struct shoot* p_shoot;
-    struct gimbal* p_gimbal;
+    struct shoot *p_shoot;
+    struct gimbal *p_gimbal;
     p_shoot = get_shoot();
     p_gimbal = get_gimbal();
 
@@ -214,14 +214,14 @@ void gimbal_heart_offline(void)
 {
     set_gimbal_sdk_mode(GIMBAL_SDK_OFF);
 
-    struct gimbal* p_gimbal;
+    struct gimbal *p_gimbal;
     p_gimbal = get_gimbal();
     gimbal_set_pitch_mode(p_gimbal, ENCODER_MODE);
     gimbal_set_pitch_angle(p_gimbal, 0);
     gimbal_set_yaw_mode(p_gimbal, ENCODER_MODE);
     gimbal_set_yaw_angle(p_gimbal, 0, 0);
 
-    struct shoot* p_shoot;
+    struct shoot *p_shoot;
     p_shoot = get_shoot();
     shoot_disable(p_shoot);
 
@@ -235,7 +235,7 @@ void gimbal_heart_online(void)
     //  struct gimbal *p_gimbal;
     //  p_gimbal = get_gimbal();
 
-    struct shoot* p_shoot;
+    struct shoot *p_shoot;
     p_shoot = get_shoot();
     shoot_enable(p_shoot);
 

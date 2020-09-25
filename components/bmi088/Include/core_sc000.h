@@ -720,7 +720,7 @@ __STATIC_INLINE void NVIC_DisableIRQ(IRQn_Type IRQn)
  */
 __STATIC_INLINE uint32_t NVIC_GetPendingIRQ(IRQn_Type IRQn)
 {
-    return((uint32_t)(((NVIC->ISPR[0] & (1UL << (((uint32_t)(int32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
+    return ((uint32_t)(((NVIC->ISPR[0] & (1UL << (((uint32_t)(int32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
 }
 
 
@@ -759,7 +759,7 @@ __STATIC_INLINE void NVIC_ClearPendingIRQ(IRQn_Type IRQn)
  */
 __STATIC_INLINE void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
 {
-    if((int32_t)(IRQn) < 0)
+    if ((int32_t)(IRQn) < 0)
     {
         SCB->SHP[_SHP_IDX(IRQn)] = ((uint32_t)(SCB->SHP[_SHP_IDX(IRQn)] & ~(0xFFUL << _BIT_SHIFT(IRQn))) |
                                     (((priority << (8 - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn)));
@@ -786,13 +786,13 @@ __STATIC_INLINE void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
 __STATIC_INLINE uint32_t NVIC_GetPriority(IRQn_Type IRQn)
 {
 
-    if((int32_t)(IRQn) < 0)
+    if ((int32_t)(IRQn) < 0)
     {
-        return((uint32_t)(((SCB->SHP[_SHP_IDX(IRQn)] >> _BIT_SHIFT(IRQn)) & (uint32_t)0xFFUL) >> (8 - __NVIC_PRIO_BITS)));
+        return ((uint32_t)(((SCB->SHP[_SHP_IDX(IRQn)] >> _BIT_SHIFT(IRQn)) & (uint32_t)0xFFUL) >> (8 - __NVIC_PRIO_BITS)));
     }
     else
     {
-        return((uint32_t)(((NVIC->IP[ _IP_IDX(IRQn)] >> _BIT_SHIFT(IRQn)) & (uint32_t)0xFFUL) >> (8 - __NVIC_PRIO_BITS)));
+        return ((uint32_t)(((NVIC->IP[ _IP_IDX(IRQn)] >> _BIT_SHIFT(IRQn)) & (uint32_t)0xFFUL) >> (8 - __NVIC_PRIO_BITS)));
     }
 }
 
@@ -808,7 +808,7 @@ __STATIC_INLINE void NVIC_SystemReset(void)
     SCB->AIRCR  = ((0x5FAUL << SCB_AIRCR_VECTKEY_Pos) |
                    SCB_AIRCR_SYSRESETREQ_Msk);
     __DSB();                                                     /* Ensure completion of memory access */
-    while(1)
+    while (1)
     {
         __NOP();  /* wait until reset */
     }
@@ -844,7 +844,7 @@ __STATIC_INLINE void NVIC_SystemReset(void)
  */
 __STATIC_INLINE uint32_t SysTick_Config(uint32_t ticks)
 {
-    if((ticks - 1UL) > SysTick_LOAD_RELOAD_Msk)
+    if ((ticks - 1UL) > SysTick_LOAD_RELOAD_Msk)
     {
         return (1UL); /* Reload value impossible */
     }

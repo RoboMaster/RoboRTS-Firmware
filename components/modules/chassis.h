@@ -29,7 +29,7 @@
 #include "pid.h"
 #include "single_gyro.h"
 
-typedef struct chassis* chassis_t;
+typedef struct chassis *chassis_t;
 
 struct chassis_acc
 {
@@ -59,18 +59,18 @@ struct chassis_info
     float yaw_gyro_rate;
     float wheel_rpm[4];
 };
-int32_t chassis_pid_init(struct chassis* chassis, const char* name, struct pid_param param, enum device_can can);
-int32_t chassis_pid_calculate(struct chassis* chassis);
+int32_t chassis_pid_init(struct chassis *chassis, const char *name, struct pid_param param, enum device_can can);
+int32_t chassis_pid_calculate(struct chassis *chassis);
 
-int32_t chassis_gyro_updata(struct chassis* chassis, float yaw_angle, float yaw_rate);
-int32_t chassis_set_vw(struct chassis* chassis, float vw);
-int32_t chassis_set_vx_vy(struct chassis* chassis, float vx, float vy);
-int32_t chassis_set_speed(struct chassis* chassis, float vx, float vy, float vw);
-int32_t chassis_set_acc(struct chassis* chassis, float ax, float ay, float wz);
-int32_t chassis_set_offset(struct chassis* chassis, float offset_x, float offset_y);
-int32_t chassis_get_info(struct chassis* chassis, struct chassis_info* info);
+int32_t chassis_gyro_updata(struct chassis *chassis, float yaw_angle, float yaw_rate);
+int32_t chassis_set_vw(struct chassis *chassis, float vw);
+int32_t chassis_set_vx_vy(struct chassis *chassis, float vx, float vy);
+int32_t chassis_set_speed(struct chassis *chassis, float vx, float vy, float vw);
+int32_t chassis_set_acc(struct chassis *chassis, float ax, float ay, float wz);
+int32_t chassis_set_offset(struct chassis *chassis, float offset_x, float offset_y);
+int32_t chassis_get_info(struct chassis *chassis, struct chassis_info *info);
 
-int32_t chassis_enable(struct chassis* chassis);
-int32_t chassis_disable(struct chassis* chassis);
+int32_t chassis_enable(struct chassis *chassis);
+int32_t chassis_disable(struct chassis *chassis);
 
 #endif // __CHASSIS_H__

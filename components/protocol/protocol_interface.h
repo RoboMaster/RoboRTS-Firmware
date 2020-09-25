@@ -53,7 +53,7 @@ enum interface_type
 typedef struct
 {
     fifo_s_t fifo;         /*!< Receive Buffer */
-    uint8_t* p_data;       /*!< Pointer To A Temp Memory When Unpack */
+    uint8_t *p_data;       /*!< Pointer To A Temp Memory When Unpack */
     uint16_t rcvd_num;     /*!< The Length Of Data That Has Been Received */
     uint16_t total_num;    /*!< The Total Data Length Of Current Package */
     uint8_t state;         /*!< Current Unpack state */
@@ -74,9 +74,9 @@ typedef struct
 /* Pointer to send function */
 union interface_send_fn_u
 {
-    void* fun;
-    uint32_t (*com_send_fn)(uint8_t* p_data, uint16_t len);
-    uint32_t (*can_send_fn)(uint16_t std_id, uint8_t* p_data, uint16_t len);
+    void *fun;
+    uint32_t (*com_send_fn)(uint8_t *p_data, uint16_t len);
+    uint32_t (*can_send_fn)(uint16_t std_id, uint8_t *p_data, uint16_t len);
 };
 
 union interface_user_data
@@ -108,22 +108,22 @@ struct perph_interface
     union interface_user_data user_data;
 };
 
-int32_t protocol_set_route(uint8_t tar_add, const char* name);
-struct perph_interface* protocol_get_interface(const char* name);
-int32_t protocol_interface_send_data(struct perph_interface* perph, uint8_t* buff, uint16_t len);
-uint32_t protocol_can_rcv_data(can_port_t can_port, uint32_t rcv_id, void* p_data, uint32_t data_len);
-uint32_t protocol_uart_rcv_data(com_port_t com_port, void* p_data, uint32_t data_len);
-int32_t protocol_can_interface_register(char* interface_name,
+int32_t protocol_set_route(uint8_t tar_add, const char *name);
+struct perph_interface *protocol_get_interface(const char *name);
+int32_t protocol_interface_send_data(struct perph_interface *perph, uint8_t *buff, uint16_t len);
+uint32_t protocol_can_rcv_data(can_port_t can_port, uint32_t rcv_id, void *p_data, uint32_t data_len);
+uint32_t protocol_uart_rcv_data(com_port_t com_port, void *p_data, uint32_t data_len);
+int32_t protocol_can_interface_register(char *interface_name,
                                         uint16_t rcv_buf_size,
                                         uint8_t broadcast_output_enable,
                                         can_port_t can_port,
                                         uint32_t can_tx_id,
                                         uint32_t can_rx_id,
-                                        uint32_t (*can_send_fn)(uint16_t std_id, uint8_t* p_data, uint16_t len));
-int32_t protocol_uart_interface_register(char* interface_name,
+                                        uint32_t (*can_send_fn)(uint16_t std_id, uint8_t *p_data, uint16_t len));
+int32_t protocol_uart_interface_register(char *interface_name,
         uint16_t rcv_buf_size,
         uint8_t broadcast_output_enable,
         com_port_t com_port,
-        uint32_t (*com_send_fn)(uint8_t* p_data, uint16_t len));
+        uint32_t (*com_send_fn)(uint8_t *p_data, uint16_t len));
 
 #endif // __PROTOCOL_INTERFACE_H__

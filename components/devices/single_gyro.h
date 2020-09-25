@@ -35,10 +35,10 @@ struct single_gyro
     float yaw_gyro_rate;
 };
 
-typedef int32_t (*gyro_can_send_t)(uint32_t std_id, uint8_t* can_rx_data);
+typedef int32_t (*gyro_can_send_t)(uint32_t std_id, uint8_t *can_rx_data);
 
-int32_t single_gyro_init(struct single_gyro* gyro, char* name, uint16_t std_id);
-int32_t single_gyro_update(struct single_gyro* gyro, uint16_t std_id, uint8_t can_rx_data[]);
+int32_t single_gyro_init(struct single_gyro *gyro, char *name, uint16_t std_id);
+int32_t single_gyro_update(struct single_gyro *gyro, uint16_t std_id, uint8_t can_rx_data[]);
 
 
 #endif // __SINGLE_GYRO_H__

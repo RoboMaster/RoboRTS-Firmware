@@ -51,9 +51,9 @@ fp32 gyro[3], accel[3], mag[3];
 static fp32 ins_quat[4];
 fp32 ins_angle[3];
 
-static void bmi088_cali_slove(fp32 gyro[3], fp32 accel[3], bmi088_real_data_t* bmi088);
+static void bmi088_cali_slove(fp32 gyro[3], fp32 accel[3], bmi088_real_data_t *bmi088);
 
-void bmi088_get_data(struct ahrs_sensor* sensor)
+void bmi088_get_data(struct ahrs_sensor *sensor)
 {
 
     BMI088_Read(bmi088_real_data.gyro, bmi088_real_data.accel, &temperate);
@@ -69,7 +69,7 @@ void bmi088_get_data(struct ahrs_sensor* sensor)
     sensor->gz = gyro[2];
 }
 
-void bmi088_get_temp(float* tmp)
+void bmi088_get_temp(float *tmp)
 {
     *tmp = temperate;
 }
@@ -94,7 +94,7 @@ uint8_t bmi088_device_init(void)
     return 0;
 }
 
-int ahrs_update(struct ahrs_sensor* sensor, uint8_t period_ms)
+int ahrs_update(struct ahrs_sensor *sensor, uint8_t period_ms)
 {
     BMI088_Read(bmi088_real_data.gyro, bmi088_real_data.accel, &temperate);
     bmi088_cali_slove(gyro, accel, &bmi088_real_data);
@@ -119,12 +119,12 @@ int ahrs_update(struct ahrs_sensor* sensor, uint8_t period_ms)
 /* temperature control, using pid */
 struct pid pid_imu_tmp;
 
-int32_t imu_temp_keep(void* argc)
+int32_t imu_temp_keep(void *argc)
 {
     float temp;
     bmi088_get_temp(&temp);
     pid_calculate(&pid_imu_tmp, temp, DEFAULT_IMU_TEMP);
-    if(pid_imu_tmp.out < 0)
+    if (pid_imu_tmp.out < 0)
     {
         pid_imu_tmp.out = 0;
     }
@@ -135,7 +135,7 @@ int32_t imu_temp_keep(void* argc)
 void imu_temp_ctrl_init(void)
 {
     pid_struct_init(&pid_imu_tmp, 20000, 8000, 800, 10, 0);
-    soft_timer_register(imu_temp_keep, (void*)NULL, 5);
+    soft_timer_register(imu_temp_keep, (void *)NULL, 5);
 }
 
 /**
@@ -147,7 +147,7 @@ uint8_t bmi088_set_offset(void)
 {
     imu_temp_ctrl_init();
     /* need adjust */
-    while(ABS_F(DEFAULT_IMU_TEMP - temperate) > 1.0f)
+    while (ABS_F(DEFAULT_IMU_TEMP - temperate) > 1.0f)
     {
         BMI088_Read(bmi088_real_data.gyro, bmi088_real_data.accel, &temperate);
 
@@ -161,7 +161,7 @@ uint8_t bmi088_set_offset(void)
 
     fp32 gyro[3], accel[3];
 
-    for(int i = 0; i < 300; i++)
+    for (int i = 0; i < 300; i++)
     {
         BMI088_Read(gyro, accel, &temperate);
 
@@ -194,7 +194,7 @@ uint8_t bmi088_get_offset(void)
     size_t read_len = 0;
     ef_get_env_blob(BMI088_PARAM_KEY, gyro_offset, sizeof(gyro_offset), &read_len);
 
-    if(read_len == sizeof(gyro_offset))
+    if (read_len == sizeof(gyro_offset))
     {
         /* read ok */
         return 0;
@@ -207,9 +207,9 @@ uint8_t bmi088_get_offset(void)
     return 0;
 }
 
-static void bmi088_cali_slove(fp32 gyro[3], fp32 accel[3], bmi088_real_data_t* bmi088)
+static void bmi088_cali_slove(fp32 gyro[3], fp32 accel[3], bmi088_real_data_t *bmi088)
 {
-    for(uint8_t i = 0; i < 3; i++)
+    for (uint8_t i = 0; i < 3; i++)
     {
         gyro[i] = bmi088->gyro[0] * gyro_scale_factor[i][0] + bmi088->gyro[1] * gyro_scale_factor[i][1] + bmi088->gyro[2] * gyro_scale_factor[i][2] - gyro_offset[i];
         accel[i] = bmi088->accel[0] * accel_scale_factor[i][0] + bmi088->accel[1] * accel_scale_factor[i][1] + bmi088->accel[2] * accel_scale_factor[i][2] - accel_offset[i];

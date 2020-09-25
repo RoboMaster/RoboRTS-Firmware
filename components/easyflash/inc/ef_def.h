@@ -70,8 +70,8 @@ if (!(EXPR))                                                                  \
 
 typedef struct _ef_env
 {
-    char* key;
-    void* value;
+    char *key;
+    void *value;
     size_t value_len;
 } ef_env, *ef_env_t;
 
@@ -123,7 +123,7 @@ struct env_node_obj
         uint32_t value;                          /**< value start address */
     } addr;
 };
-typedef struct env_node_obj* env_node_obj_t;
+typedef struct env_node_obj *env_node_obj_t;
 
 #ifdef __cplusplus
 }

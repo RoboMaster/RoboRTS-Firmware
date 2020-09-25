@@ -34,7 +34,7 @@ uint8_t get_chassis_sdk_mode(void)
     return chassis_sdk_state;
 }
 
-int32_t chassis_manifold_heart(uint8_t* buff, uint16_t len)
+int32_t chassis_manifold_heart(uint8_t *buff, uint16_t len)
 {
     offline_event_time_update(OFFLINE_MANIFOLD2_HEART);
     return 0;
@@ -45,17 +45,17 @@ int32_t chassis_manifold_heart(uint8_t* buff, uint16_t len)
   * @param
   * @retval int32_t
   */
-int32_t chassis_speed_ctrl(uint8_t* buff, uint16_t len)
+int32_t chassis_speed_ctrl(uint8_t *buff, uint16_t len)
 {
-    if(get_chassis_sdk_mode() != CHASSIS_SDK_ON)
+    if (get_chassis_sdk_mode() != CHASSIS_SDK_ON)
     {
         return -1;
     }
 
-    if(len == sizeof(struct cmd_chassis_speed))
+    if (len == sizeof(struct cmd_chassis_speed))
     {
         chassis_t p_chassis = get_chassis();
-        struct cmd_chassis_speed* p_speed = (struct cmd_chassis_speed*)buff;
+        struct cmd_chassis_speed *p_speed = (struct cmd_chassis_speed *)buff;
         chassis_set_offset(p_chassis, p_speed->rotate_x_offset, p_speed->rotate_x_offset);
         chassis_set_acc(p_chassis, 0, 0, 0);
         chassis_set_speed(p_chassis, p_speed->vx, p_speed->vy, p_speed->vw / 10.0f);
@@ -70,17 +70,17 @@ int32_t chassis_speed_ctrl(uint8_t* buff, uint16_t len)
   * @param
   * @retval int32_t
   */
-int32_t chassis_spd_acc_ctrl(uint8_t* buff, uint16_t len)
+int32_t chassis_spd_acc_ctrl(uint8_t *buff, uint16_t len)
 {
-    if(get_chassis_sdk_mode() != CHASSIS_SDK_ON)
+    if (get_chassis_sdk_mode() != CHASSIS_SDK_ON)
     {
         return -1;
     }
 
-    if(len == sizeof(struct cmd_chassis_spd_acc))
+    if (len == sizeof(struct cmd_chassis_spd_acc))
     {
         chassis_t p_chassis = get_chassis();
-        struct cmd_chassis_spd_acc* p_acc = (struct cmd_chassis_spd_acc*)buff;
+        struct cmd_chassis_spd_acc *p_acc = (struct cmd_chassis_spd_acc *)buff;
         chassis_set_offset(p_chassis, p_acc->rotate_x_offset, p_acc->rotate_x_offset);
         chassis_set_acc(p_chassis, p_acc->ax, p_acc->ay, p_acc->wz / 10.0f);
         chassis_set_speed(p_chassis, p_acc->vx, p_acc->vy, p_acc->vw / 10.0f);
@@ -95,9 +95,9 @@ int32_t chassis_spd_acc_ctrl(uint8_t* buff, uint16_t len)
   * @param
   * @retval int32_t
   */
-int32_t student_data_transmit(uint8_t* buff, uint16_t len)
+int32_t student_data_transmit(uint8_t *buff, uint16_t len)
 {
-    uint16_t cmd_id = *(uint16_t*)buff;
+    uint16_t cmd_id = *(uint16_t *)buff;
     referee_protocol_tansmit(cmd_id, buff + 2, len - 2);
     return 0;
 }
@@ -107,7 +107,7 @@ int32_t student_data_transmit(uint8_t* buff, uint16_t len)
   * @param
   * @retval int32_t
   */
-int32_t chassis_info_push(void* argc)
+int32_t chassis_info_push(void *argc)
 {
     struct chassis_info info;
     struct cmd_chassis_info cmd_chassis_info;

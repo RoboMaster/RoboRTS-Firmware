@@ -37,8 +37,8 @@
 #define RC_S2_MID      (1 << 12u)
 #define RC_S2_DOWN     (1 << 13u)
 
-typedef struct rc_device* rc_device_t;
-typedef struct rc_info* rc_info_t;
+typedef struct rc_device *rc_device_t;
+typedef struct rc_info *rc_info_t;
 
 // #pragma pack(push, 1)
 
@@ -100,15 +100,15 @@ struct rc_device
     struct rc_info rc_info;
     struct rc_info last_rc_info;
     uint16_t state;
-    void (*get_data)(rc_device_t, uint8_t*);
+    void (*get_data)(rc_device_t, uint8_t *);
     void (*get_state)(rc_device_t);
 };
 
-int32_t rc_device_register(rc_device_t rc_dev, const char* name);
-int32_t rc_device_date_update(rc_device_t rc_dev, uint8_t* buff);
+int32_t rc_device_register(rc_device_t rc_dev, const char *name);
+int32_t rc_device_date_update(rc_device_t rc_dev, uint8_t *buff);
 int32_t rc_device_get_state(rc_device_t rc_dev, uint16_t state);
 rc_info_t rc_device_get_info(rc_device_t rc_dev);
-rc_device_t rc_device_find(const char* name);
+rc_device_t rc_device_find(const char *name);
 
 
 #endif // __DBUS_H__

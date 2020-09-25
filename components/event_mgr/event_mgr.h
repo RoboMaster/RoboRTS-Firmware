@@ -107,13 +107,13 @@ typedef enum
 /* 事件订阅队列头 */
 typedef struct ListHead_t
 {
-    struct ListHead_t* next;
+    struct ListHead_t *next;
 } listHead_t;
 
 /* 事件数据类型 */
 typedef struct Event_t
 {
-    struct Event_t*  next;
+    struct Event_t  *next;
     uint32_t        eventID;
     uint16_t        msgSize;            /* 每个消息的大小，单位字节 */
     uint8_t         msgNum;             /* 消息个数 */
@@ -124,23 +124,23 @@ typedef struct Event_t
 } event_t;
 
 /* 推送者数据类型 */
-typedef event_t* publisher_t;
+typedef event_t *publisher_t;
 
 /* 事件句柄 */
-typedef event_t* eventHandler_t;
+typedef event_t *eventHandler_t;
 
 /* 事件列表头 */
 typedef struct
 {
-    event_t* next;
+    event_t *next;
 }
 headEvent_t;
 
 /* 事件消息数据类型 */
 typedef struct EventMsg_t
 {
-    struct EventMsg_t*   next;
-    event_t*             pEvent;
+    struct EventMsg_t   *next;
+    event_t             *pEvent;
 #ifdef EVENT_USE_TIMESTAMP
     uint32_t            timeStamp;
 #endif
@@ -149,22 +149,22 @@ typedef struct EventMsg_t
 
 
 /* 消息回调 */
-typedef void (*msgCallBack_f)(uint32_t eventID, void* pMsgData, uint32_t timeStamp);
+typedef void (*msgCallBack_f)(uint32_t eventID, void *pMsgData, uint32_t timeStamp);
 
 
 /* 订阅事件列表项 */
 typedef struct SubsEvent_t
 {
-    struct SubsEvent_t*  next;
+    struct SubsEvent_t  *next;
     uint32_t            eventID;
-    void*                callBackOrMemory;
+    void                *callBackOrMemory;
 } subsEvent_t;
 
 /* 订阅者数据类型 */
 typedef struct Subscriber_t
 {
-    eventMsg_t*  pMsgHead;
-    eventMsg_t*  pMsgTail;
+    eventMsg_t  *pMsgHead;
+    eventMsg_t  *pMsgTail;
     uint32_t    subsMode;        /* 订阅模式 subscribeMode_t */
     listHead_t  eventListHead;   /* 挂 subsEvent_t 结构 */
     // xSemaphoreHandle mutex;
@@ -177,22 +177,22 @@ typedef struct Subscriber_t
 /* 订阅者列表项 */
 typedef struct SubsList_t
 {
-    struct SubsList_t* next;
-    subscriber_t*      subscriber;
+    struct SubsList_t *next;
+    subscriber_t      *subscriber;
 } subsList_t;
 
 
 
 
-int EventSubscribeInit(subscriber_t* pSubscriber, subscribeMode_t mode);
-int EventSubscribe(subscriber_t* pSubscriber, uint32_t eventID, uint32_t msgSize, uint32_t msgAddNum, msgCallBack_f handlerFun);
-int EventUnsubscribe(subscriber_t* pSubscriber, uint32_t eventID);
+int EventSubscribeInit(subscriber_t *pSubscriber, subscribeMode_t mode);
+int EventSubscribe(subscriber_t *pSubscriber, uint32_t eventID, uint32_t msgSize, uint32_t msgAddNum, msgCallBack_f handlerFun);
+int EventUnsubscribe(subscriber_t *pSubscriber, uint32_t eventID);
 
-int EventPostInit(publisher_t* publisher, uint32_t eventID, uint32_t msgSize);
-int EventMsgPost(publisher_t* publisher, void* pMsgData, TickType_t waitTicks);
+int EventPostInit(publisher_t *publisher, uint32_t eventID, uint32_t msgSize);
+int EventMsgPost(publisher_t *publisher, void *pMsgData, TickType_t waitTicks);
 
-void EventMsgProcess(subscriber_t* pSubscriber, TickType_t waitTicks);
-int EventMsgGetLast(subscriber_t* pSubscriber, uint32_t eventID, void* pMsgAddr, uint32_t* pTimeStamp);
+void EventMsgProcess(subscriber_t *pSubscriber, TickType_t waitTicks);
+int EventMsgGetLast(subscriber_t *pSubscriber, uint32_t eventID, void *pMsgAddr, uint32_t *pTimeStamp);
 
 
 #endif

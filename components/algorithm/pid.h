@@ -21,7 +21,7 @@
 #include "stdint.h"
 
 #if defined(__CC_ARM)
-    typedef struct pid* pid_t;
+    typedef struct pid *pid_t;
 #endif
 
 struct pid_param
@@ -52,17 +52,17 @@ struct pid
     float dout;
     float out;
 
-    void (*f_param_init)(struct pid* pid,
+    void (*f_param_init)(struct pid *pid,
                          float max_output,
                          float integral_limit,
                          float p,
                          float i,
                          float d);
-    void (*f_pid_reset)(struct pid* pid, float p, float i, float d);
+    void (*f_pid_reset)(struct pid *pid, float p, float i, float d);
 };
 
 void pid_struct_init(
-    struct pid* pid,
+    struct pid *pid,
     float maxout,
     float intergral_limit,
 
@@ -70,6 +70,6 @@ void pid_struct_init(
     float ki,
     float kd);
 
-float pid_calculate(struct pid* pid, float fdb, float ref);
+float pid_calculate(struct pid *pid, float fdb, float ref);
 
 #endif // __PID_H__

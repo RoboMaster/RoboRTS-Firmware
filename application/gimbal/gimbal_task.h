@@ -31,8 +31,8 @@
 void gimbal_init_start(void);
 uint8_t gimbal_get_work_mode(void);
 void gimbal_set_work_mode(uint8_t mode);
-void gimbal_task(void const* argument);
-struct gimbal* get_gimbal(void);
-void gimbal_gyro_yaw_update(uint16_t std_id, uint8_t* data);
+void gimbal_task(void const *argument);
+struct gimbal *get_gimbal(void);
+void gimbal_gyro_yaw_update(uint16_t std_id, uint8_t *data);
 
 #endif // __GIMBAL_TASK_H__

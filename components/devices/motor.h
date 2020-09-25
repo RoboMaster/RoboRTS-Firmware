@@ -33,8 +33,8 @@
 #define MOTOR_FLAG_UNINITIALIZED (1 << 0)
 #define MOTOR_FLAG_OFFLINE       (1 << 7)
 
-typedef struct motor_data* motor_data_t;
-typedef struct motor_device* motor_device_t;
+typedef struct motor_data *motor_data_t;
+typedef struct motor_device *motor_device_t;
 
 struct motor_data
 {
@@ -78,16 +78,16 @@ struct motor_device
 
     int16_t current;
 
-    void (*get_data)(motor_device_t, uint8_t*);
+    void (*get_data)(motor_device_t, uint8_t *);
 };
 
 typedef int32_t (*fn_can_send)(enum device_can can, struct can_msg);
 
 void motor_device_can_send_register(fn_can_send fn);
 
-motor_device_t motor_find(const char* name);
+motor_device_t motor_find(const char *name);
 motor_device_t motor_find_by_canid(enum device_can can, uint16_t can_id);
-int32_t motor_register(motor_device_t motor_dev, const char* name);
+int32_t motor_register(motor_device_t motor_dev, const char *name);
 void motor_can_send_register(fn_can_send fn);
 motor_data_t motor_get_data(motor_device_t motor_dev);
 int32_t motor_set_current(motor_device_t motor_dev, int16_t current);

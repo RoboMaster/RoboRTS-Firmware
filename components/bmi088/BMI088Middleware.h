@@ -23,8 +23,8 @@ extern void BMI088_Delay_us(uint16_t us);
 #elif defined(BMI088_USE_IIC)
 
     extern uint8_t I2C_WriteByte(uint8_t data, uint8_t addr, uint8_t reg);
-    extern uint8_t I2C_WriteBuf(uint8_t* data, uint8_t len, uint8_t addr, uint8_t reg);
-    extern uint8_t I2C_ReadByte(uint8_t* buf, uint8_t len, uint8_t addr, uint8_t reg);
+    extern uint8_t I2C_WriteBuf(uint8_t *data, uint8_t len, uint8_t addr, uint8_t reg);
+    extern uint8_t I2C_ReadByte(uint8_t *buf, uint8_t len, uint8_t addr, uint8_t reg);
 
     #define BMI088_IIC_Write_Single_Reg(data, addr, reg) I2C_WriteByte((data), (addr), (reg))
 

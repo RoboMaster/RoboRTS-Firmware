@@ -22,7 +22,7 @@
   * @param[in]      最小值
   * @retval         返回空
   */
-void ramp_init(ramp_function_source_t* ramp_source_type, fp32 frame_period, fp32 max, fp32 min)
+void ramp_init(ramp_function_source_t *ramp_source_type, fp32 frame_period, fp32 max, fp32 min)
 {
     ramp_source_type->frame_period = frame_period;
     ramp_source_type->max_value = max;
@@ -39,15 +39,15 @@ void ramp_init(ramp_function_source_t* ramp_source_type, fp32 frame_period, fp32
   * @param[in]      滤波参数
   * @retval         返回空
   */
-void ramp_calc(ramp_function_source_t* ramp_source_type, fp32 input)
+void ramp_calc(ramp_function_source_t *ramp_source_type, fp32 input)
 {
     ramp_source_type->input = input;
     ramp_source_type->out += ramp_source_type->input * ramp_source_type->frame_period;
-    if(ramp_source_type->out > ramp_source_type->max_value)
+    if (ramp_source_type->out > ramp_source_type->max_value)
     {
         ramp_source_type->out = ramp_source_type->max_value;
     }
-    else if(ramp_source_type->out < ramp_source_type->min_value)
+    else if (ramp_source_type->out < ramp_source_type->min_value)
     {
         ramp_source_type->out = ramp_source_type->min_value;
     }
@@ -60,7 +60,7 @@ void ramp_calc(ramp_function_source_t* ramp_source_type, fp32 input)
   * @param[in]      滤波参数
   * @retval         返回空
   */
-void first_order_filter_init(first_order_filter_type_t* first_order_filter_type, fp32 frame_period, const fp32 num[1])
+void first_order_filter_init(first_order_filter_type_t *first_order_filter_type, fp32 frame_period, const fp32 num[1])
 {
     first_order_filter_type->frame_period = frame_period;
     first_order_filter_type->num[0] = num[0];
@@ -75,7 +75,7 @@ void first_order_filter_init(first_order_filter_type_t* first_order_filter_type,
   * @param[in]      间隔的时间，单位 s
   * @retval         返回空
   */
-void first_order_filter_cali(first_order_filter_type_t* first_order_filter_type, fp32 input)
+void first_order_filter_cali(first_order_filter_type_t *first_order_filter_type, fp32 input)
 {
     first_order_filter_type->input = input;
     first_order_filter_type->out =
@@ -83,13 +83,13 @@ void first_order_filter_cali(first_order_filter_type_t* first_order_filter_type,
 }
 
 //绝对限制
-void abs_limit(fp32* num, fp32 Limit)
+void abs_limit(fp32 *num, fp32 Limit)
 {
-    if(*num > Limit)
+    if (*num > Limit)
     {
         *num = Limit;
     }
-    else if(*num < -Limit)
+    else if (*num < -Limit)
     {
         *num = -Limit;
     }
@@ -98,7 +98,7 @@ void abs_limit(fp32* num, fp32 Limit)
 //判断符号位
 fp32 sign(fp32 value)
 {
-    if(value >= 0.0f)
+    if (value >= 0.0f)
     {
         return 1.0f;
     }
@@ -111,7 +111,7 @@ fp32 sign(fp32 value)
 //浮点死区
 fp32 fp32_deadline(fp32 Value, fp32 minValue, fp32 maxValue)
 {
-    if(Value < maxValue && Value > minValue)
+    if (Value < maxValue && Value > minValue)
     {
         Value = 0.0f;
     }
@@ -121,7 +121,7 @@ fp32 fp32_deadline(fp32 Value, fp32 minValue, fp32 maxValue)
 //int26死区
 int16_t int16_deadline(int16_t Value, int16_t minValue, int16_t maxValue)
 {
-    if(Value < maxValue && Value > minValue)
+    if (Value < maxValue && Value > minValue)
     {
         Value = 0;
     }
@@ -131,11 +131,11 @@ int16_t int16_deadline(int16_t Value, int16_t minValue, int16_t maxValue)
 //限幅函数
 fp32 fp32_constrain(fp32 Value, fp32 minValue, fp32 maxValue)
 {
-    if(Value < minValue)
+    if (Value < minValue)
     {
         return minValue;
     }
-    else if(Value > maxValue)
+    else if (Value > maxValue)
     {
         return maxValue;
     }
@@ -148,11 +148,11 @@ fp32 fp32_constrain(fp32 Value, fp32 minValue, fp32 maxValue)
 //限幅函数
 int16_t int16_constrain(int16_t Value, int16_t minValue, int16_t maxValue)
 {
-    if(Value < minValue)
+    if (Value < minValue)
     {
         return minValue;
     }
-    else if(Value > maxValue)
+    else if (Value > maxValue)
     {
         return maxValue;
     }
@@ -165,23 +165,23 @@ int16_t int16_constrain(int16_t Value, int16_t minValue, int16_t maxValue)
 //循环限幅函数
 fp32 loop_fp32_constrain(fp32 Input, fp32 minValue, fp32 maxValue)
 {
-    if(maxValue < minValue)
+    if (maxValue < minValue)
     {
         return Input;
     }
 
-    if(Input > maxValue)
+    if (Input > maxValue)
     {
         fp32 len = maxValue - minValue;
-        while(Input > maxValue)
+        while (Input > maxValue)
         {
             Input -= len;
         }
     }
-    else if(Input < minValue)
+    else if (Input < minValue)
     {
         fp32 len = maxValue - minValue;
-        while(Input < minValue)
+        while (Input < minValue)
         {
             Input += len;
         }

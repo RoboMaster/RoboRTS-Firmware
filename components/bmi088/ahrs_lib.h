@@ -56,7 +56,7 @@ extern fp32 get_roll(const fp32 quat[4]);
   * @param[in]      返回的俯仰角pitch  单位 rad
   * @param[in]      返回的横滚角roll 单位 rad
   */
-extern void get_angle(const fp32 quat[4], fp32* yaw, fp32* pitch, fp32* roll);
+extern void get_angle(const fp32 quat[4], fp32 *yaw, fp32 *pitch, fp32 *roll);
 /**
   * @brief          返回当前的重力加速度
   * @author         luopin

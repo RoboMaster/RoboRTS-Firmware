@@ -37,11 +37,11 @@ void soft_timer_FreeRTOS_init(void)
   * @param[in] call_back_fucn/param/period
   * @retval    timer id
   */
-int32_t soft_timer_register(soft_timer_callback callback_t, void* argc, uint32_t ticks)
+int32_t soft_timer_register(soft_timer_callback callback_t, void *argc, uint32_t ticks)
 {
-    for(int i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
+    for (int i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
     {
-        if(soft_timer[i].id == 0)
+        if (soft_timer[i].id == 0)
         {
             soft_timer[i].id = soft_timer_req(ticks);
             soft_timer[i].ticks = ticks;
@@ -54,19 +54,19 @@ int32_t soft_timer_register(soft_timer_callback callback_t, void* argc, uint32_t
 }
 
 /* FreeRTOS soft timer thread */
-void timer_task(void const* argument)
+void timer_task(void const *argument)
 {
     uint32_t period = osKernelSysTick();
 
-    while(1)
+    while (1)
     {
         TimerISR_Hook();
 
-        for(int i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
+        for (int i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
         {
-            if((soft_timer[i].id != 0) && (soft_timer[i].callback != NULL))
+            if ((soft_timer[i].id != 0) && (soft_timer[i].callback != NULL))
             {
-                if(soft_timer_check(soft_timer[i].id) == SOFT_TIMER_TIMEOUT)
+                if (soft_timer_check(soft_timer[i].id) == SOFT_TIMER_TIMEOUT)
                 {
                     soft_timer[i].callback(soft_timer[i].argc);
 
