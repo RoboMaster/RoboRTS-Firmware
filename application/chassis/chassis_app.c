@@ -206,12 +206,20 @@ void chassis_heart_offline(void)
     LED_B_ON();
     chassis_set_acc(p_chassis, 0, 0, 0);
     chassis_set_speed(p_chassis, 0, 0, 0);
+    offline_event_enable(OFFLINE_CHASSIS_MOTOR1);
+    offline_event_enable(OFFLINE_CHASSIS_MOTOR2);
+    offline_event_enable(OFFLINE_CHASSIS_MOTOR3);
+    offline_event_enable(OFFLINE_CHASSIS_MOTOR4);
 }
 
 void chassis_heart_online(void)
 {
     LED_B_OFF();
     set_chassis_sdk_mode(CHASSIS_SDK_ON);
+    offline_event_disable(OFFLINE_CHASSIS_MOTOR1);
+    offline_event_disable(OFFLINE_CHASSIS_MOTOR2);
+    offline_event_disable(OFFLINE_CHASSIS_MOTOR3);
+    offline_event_disable(OFFLINE_CHASSIS_MOTOR4);
 }
 
 void chassis_control_offline(void)

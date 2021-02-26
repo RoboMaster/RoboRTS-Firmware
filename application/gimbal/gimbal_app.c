@@ -29,6 +29,7 @@
 #include "board.h"
 
 #include "easyflash.h"
+#include "offline_service.h"
 
 osThreadId gimbal_task_t;
 osThreadId shoot_task_t;
@@ -212,8 +213,6 @@ void gimbal_offline(void)
 
 void gimbal_heart_offline(void)
 {
-    set_gimbal_sdk_mode(GIMBAL_SDK_OFF);
-
     struct gimbal* p_gimbal;
     p_gimbal = get_gimbal();
     gimbal_set_pitch_mode(p_gimbal, ENCODER_MODE);
@@ -226,6 +225,9 @@ void gimbal_heart_offline(void)
     shoot_disable(p_shoot);
 
     set_gimbal_sdk_mode(GIMBAL_SDK_OFF);
+    offline_event_enable(OFFLINE_GIMBAL_PITCH);
+    offline_event_enable(OFFLINE_GIMBAL_YAW);
+    offline_event_enable(OFFLINE_GIMBAL_TURN_MOTOR);
 
     LED_B_ON();
 }
@@ -240,6 +242,9 @@ void gimbal_heart_online(void)
     shoot_enable(p_shoot);
 
     set_gimbal_sdk_mode(GIMBAL_SDK_ON);
+    offline_event_disable(OFFLINE_GIMBAL_PITCH);
+    offline_event_disable(OFFLINE_GIMBAL_YAW);
+    offline_event_disable(OFFLINE_GIMBAL_TURN_MOTOR);
 
     LED_B_OFF();
 }
