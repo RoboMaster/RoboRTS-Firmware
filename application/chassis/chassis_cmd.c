@@ -22,16 +22,22 @@
 #include "referee_system.h"
 #include "offline_service.h"
 
-static uint8_t chassis_sdk_state = CHASSIS_SDK_OFF;
+uint8_t chassis_sdk_state = CHASSIS_SDK_OFF;
+uint8_t chassis_heart_state = CHASSIS_HEART_OFF;
 
 void set_chassis_sdk_mode(uint8_t state)
 {
     chassis_sdk_state = state;
 }
 
+void set_chassis_heart_mode(uint8_t state)
+{
+    chassis_heart_state = state;
+}
+
 uint8_t get_chassis_sdk_mode(void)
 {
-    return chassis_sdk_state;
+    return (chassis_sdk_state && chassis_heart_state);
 }
 
 int32_t chassis_manifold_heart(uint8_t* buff, uint16_t len)

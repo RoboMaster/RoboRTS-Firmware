@@ -287,6 +287,7 @@ void gimbal_normol_handle(struct gimbal* p_gimbal, struct rc_device* p_rc, struc
 
     if(rc_device_get_state(p_rc, RC_S2_DOWN) == E_OK)
     {
+        set_gimbal_sdk_mode(GIMBAL_SDK_ON);
         gimbal_set_yaw_mode(p_gimbal, ENCODER_MODE);
         offline_event_enable(OFFLINE_MANIFOLD2_HEART);
         offline_event_enable(OFFLINE_CONTROL_CMD);

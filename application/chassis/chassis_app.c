@@ -201,7 +201,7 @@ void chassis_online(void)
 
 void chassis_heart_offline(void)
 {
-    set_chassis_sdk_mode(CHASSIS_SDK_OFF);
+    set_chassis_heart_mode(CHASSIS_HEART_OFF);
     chassis_t p_chassis = get_chassis();
     LED_B_ON();
     chassis_set_acc(p_chassis, 0, 0, 0);
@@ -215,7 +215,7 @@ void chassis_heart_offline(void)
 void chassis_heart_online(void)
 {
     LED_B_OFF();
-    set_chassis_sdk_mode(CHASSIS_SDK_ON);
+    set_chassis_heart_mode(CHASSIS_HEART_ON);
     offline_event_disable(OFFLINE_CHASSIS_MOTOR1);
     offline_event_disable(OFFLINE_CHASSIS_MOTOR2);
     offline_event_disable(OFFLINE_CHASSIS_MOTOR3);

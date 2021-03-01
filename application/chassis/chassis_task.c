@@ -114,6 +114,7 @@ void chassis_task(void const* argument)
 
         if(rc_device_get_state(&chassis_rc, RC_S2_DOWN) == E_OK)
         {
+            set_chassis_sdk_mode(CHASSIS_SDK_ON);
             offline_event_enable(OFFLINE_MANIFOLD2_HEART);
             offline_event_enable(OFFLINE_CONTROL_CMD);
 

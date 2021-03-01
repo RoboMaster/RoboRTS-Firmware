@@ -22,7 +22,11 @@
 #define CHASSIS_SDK_ON  1
 #define CHASSIS_SDK_OFF 0
 
+#define CHASSIS_HEART_ON  1
+#define CHASSIS_HEART_OFF 0
+
 void set_chassis_sdk_mode(uint8_t state);
+void set_chassis_heart_mode(uint8_t state);
 uint8_t get_chassis_sdk_mode(void);
 
 int32_t chassis_manifold_heart(uint8_t* buff, uint16_t len);

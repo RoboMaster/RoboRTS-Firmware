@@ -224,7 +224,7 @@ void gimbal_heart_offline(void)
     p_shoot = get_shoot();
     shoot_disable(p_shoot);
 
-    set_gimbal_sdk_mode(GIMBAL_SDK_OFF);
+    set_gimbal_heart_mode(GIMBAL_HEART_OFF);
     offline_event_enable(OFFLINE_GIMBAL_PITCH);
     offline_event_enable(OFFLINE_GIMBAL_YAW);
     offline_event_enable(OFFLINE_GIMBAL_TURN_MOTOR);
@@ -241,7 +241,7 @@ void gimbal_heart_online(void)
     p_shoot = get_shoot();
     shoot_enable(p_shoot);
 
-    set_gimbal_sdk_mode(GIMBAL_SDK_ON);
+    set_gimbal_heart_mode(GIMBAL_HEART_ON);
     offline_event_disable(OFFLINE_GIMBAL_PITCH);
     offline_event_disable(OFFLINE_GIMBAL_YAW);
     offline_event_disable(OFFLINE_GIMBAL_TURN_MOTOR);

@@ -24,7 +24,8 @@
 #include "protocol.h"
 #include "offline_service.h"
 
-static uint8_t gimbal_sdk_state = GIMBAL_SDK_OFF;
+uint8_t gimbal_sdk_state = GIMBAL_SDK_OFF;
+uint8_t gimbal_heart_state = GIMBAL_HEART_OFF;
 
 void gimbal_user_key_handle(void);
 
@@ -33,9 +34,14 @@ void set_gimbal_sdk_mode(uint8_t state)
     gimbal_sdk_state = state;
 }
 
+void set_gimbal_heart_mode(uint8_t state)
+{
+    gimbal_heart_state = state;
+}
+
 uint8_t get_gimbal_sdk_mode(void)
 {
-    return gimbal_sdk_state;
+    return (gimbal_sdk_state && gimbal_heart_state);
 }
 
 int32_t gimbal_manifold_heart(uint8_t* buff, uint16_t len)
