@@ -27,31 +27,31 @@
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/
 
-uint8_t protocol_get_session(struct perph_interface* interface);
-int32_t protocol_release_session(struct perph_interface* interface, uint8_t id);
-struct send_cmd_info* protocol_get_send_cmd_info(uint16_t cmd);
+uint8_t protocol_get_session(struct perph_interface *interface);
+int32_t protocol_release_session(struct perph_interface *interface, uint8_t id);
+struct send_cmd_info *protocol_get_send_cmd_info(uint16_t cmd);
 
 uint32_t protocol_s_add_sendnode(uint8_t reciver, uint8_t session, uint8_t pack_type,
-                                 void* p_data, uint32_t data_len, uint16_t cmd, uint16_t ack_seq);
-uint32_t protocol_s_broadcast_add_node(void* p_data, uint32_t data_len, uint16_t cmd);
-uint32_t protocol_s_fill_pack(send_ctx_t* ctx, uint8_t* p_data,
-                              uint32_t data_len, uint8_t* pack_zone, uint16_t seq, uint16_t cmd);
-uint32_t protocol_s_interface_send_data(send_list_node_t* cur_send_node, struct perph_interface* obj);
-uint32_t protocol_s_interface_normal_send_flush(struct perph_interface* obj);
-uint32_t protocol_s_interface_ack_send_flush(struct perph_interface* obj);
+                                 void *p_data, uint32_t data_len, uint16_t cmd, uint16_t ack_seq);
+uint32_t protocol_s_broadcast_add_node(void *p_data, uint32_t data_len, uint16_t cmd);
+uint32_t protocol_s_fill_pack(send_ctx_t *ctx, uint8_t *p_data,
+                              uint32_t data_len, uint8_t *pack_zone, uint16_t seq, uint16_t cmd);
+uint32_t protocol_s_interface_send_data(send_list_node_t *cur_send_node, struct perph_interface *obj);
+uint32_t protocol_s_interface_normal_send_flush(struct perph_interface *obj);
+uint32_t protocol_s_interface_ack_send_flush(struct perph_interface *obj);
 uint32_t protocol_s_broadcast_send_flush(void);
 
-struct perph_interface* protocol_s_get_route(uint8_t tar_add);
+struct perph_interface *protocol_s_get_route(uint8_t tar_add);
 
-uint32_t protocol_s_pack_forward(protocol_pack_desc_t* p_pack, struct perph_interface* src_obj);
-uint32_t protocol_s_unpack_data_handle(struct perph_interface* obj);
-send_list_node_t* protocol_s_session_get_node(struct perph_interface* obj,
+uint32_t protocol_s_pack_forward(protocol_pack_desc_t *p_pack, struct perph_interface *src_obj);
+uint32_t protocol_s_unpack_data_handle(struct perph_interface *obj);
+send_list_node_t *protocol_s_session_get_node(struct perph_interface *obj,
         uint8_t address, uint8_t session);
-uint32_t protocol_s_extract(struct perph_interface* obj);
-uint32_t protocol_s_find_pack_header(rcvd_desc_t* rcvd);
-uint32_t protocol_s_auth_pack_header(rcvd_desc_t* rcvd);
-uint32_t protocol_s_fetch_pack_data(rcvd_desc_t* rcvd);
-ver_data_len_t protocol_s_get_ver_datalen(void* pack);
-void protocol_s_error_info_printf(uint32_t status, char* file, int line);
+uint32_t protocol_s_extract(struct perph_interface *obj);
+uint32_t protocol_s_find_pack_header(rcvd_desc_t *rcvd);
+uint32_t protocol_s_auth_pack_header(rcvd_desc_t *rcvd);
+uint32_t protocol_s_fetch_pack_data(rcvd_desc_t *rcvd);
+ver_data_len_t protocol_s_get_ver_datalen(void *pack);
+void protocol_s_error_info_printf(uint32_t status, char *file, int line);
 
 #endif

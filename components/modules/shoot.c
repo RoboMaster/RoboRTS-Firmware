@@ -21,16 +21,16 @@
 #define LOG_TAG "shoot"
 #include "log.h"
 
-static int32_t shoot_fric_ctrl(struct shoot* shoot);
-static int32_t shoot_cmd_ctrl(struct shoot* shoot);
-static int32_t shoot_block_check(struct shoot* shoot);
+static int32_t shoot_fric_ctrl(struct shoot *shoot);
+static int32_t shoot_cmd_ctrl(struct shoot *shoot);
+static int32_t shoot_block_check(struct shoot *shoot);
 
 /**
   * @brief     turn motor pid init
   * @param[in]
   * @retval    error code
   */
-int32_t shoot_pid_init(struct shoot* shoot, const char* name, struct pid_param param, enum device_can can)
+int32_t shoot_pid_init(struct shoot *shoot, const char *name, struct pid_param param, enum device_can can)
 {
     char motor_name[OBJECT_NAME_MAX_LEN] = {0};
     uint8_t name_len;
@@ -57,7 +57,7 @@ int32_t shoot_pid_init(struct shoot* shoot, const char* name, struct pid_param p
     memcpy(&motor_name[name_len], "_TURN\0", 6);
 
     err = motor_register(&(shoot->motor), motor_name);
-    if(err != E_OK)
+    if (err != E_OK)
     {
         goto end;
     }
@@ -77,7 +77,7 @@ end:
   * @param[in]
   * @retval    error code
   */
-int32_t shoot_set_fric_speed(struct shoot* shoot, uint16_t fric_spd1, uint16_t fric_spd2)
+int32_t shoot_set_fric_speed(struct shoot *shoot, uint16_t fric_spd1, uint16_t fric_spd2)
 {
     device_assert(shoot != NULL);
 
@@ -87,7 +87,7 @@ int32_t shoot_set_fric_speed(struct shoot* shoot, uint16_t fric_spd1, uint16_t f
     return E_OK;
 }
 
-int32_t shoot_get_fric_speed(struct shoot* shoot, uint16_t* fric_spd1, uint16_t* fric_spd2)
+int32_t shoot_get_fric_speed(struct shoot *shoot, uint16_t *fric_spd1, uint16_t *fric_spd2)
 {
     device_assert(shoot != NULL);
 
@@ -100,13 +100,13 @@ int32_t shoot_get_fric_speed(struct shoot* shoot, uint16_t* fric_spd1, uint16_t*
   * @param[in]
   * @retval    error code
   */
-int32_t shoot_set_cmd(struct shoot* shoot, uint8_t cmd, uint32_t shoot_num)
+int32_t shoot_set_cmd(struct shoot *shoot, uint8_t cmd, uint32_t shoot_num)
 {
     device_assert(shoot != NULL);
 
     shoot->cmd = cmd;
 
-    if(cmd == SHOOT_ONCE_CMD)
+    if (cmd == SHOOT_ONCE_CMD)
     {
         shoot->target.shoot_num = shoot->shoot_num + shoot_num;
     }
@@ -114,7 +114,7 @@ int32_t shoot_set_cmd(struct shoot* shoot, uint8_t cmd, uint32_t shoot_num)
     return E_OK;
 }
 
-int32_t shoot_pid_calculate(struct shoot* shoot)
+int32_t shoot_pid_calculate(struct shoot *shoot)
 {
     float motor_out;
 
@@ -135,21 +135,21 @@ int32_t shoot_pid_calculate(struct shoot* shoot)
   * @param[in]
   * @retval    error code
   */
-int32_t shoot_state_update(struct shoot* shoot)
+int32_t shoot_state_update(struct shoot *shoot)
 {
     device_assert(shoot != NULL);
 
     shoot->trigger_key = get_trig_status();
-    if(shoot->trigger_key == TRIG_PRESS_DOWN)
+    if (shoot->trigger_key == TRIG_PRESS_DOWN)
     {
         shoot->target.motor_speed = 0;
         shoot->state = SHOOT_READY;
     }
-    else if(shoot->trigger_key == TRIG_BOUNCE_UP)
+    else if (shoot->trigger_key == TRIG_BOUNCE_UP)
     {
         shoot->target.motor_speed = shoot->param.turn_speed;
         shoot->state = SHOOT_INIT;
-        if(shoot->cmd == SHOOT_ONCE_CMD)
+        if (shoot->cmd == SHOOT_ONCE_CMD)
         {
             shoot->shoot_num++;
             shoot->cmd = SHOOT_STOP_CMD;
@@ -158,7 +158,7 @@ int32_t shoot_state_update(struct shoot* shoot)
     return E_OK;
 }
 
-int32_t shoot_set_turn_speed(struct shoot* shoot, uint16_t speed)
+int32_t shoot_set_turn_speed(struct shoot *shoot, uint16_t speed)
 {
     device_assert(shoot != NULL);
 
@@ -169,7 +169,7 @@ int32_t shoot_set_turn_speed(struct shoot* shoot, uint16_t speed)
     return E_OK;
 }
 
-int32_t shoot_enable(struct shoot* shoot)
+int32_t shoot_enable(struct shoot *shoot)
 {
     device_assert(shoot != NULL);
 
@@ -178,7 +178,7 @@ int32_t shoot_enable(struct shoot* shoot)
     return E_OK;
 }
 
-int32_t shoot_disable(struct shoot* shoot)
+int32_t shoot_disable(struct shoot *shoot)
 {
     device_assert(shoot != NULL);
 
@@ -196,21 +196,21 @@ int32_t shoot_disable(struct shoot* shoot)
   * @param[in]
   * @retval    error code
   */
-static int32_t shoot_block_check(struct shoot* shoot)
+static int32_t shoot_block_check(struct shoot *shoot)
 {
     static uint8_t first_block_f = 0;
     static uint32_t check_time;
 
     device_assert(shoot != NULL);
 
-    if(shoot->motor.current > shoot->param.block_current)
+    if (shoot->motor.current > shoot->param.block_current)
     {
-        if(first_block_f == 0)
+        if (first_block_f == 0)
         {
             first_block_f = 1;
             check_time = get_time_ms();
         }
-        else if(get_time_ms() - check_time > shoot->param.check_timeout)
+        else if (get_time_ms() - check_time > shoot->param.check_timeout)
         {
             first_block_f = 0;
             shoot->block_time = get_time_ms();
@@ -225,19 +225,19 @@ static int32_t shoot_block_check(struct shoot* shoot)
     return E_OK;
 }
 
-static int32_t shoot_cmd_ctrl(struct shoot* shoot)
+static int32_t shoot_cmd_ctrl(struct shoot *shoot)
 {
     device_assert(shoot != NULL);
 
-    if(shoot->state == SHOOT_INIT)
+    if (shoot->state == SHOOT_INIT)
     {
         shoot->target.motor_speed = shoot->param.turn_speed;
     }
-    else if(shoot->state == SHOOT_READY)
+    else if (shoot->state == SHOOT_READY)
     {
-        if((shoot->fric_spd[0] >= FRIC_MIN_SPEED) && (shoot->fric_spd[1] >= FRIC_MIN_SPEED))
+        if ((shoot->fric_spd[0] >= FRIC_MIN_SPEED) && (shoot->fric_spd[1] >= FRIC_MIN_SPEED))
         {
-            switch(shoot->cmd)
+            switch (shoot->cmd)
             {
             case SHOOT_ONCE_CMD:
             case SHOOT_CONTINUOUS_CMD:
@@ -247,7 +247,7 @@ static int32_t shoot_cmd_ctrl(struct shoot* shoot)
             break;
             case SHOOT_STOP_CMD:
             {
-                if(shoot->shoot_num < shoot->target.shoot_num)
+                if (shoot->shoot_num < shoot->target.shoot_num)
                 {
                     shoot->cmd = SHOOT_ONCE_CMD;
                 }
@@ -262,16 +262,16 @@ static int32_t shoot_cmd_ctrl(struct shoot* shoot)
             shoot->cmd = SHOOT_STOP_CMD;
         }
     }
-    else if(shoot->state == SHOOT_BLOCK)
+    else if (shoot->state == SHOOT_BLOCK)
     {
         shoot->target.motor_speed = shoot->param.block_speed;
-        if(get_time_ms() - shoot->block_time > shoot->param.block_timeout)
+        if (get_time_ms() - shoot->block_time > shoot->param.block_timeout)
         {
             shoot_state_update(shoot);
         }
     }
 
-    if((shoot->fric_spd[0] >= FRIC_MIN_SPEED) && (shoot->fric_spd[1] >= FRIC_MIN_SPEED))
+    if ((shoot->fric_spd[0] >= FRIC_MIN_SPEED) && (shoot->fric_spd[1] >= FRIC_MIN_SPEED))
     {
         shoot->motor_pid.enable = 1;
     }
@@ -288,7 +288,7 @@ static int32_t shoot_cmd_ctrl(struct shoot* shoot)
   * @param[in]
   * @retval    error code
   */
-static int32_t shoot_fric_ctrl(struct shoot* shoot)
+static int32_t shoot_fric_ctrl(struct shoot *shoot)
 {
     device_assert(shoot != NULL);
 
@@ -297,9 +297,9 @@ static int32_t shoot_fric_ctrl(struct shoot* shoot)
 
     shoot_get_fric_speed(shoot, &(shoot->fric_spd[0]), &(shoot->fric_spd[1]));
 
-    if(shoot->target.fric_spd[0] != shoot->fric_spd[0])
+    if (shoot->target.fric_spd[0] != shoot->fric_spd[0])
     {
-        if(shoot->target.fric_spd[0] < shoot->fric_spd[0])
+        if (shoot->target.fric_spd[0] < shoot->fric_spd[0])
         {
             shoot->fric_spd[0] -= 1;
         }
@@ -308,9 +308,9 @@ static int32_t shoot_fric_ctrl(struct shoot* shoot)
             shoot->fric_spd[0] += 1;
         }
     }
-    else if(shoot->target.fric_spd[1] != shoot->fric_spd[1])
+    else if (shoot->target.fric_spd[1] != shoot->fric_spd[1])
     {
-        if(shoot->target.fric_spd[1] < shoot->fric_spd[1])
+        if (shoot->target.fric_spd[1] < shoot->fric_spd[1])
         {
             shoot->fric_spd[1] -= 1;
         }

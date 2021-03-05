@@ -50,17 +50,17 @@ static const uint8_t CRC8_TAB[256] =
 };
 
 // caculate crc value by lookup table
-uint8_t get_crc8(uint8_t* pchMessage, uint32_t dwLength, uint8_t ucCRC8)
+uint8_t get_crc8(uint8_t *pchMessage, uint32_t dwLength, uint8_t ucCRC8)
 {
     uint8_t ucIndex;
 
-    while(dwLength--)
+    while (dwLength--)
     {
         ucIndex = ucCRC8 ^ (*pchMessage++);
         ucCRC8  = CRC8_TAB[ucIndex];
     }
 
-    return(ucCRC8);
+    return (ucCRC8);
 }
 
 #else
@@ -88,11 +88,11 @@ static const uint8_t CRC8_TAB[256] =
     0xDE, 0xD9, 0xD0, 0xD7, 0xC2, 0xC5, 0xCC, 0xCB, 0xE6, 0xE1, 0xE8, 0xEF, 0xFA, 0xFD, 0xF4, 0xF3
 };
 
-uint8_t get_crc8(uint8_t* pchMessage, uint32_t dwLength, uint8_t ucCRC8)
+uint8_t get_crc8(uint8_t *pchMessage, uint32_t dwLength, uint8_t ucCRC8)
 {
     uint8_t ucIndex;
 
-    while(dwLength--)
+    while (dwLength--)
     {
         ucIndex = ucCRC8 ^ (*pchMessage++);
         ucCRC8  = CRC8_TAB[ucIndex];
@@ -108,11 +108,11 @@ uint8_t get_crc8(uint8_t* pchMessage, uint32_t dwLength, uint8_t ucCRC8)
 **  Input:        Data to Verify,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-uint32_t verify_crc8(uint8_t* pchMessage, uint32_t dwLength)
+uint32_t verify_crc8(uint8_t *pchMessage, uint32_t dwLength)
 {
     uint8_t ucExpected = 0;
 
-    if((pchMessage == 0) || (dwLength <= 2))
+    if ((pchMessage == 0) || (dwLength <= 2))
     {
         return 0;
     }
@@ -127,16 +127,16 @@ uint32_t verify_crc8(uint8_t* pchMessage, uint32_t dwLength)
 **  Input:        Data to CRC and append,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-void append_crc8(uint8_t* pchMessage, uint32_t dwLength)
+void append_crc8(uint8_t *pchMessage, uint32_t dwLength)
 {
     uint8_t ucCRC = 0;
 
-    if((pchMessage == 0) || (dwLength <= 2))
+    if ((pchMessage == 0) || (dwLength <= 2))
     {
         return;
     }
 
-    ucCRC = get_crc8((uint8_t*)pchMessage, dwLength - 1, CRC8_INIT);
+    ucCRC = get_crc8((uint8_t *)pchMessage, dwLength - 1, CRC8_INIT);
 
     pchMessage[dwLength - 1] = ucCRC;
 }
@@ -194,15 +194,15 @@ static const uint16_t wCRC_Table[256] =
 **  Input:        Data to check,Stream length, initialized checksum
 **  Output:       CRC checksum
 */
-uint16_t get_crc16(uint8_t* pchMessage, uint32_t dwLength, uint16_t wCRC)
+uint16_t get_crc16(uint8_t *pchMessage, uint32_t dwLength, uint16_t wCRC)
 {
     uint8_t chData;
-    if(pchMessage == NULL)
+    if (pchMessage == NULL)
     {
         return 0xFFFF;
     }
 
-    while(dwLength--)
+    while (dwLength--)
     {
         chData = *pchMessage++;
         (wCRC) = ((uint16_t)(wCRC) >> 8)  ^ wCRC_Table[((uint16_t)(wCRC) ^ (uint16_t)(chData)) & 0x00ff];
@@ -216,11 +216,11 @@ uint16_t get_crc16(uint8_t* pchMessage, uint32_t dwLength, uint16_t wCRC)
 **  Input:        Data to Verify,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-uint32_t verify_crc16(uint8_t* pchMessage, uint32_t dwLength)
+uint32_t verify_crc16(uint8_t *pchMessage, uint32_t dwLength)
 {
     uint16_t wExpected = 0;
 
-    if((pchMessage == NULL) || (dwLength <= 2))
+    if ((pchMessage == NULL) || (dwLength <= 2))
     {
         return __FALSE;
     }
@@ -234,15 +234,15 @@ uint32_t verify_crc16(uint8_t* pchMessage, uint32_t dwLength)
 **  Input:        Data to CRC and append,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-void append_crc16(uint8_t* pchMessage, uint32_t dwLength)
+void append_crc16(uint8_t *pchMessage, uint32_t dwLength)
 {
     uint16_t wCRC = 0;
 
-    if((pchMessage == NULL) || (dwLength <= 2))
+    if ((pchMessage == NULL) || (dwLength <= 2))
     {
         return;
     }
-    wCRC = get_crc16((uint8_t*)pchMessage, dwLength - 2, CRC16_INIT);
+    wCRC = get_crc16((uint8_t *)pchMessage, dwLength - 2, CRC16_INIT);
 
     pchMessage[dwLength - 2] = (uint8_t)(wCRC & 0x00ff);
     pchMessage[dwLength - 1] = (uint8_t)((wCRC >> 8) & 0x00ff);
@@ -308,15 +308,15 @@ static const uint16_t CRC32_INIT = 0x3aa3;
 **  Input:        Data to check,Stream length, initialized checksum
 **  Output:       CRC checksum
 */
-uint32_t get_crc32(uint8_t* pchMessage, uint32_t dwLength, uint32_t wCRC)
+uint32_t get_crc32(uint8_t *pchMessage, uint32_t dwLength, uint32_t wCRC)
 {
     uint8_t chData;
-    if(pchMessage == NULL)
+    if (pchMessage == NULL)
     {
         return 0xFFFF;
     }
 
-    while(dwLength--)
+    while (dwLength--)
     {
         chData = *pchMessage++;
         (wCRC) = ((uint32_t)(wCRC) >> 8)  ^ CRC32_Table[((uint32_t)(wCRC) ^ (uint32_t)(chData)) & 0x000000ff];
@@ -330,11 +330,11 @@ uint32_t get_crc32(uint8_t* pchMessage, uint32_t dwLength, uint32_t wCRC)
 **  Input:        Data to Verify,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-uint32_t verify_crc32(uint8_t* pchMessage, uint32_t dwLength)
+uint32_t verify_crc32(uint8_t *pchMessage, uint32_t dwLength)
 {
     uint32_t wExpected = 0;
     uint32_t input_crc = 0;
-    if((pchMessage == NULL) || (dwLength <= 4))
+    if ((pchMessage == NULL) || (dwLength <= 4))
     {
         return __FALSE;
     }
@@ -353,15 +353,15 @@ uint32_t verify_crc32(uint8_t* pchMessage, uint32_t dwLength)
 **  Input:        Data to CRC and append,Stream length = Data + checksum
 **  Output:       True or False (CRC Verify Result)
 */
-void append_crc32(uint8_t* pchMessage, uint32_t dwLength)
+void append_crc32(uint8_t *pchMessage, uint32_t dwLength)
 {
     uint32_t wCRC = 0;
 
-    if((pchMessage == NULL) || (dwLength <= 4))
+    if ((pchMessage == NULL) || (dwLength <= 4))
     {
         return;
     }
-    wCRC = get_crc32((uint8_t*)pchMessage, dwLength - 4, CRC32_INIT);
+    wCRC = get_crc32((uint8_t *)pchMessage, dwLength - 4, CRC32_INIT);
 
     pchMessage[dwLength - 4] = (uint8_t)(wCRC & 0xff);
     pchMessage[dwLength - 3] = (uint8_t)((wCRC >> 8) & 0xff);

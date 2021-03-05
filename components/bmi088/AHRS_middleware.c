@@ -27,9 +27,9 @@
  * @retval         返回空
  */
 
-void AHRS_get_height(fp32* high)
+void AHRS_get_height(fp32 *high)
 {
-    if(high != NULL)
+    if (high != NULL)
     {
         *high = 0.0f;
     }
@@ -42,9 +42,9 @@ void AHRS_get_height(fp32* high)
  * @retval         返回空
  */
 
-void AHRS_get_latitude(fp32* latitude)
+void AHRS_get_latitude(fp32 *latitude)
 {
-    if(latitude != NULL)
+    if (latitude != NULL)
     {
         *latitude = 22.0f;
     }

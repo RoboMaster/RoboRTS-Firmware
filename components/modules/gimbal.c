@@ -19,7 +19,7 @@
 #define LOG_TAG "gimbal"
 #include "log.h"
 
-static int32_t gimbal_set_yaw_gyro_angle(struct gimbal* gimbal, float yaw, uint8_t mode);
+static int32_t gimbal_set_yaw_gyro_angle(struct gimbal *gimbal, float yaw, uint8_t mode);
 static int16_t gimbal_get_ecd_angle(int16_t raw_ecd, int16_t center_offset);
 
 /**
@@ -27,7 +27,7 @@ static int16_t gimbal_get_ecd_angle(int16_t raw_ecd, int16_t center_offset);
   * @param[in]
   * @retval    error code
   */
-int32_t gimbal_cascade_init(struct gimbal* gimbal, const char* name,
+int32_t gimbal_cascade_init(struct gimbal *gimbal, const char *name,
                             struct pid_param yaw_inter_param,
                             struct pid_param yaw_outer_param,
                             struct pid_param pitch_inter_param,
@@ -41,12 +41,12 @@ int32_t gimbal_cascade_init(struct gimbal* gimbal, const char* name,
 
     name_len = strlen(name);
 
-    if(name_len > OBJECT_NAME_MAX_LEN / 2)
+    if (name_len > OBJECT_NAME_MAX_LEN / 2)
     {
         name_len = OBJECT_NAME_MAX_LEN / 2;
     }
 
-    for(int i = 0; i < 2; i++)
+    for (int i = 0; i < 2; i++)
     {
         memcpy(&motor_name[i], name, name_len);
     }
@@ -80,11 +80,11 @@ int32_t gimbal_cascade_init(struct gimbal* gimbal, const char* name,
   * @param[in]
   * @retval    error code
   */
-int32_t gimbal_set_pitch_delta(struct gimbal* gimbal, float pitch)
+int32_t gimbal_set_pitch_delta(struct gimbal *gimbal, float pitch)
 {
     device_assert(gimbal != NULL);
 
-    if(gimbal->mode.bit.pitch_mode == GYRO_MODE)
+    if (gimbal->mode.bit.pitch_mode == GYRO_MODE)
     {
         gimbal_set_pitch_angle(gimbal, gimbal->gyro_target_angle.pitch + pitch);
     }
@@ -96,11 +96,11 @@ int32_t gimbal_set_pitch_delta(struct gimbal* gimbal, float pitch)
     return E_OK;
 }
 
-int32_t gimbal_set_yaw_delta(struct gimbal* gimbal, float yaw)
+int32_t gimbal_set_yaw_delta(struct gimbal *gimbal, float yaw)
 {
     device_assert(gimbal != NULL);
 
-    if(gimbal->mode.bit.yaw_mode == GYRO_MODE)
+    if (gimbal->mode.bit.yaw_mode == GYRO_MODE)
     {
         gimbal_set_yaw_angle(gimbal, gimbal->gyro_target_angle.yaw + yaw, 0);
     }
@@ -117,11 +117,11 @@ int32_t gimbal_set_yaw_delta(struct gimbal* gimbal, float yaw)
   * @param[in]
   * @retval    error code
   */
-int32_t gimbal_set_pitch_speed(struct gimbal* gimbal, float pitch)
+int32_t gimbal_set_pitch_speed(struct gimbal *gimbal, float pitch)
 {
     device_assert(gimbal != NULL);
 
-    if(gimbal->mode.bit.pitch_mode == GYRO_MODE)
+    if (gimbal->mode.bit.pitch_mode == GYRO_MODE)
     {
         gimbal_set_pitch_angle(gimbal, gimbal->sensor.gyro_angle.pitch + pitch);
     }
@@ -133,11 +133,11 @@ int32_t gimbal_set_pitch_speed(struct gimbal* gimbal, float pitch)
     return E_OK;
 }
 
-int32_t gimbal_set_yaw_speed(struct gimbal* gimbal, float yaw)
+int32_t gimbal_set_yaw_speed(struct gimbal *gimbal, float yaw)
 {
     device_assert(gimbal != NULL);
 
-    if(gimbal->mode.bit.yaw_mode == GYRO_MODE)
+    if (gimbal->mode.bit.yaw_mode == GYRO_MODE)
     {
         gimbal_set_yaw_angle(gimbal, gimbal->sensor.gyro_angle.yaw + yaw, YAW_FASTEST);
     }
@@ -149,11 +149,11 @@ int32_t gimbal_set_yaw_speed(struct gimbal* gimbal, float yaw)
     return E_OK;
 }
 
-int32_t gimbal_set_pitch_angle(struct gimbal* gimbal, float pitch)
+int32_t gimbal_set_pitch_angle(struct gimbal *gimbal, float pitch)
 {
     device_assert(gimbal != NULL);
 
-    if(gimbal->mode.bit.pitch_mode == GYRO_MODE)
+    if (gimbal->mode.bit.pitch_mode == GYRO_MODE)
     {
         float center_offset;
 
@@ -171,11 +171,11 @@ int32_t gimbal_set_pitch_angle(struct gimbal* gimbal, float pitch)
     return E_OK;
 }
 
-int32_t gimbal_set_yaw_angle(struct gimbal* gimbal, float yaw, uint8_t mode)
+int32_t gimbal_set_yaw_angle(struct gimbal *gimbal, float yaw, uint8_t mode)
 {
     device_assert(gimbal != NULL);
 
-    if(gimbal->mode.bit.yaw_mode == GYRO_MODE)
+    if (gimbal->mode.bit.yaw_mode == GYRO_MODE)
     {
         gimbal_set_yaw_gyro_angle(gimbal, yaw, mode);
     }
@@ -193,18 +193,18 @@ int32_t gimbal_set_yaw_angle(struct gimbal* gimbal, float yaw, uint8_t mode)
   * @param[in]
   * @retval    error code
   */
-int32_t gimbal_set_pitch_mode(struct gimbal* gimbal, uint8_t mode)
+int32_t gimbal_set_pitch_mode(struct gimbal *gimbal, uint8_t mode)
 {
     device_assert(gimbal != NULL);
 
-    if(mode != gimbal->mode.bit.pitch_mode)
+    if (mode != gimbal->mode.bit.pitch_mode)
     {
         gimbal->mode.bit.pitch_mode = mode;
-        if(mode == GYRO_MODE)
+        if (mode == GYRO_MODE)
         {
             gimbal_set_pitch_angle(gimbal, gimbal->sensor.gyro_angle.pitch);
         }
-        else if(mode == ENCODER_MODE)
+        else if (mode == ENCODER_MODE)
         {
             gimbal_set_pitch_angle(gimbal, gimbal->ecd_angle.pitch);
         }
@@ -213,18 +213,18 @@ int32_t gimbal_set_pitch_mode(struct gimbal* gimbal, uint8_t mode)
     return E_OK;
 }
 
-int32_t gimbal_set_yaw_mode(struct gimbal* gimbal, uint8_t mode)
+int32_t gimbal_set_yaw_mode(struct gimbal *gimbal, uint8_t mode)
 {
     device_assert(gimbal != NULL);
 
-    if(mode != gimbal->mode.bit.yaw_mode)
+    if (mode != gimbal->mode.bit.yaw_mode)
     {
         gimbal->mode.bit.yaw_mode = mode;
-        if(mode == GYRO_MODE)
+        if (mode == GYRO_MODE)
         {
             gimbal_set_yaw_angle(gimbal, gimbal->sensor.gyro_angle.yaw, YAW_FASTEST);
         }
-        else if(mode == ENCODER_MODE)
+        else if (mode == ENCODER_MODE)
         {
             gimbal_set_yaw_angle(gimbal, gimbal->ecd_angle.yaw, 0);
         }
@@ -233,7 +233,7 @@ int32_t gimbal_set_yaw_mode(struct gimbal* gimbal, uint8_t mode)
     return E_OK;
 }
 
-int32_t gimbal_set_offset(struct gimbal* gimbal, uint16_t yaw_ecd, uint16_t pitch_ecd)
+int32_t gimbal_set_offset(struct gimbal *gimbal, uint16_t yaw_ecd, uint16_t pitch_ecd)
 {
     device_assert(gimbal != NULL);
 
@@ -243,7 +243,7 @@ int32_t gimbal_set_offset(struct gimbal* gimbal, uint16_t yaw_ecd, uint16_t pitc
     return E_OK;
 }
 
-int32_t gimbal_pitch_enable(struct gimbal* gimbal)
+int32_t gimbal_pitch_enable(struct gimbal *gimbal)
 {
     device_assert(gimbal != NULL);
 
@@ -252,7 +252,7 @@ int32_t gimbal_pitch_enable(struct gimbal* gimbal)
     return E_OK;
 }
 
-int32_t gimbal_pitch_disable(struct gimbal* gimbal)
+int32_t gimbal_pitch_disable(struct gimbal *gimbal)
 {
     device_assert(gimbal != NULL);
 
@@ -261,7 +261,7 @@ int32_t gimbal_pitch_disable(struct gimbal* gimbal)
     return E_OK;
 }
 
-int32_t gimbal_yaw_enable(struct gimbal* gimbal)
+int32_t gimbal_yaw_enable(struct gimbal *gimbal)
 {
     device_assert(gimbal != NULL);
 
@@ -270,7 +270,7 @@ int32_t gimbal_yaw_enable(struct gimbal* gimbal)
     return E_OK;
 }
 
-int32_t gimbal_yaw_disable(struct gimbal* gimbal)
+int32_t gimbal_yaw_disable(struct gimbal *gimbal)
 {
     device_assert(gimbal != NULL);
 
@@ -284,11 +284,11 @@ int32_t gimbal_yaw_disable(struct gimbal* gimbal)
   * @param[in]
   * @retval    error code
   */
-int32_t gimbal_cascade_calculate(struct gimbal* gimbal)
+int32_t gimbal_cascade_calculate(struct gimbal *gimbal)
 {
     float motor_out;
     float outer_out;
-    struct motor_data* pdata;
+    struct motor_data *pdata;
     float yaw_fdb, pitch_fdb;
 
     device_assert(gimbal != NULL);
@@ -299,7 +299,7 @@ int32_t gimbal_cascade_calculate(struct gimbal* gimbal)
     pdata = motor_get_data(&(gimbal->pitch_motor));
     gimbal->ecd_angle.pitch = PITCH_MOTOR_POSITIVE_DIR * gimbal_get_ecd_angle(pdata->ecd, gimbal->param.pitch_ecd_center) / ENCODER_ANGLE_RATIO;
 
-    if(gimbal->mode.bit.yaw_mode == GYRO_MODE)
+    if (gimbal->mode.bit.yaw_mode == GYRO_MODE)
     {
         float center_offset;
 
@@ -321,7 +321,7 @@ int32_t gimbal_cascade_calculate(struct gimbal* gimbal)
     motor_out = pid_calculate(&(gimbal->yaw_inter_pid), gimbal->sensor.rate.yaw_rate, outer_out);
     motor_set_current(&(gimbal->yaw_motor), (int16_t)YAW_MOTOR_POSITIVE_DIR * motor_out);
 
-    if(gimbal->mode.bit.pitch_mode == GYRO_MODE)
+    if (gimbal->mode.bit.pitch_mode == GYRO_MODE)
     {
         float center_offset;
 
@@ -351,7 +351,7 @@ int32_t gimbal_cascade_calculate(struct gimbal* gimbal)
   * @param[in]
   * @retval    error code
   */
-int32_t gimbal_rate_update(struct gimbal* gimbal, float yaw_rate, float pitch_rate)
+int32_t gimbal_rate_update(struct gimbal *gimbal, float yaw_rate, float pitch_rate)
 {
     device_assert(gimbal != NULL);
 
@@ -366,7 +366,7 @@ int32_t gimbal_rate_update(struct gimbal* gimbal, float yaw_rate, float pitch_ra
   * @param[in]
   * @retval    error code
   */
-int32_t gimbal_yaw_gyro_update(struct gimbal* gimbal, float yaw)
+int32_t gimbal_yaw_gyro_update(struct gimbal *gimbal, float yaw)
 {
     device_assert(gimbal != NULL);
 
@@ -375,7 +375,7 @@ int32_t gimbal_yaw_gyro_update(struct gimbal* gimbal, float yaw)
     return E_OK;
 }
 
-int32_t gimbal_pitch_gyro_update(struct gimbal* gimbal, float pitch)
+int32_t gimbal_pitch_gyro_update(struct gimbal *gimbal, float pitch)
 {
     device_assert(gimbal != NULL);
 
@@ -389,7 +389,7 @@ int32_t gimbal_pitch_gyro_update(struct gimbal* gimbal, float pitch)
   * @param[in]
   * @retval    error code
   */
-int32_t gimbal_get_info(struct gimbal* gimbal, struct gimbal_info* info)
+int32_t gimbal_get_info(struct gimbal *gimbal, struct gimbal_info *info)
 {
     device_assert(gimbal != NULL);
 
@@ -408,9 +408,9 @@ int32_t gimbal_get_info(struct gimbal* gimbal, struct gimbal_info* info)
 static int16_t gimbal_get_ecd_angle(int16_t raw_ecd, int16_t center_offset)
 {
     int16_t tmp = 0;
-    if(center_offset >= 4096)
+    if (center_offset >= 4096)
     {
-        if(raw_ecd > center_offset - 4096)
+        if (raw_ecd > center_offset - 4096)
         {
             tmp = raw_ecd - center_offset;
         }
@@ -421,7 +421,7 @@ static int16_t gimbal_get_ecd_angle(int16_t raw_ecd, int16_t center_offset)
     }
     else
     {
-        if(raw_ecd > center_offset + 4096)
+        if (raw_ecd > center_offset + 4096)
         {
             tmp = raw_ecd - 8192 - center_offset;
         }
@@ -438,7 +438,7 @@ static int16_t gimbal_get_ecd_angle(int16_t raw_ecd, int16_t center_offset)
   * @param[in]
   * @retval    error code
   */
-static int32_t gimbal_set_yaw_gyro_angle(struct gimbal* gimbal, float yaw, uint8_t mode)
+static int32_t gimbal_set_yaw_gyro_angle(struct gimbal *gimbal, float yaw, uint8_t mode)
 {
     device_assert(gimbal != NULL);
 
@@ -447,9 +447,9 @@ static int32_t gimbal_set_yaw_gyro_angle(struct gimbal* gimbal, float yaw, uint8
     ANGLE_LIMIT_360(yaw_target, yaw);
     ANGLE_LIMIT_360(yaw_now, gimbal->sensor.gyro_angle.yaw);
 
-    if(mode == YAW_CLOCKWISE)
+    if (mode == YAW_CLOCKWISE)
     {
-        if(yaw_now < yaw_target)
+        if (yaw_now < yaw_target)
         {
             yaw_offset = -(360 - (yaw_target - yaw_now));
         }
@@ -458,9 +458,9 @@ static int32_t gimbal_set_yaw_gyro_angle(struct gimbal* gimbal, float yaw, uint8
             yaw_offset = yaw_target - yaw_now;
         }
     }
-    else if(mode == YAW_ANTICLOCKWISE)
+    else if (mode == YAW_ANTICLOCKWISE)
     {
-        if(yaw_now < yaw_target)
+        if (yaw_now < yaw_target)
         {
             yaw_offset = yaw_target - yaw_now;
         }
@@ -469,14 +469,14 @@ static int32_t gimbal_set_yaw_gyro_angle(struct gimbal* gimbal, float yaw, uint8
             yaw_offset = 360 + (yaw_target - yaw_now);
         }
     }
-    else if(mode == YAW_FASTEST)
+    else if (mode == YAW_FASTEST)
     {
         yaw_offset = yaw_target - yaw_now;
-        if(yaw_offset > 180)
+        if (yaw_offset > 180)
         {
             yaw_offset = yaw_offset - 360;
         }
-        else if(yaw_offset < -180)
+        else if (yaw_offset < -180)
         {
             yaw_offset = yaw_offset + 360;
         }

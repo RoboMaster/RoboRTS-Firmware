@@ -31,8 +31,8 @@ typedef struct ramp_v0_t
     int32_t count;
     int32_t scale;
     float   out;
-    void (*init)(struct ramp_v0_t* ramp, int32_t scale);
-    float (*calc)(struct ramp_v0_t* ramp);
+    void (*init)(struct ramp_v0_t *ramp, int32_t scale);
+    float (*calc)(struct ramp_v0_t *ramp);
 } ramp_v0_t;
 
 #define RAMP_GEN_DAFAULT     \
@@ -44,8 +44,8 @@ typedef struct ramp_v0_t
     .calc = &ramp_v0_calculate, \
   }
 
-void  ramp_v0_init(ramp_v0_t* ramp, int32_t scale);
-float ramp_v0_calculate(ramp_v0_t* ramp);
+void  ramp_v0_init(ramp_v0_t *ramp, int32_t scale);
+float ramp_v0_calculate(ramp_v0_t *ramp);
 
 #endif // __RAMP_H__
 

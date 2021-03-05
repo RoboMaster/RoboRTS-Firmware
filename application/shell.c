@@ -28,7 +28,7 @@
 #define CLI_PWD "robomaster"
 
 /************************************** 系统密码 ************************************/
-int pwd_command(char* write_buf, int buf_len, const char* cmd_str);
+int pwd_command(char *write_buf, int buf_len, const char *cmd_str);
 
 cli_cmd_t pwd_cmd =
 {
@@ -39,14 +39,14 @@ cli_cmd_t pwd_cmd =
     .cli_cmd_handler = pwd_command,
     .expect_param_num = 1
 };
-int pwd_command(char* write_buf, int buf_len, const char* cmd_str)
+int pwd_command(char *write_buf, int buf_len, const char *cmd_str)
 {
-    const char* param[1];
+    const char *param[1];
     int param_len[1];
 
     param[0] = cli_get_param(cmd_str, 1, &param_len[0]);
     cli_get_param_end(cmd_str);
-    if(strcmp(param[0], CLI_PWD) == 0)
+    if (strcmp(param[0], CLI_PWD) == 0)
     {
         strcpy(write_buf, "login success, welcome!\r\n");
     }
@@ -61,7 +61,7 @@ int pwd_command(char* write_buf, int buf_len, const char* cmd_str)
 /************************************** 环境变量 ***********************************/
 void ef_print_env(void);
 
-int env_command(char* write_buf, int buf_len, const char* cmd_str);
+int env_command(char *write_buf, int buf_len, const char *cmd_str);
 
 cli_cmd_t env_cmd =
 {
@@ -72,14 +72,14 @@ cli_cmd_t env_cmd =
     .cli_cmd_handler = env_command,
     .expect_param_num = 1
 };
-int env_command(char* write_buf, int buf_len, const char* cmd_str)
+int env_command(char *write_buf, int buf_len, const char *cmd_str)
 {
-    const char* param[1];
+    const char *param[1];
     int param_len[1];
 
     param[0] = cli_get_param(cmd_str, 1, &param_len[0]);
 
-    if(strcmp(param[0], "print") == 0)
+    if (strcmp(param[0], "print") == 0)
     {
         ef_print_env();
     }
@@ -106,20 +106,20 @@ void cli_cmd_init(void)
 #define CMD_BUFSIZE MAX_CMD_SIZE
 
 /* 内部函数申明 */
-static void pthread_cli(void const* argc);
+static void pthread_cli(void const *argc);
 
-int cli_send(char* out_str)
+int cli_send(char *out_str)
 {
-    usart1_transmit((uint8_t*)out_str, strlen(out_str) + 1);
+    usart1_transmit((uint8_t *)out_str, strlen(out_str) + 1);
     return 0;
 }
 
 fifo_s_t shell_fifo;
 char shell_buf[CMD_BUFSIZE];
 
-void shell_interupt(uint8_t* buff, uint16_t len)
+void shell_interupt(uint8_t *buff, uint16_t len)
 {
-    fifo_s_puts_noprotect(&shell_fifo, (char*)buff, len);
+    fifo_s_puts_noprotect(&shell_fifo, (char *)buff, len);
 }
 
 osThreadId shell_task_t;
@@ -134,7 +134,7 @@ int thread_cli_init(void)
 }
 
 /****************************************   线程函数  ***************************************/
-void pthread_cli(void const* argc)
+void pthread_cli(void const *argc)
 {
     char input_buf[CMD_BUFSIZE];
     int ret;
@@ -144,12 +144,12 @@ void pthread_cli(void const* argc)
 
     cli_cmd_init();
 
-    while(1)
+    while (1)
     {
         uint16_t used_len;
         used_len = shell_fifo.used_num;
         ret = fifo_s_gets(&shell_fifo, input_buf, used_len);
-        if(ret > 0)
+        if (ret > 0)
         {
             cli_process(input_buf, ret, cli_send);
         }

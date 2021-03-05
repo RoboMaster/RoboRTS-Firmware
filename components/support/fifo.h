@@ -64,25 +64,25 @@
     //! FIFO Memory Model (Single Byte Mode)
     typedef struct
     {
-        char* p_start_addr; //!< FIFO Memory Pool Start Address
-        char* p_end_addr;   //!< FIFO Memory Pool End Address
+        char *p_start_addr; //!< FIFO Memory Pool Start Address
+        char *p_end_addr;   //!< FIFO Memory Pool End Address
         int free_num;       //!< The remain capacity of FIFO
         int used_num;       //!< The number of elements in FIFO
-        char* p_read_addr;  //!< FIFO Data Read Index Pointer
-        char* p_write_addr; //!< FIFO Data Write Index Pointer
+        char *p_read_addr;  //!< FIFO Data Read Index Pointer
+        char *p_write_addr; //!< FIFO Data Write Index Pointer
         MUTEX_DECLARE(mutex);
     } fifo_s_t;
 
     //! FIFO Memory Model
     typedef struct
     {
-        char* p_start_addr; //!< FIFO Memory Pool Start Address
-        char* p_end_addr;   //!< FIFO Memory Pool End Address
+        char *p_start_addr; //!< FIFO Memory Pool Start Address
+        char *p_end_addr;   //!< FIFO Memory Pool End Address
         int free_num;       //!< The remain capacity of FIFO
         int used_num;       //!< The number of elements in FIFO
         int unit_size;      //!< FIFO Element Size(Unit: Byte)
-        char* p_read_addr;  //!< FIFO Data Read Index Pointer
-        char* p_write_addr; //!< FIFO Data Write Index Pointer
+        char *p_read_addr;  //!< FIFO Data Read Index Pointer
+        char *p_write_addr; //!< FIFO Data Write Index Pointer
         MUTEX_DECLARE(mutex);
     } fifo_t;
 
@@ -106,7 +106,7 @@
     //! \note   -# Functions FIFO_Create and FIFO_Destory must be used in pairs.
     //!
     //******************************************************************************************
-    fifo_s_t* fifo_s_create(int uint_cnt);
+    fifo_s_t *fifo_s_create(int uint_cnt);
 
     //******************************************************************************************
     //
@@ -120,7 +120,7 @@
     //!            Header file before use this function.
     //
     //******************************************************************************************
-    void fifo_s_destroy(fifo_s_t* p_fifo);
+    void fifo_s_destroy(fifo_s_t *p_fifo);
 
 #endif // USE_DYNAMIC_MEMORY
 
@@ -134,7 +134,7 @@
     //! \retval 0 if initialize successfully, otherwise return -1.
     //
     //******************************************************************************************
-    int fifo_s_init(fifo_s_t* p_fifo, void* p_base_addr, int uint_cnt);
+    int fifo_s_init(fifo_s_t *p_fifo, void *p_base_addr, int uint_cnt);
 
     //******************************************************************************************
     //
@@ -146,10 +146,10 @@
     //! \retval 0 if operate successfully, otherwise return -1.
     //
     //******************************************************************************************
-    int fifo_s_put(fifo_s_t* p_fifo, char element);
+    int fifo_s_put(fifo_s_t *p_fifo, char element);
 
-    int fifo_s_puts(fifo_s_t* p_fifo, char* p_source, int len);
-    int fifo_s_puts_noprotect(fifo_s_t* p_fifo, char* p_source, int len);
+    int fifo_s_puts(fifo_s_t *p_fifo, char *p_source, int len);
+    int fifo_s_puts_noprotect(fifo_s_t *p_fifo, char *p_source, int len);
 
     //******************************************************************************************
     //
@@ -160,9 +160,9 @@
     //! \retval the data element of FIFO.
     //
     //******************************************************************************************
-    char fifo_s_get(fifo_s_t* p_fifo);
-    int fifo_s_gets(fifo_s_t* p_fifo, char* p_dest, int len);
-    int fifo_s_gets_noprotect(fifo_s_t* p_fifo, char* p_dest, int len);
+    char fifo_s_get(fifo_s_t *p_fifo);
+    int fifo_s_gets(fifo_s_t *p_fifo, char *p_dest, int len);
+    int fifo_s_gets_noprotect(fifo_s_t *p_fifo, char *p_dest, int len);
 
     //******************************************************************************************
     //
@@ -174,8 +174,8 @@
     //! \retval the data element of FIFO.
     //
     //******************************************************************************************
-    char fifo_s_preread(fifo_s_t* p_fifo, int offset);
-    int fifo_s_prereads(fifo_s_t* p_fifo, char* p_dest, int offset, int len);
+    char fifo_s_preread(fifo_s_t *p_fifo, int offset);
+    int fifo_s_prereads(fifo_s_t *p_fifo, char *p_dest, int offset, int len);
 
     //******************************************************************************************
     //
@@ -187,7 +187,7 @@
     //!         - Zero(false) if not empty.
     //
     //******************************************************************************************
-    char fifo_s_isempty(fifo_s_t* p_fifo);
+    char fifo_s_isempty(fifo_s_t *p_fifo);
 
     //******************************************************************************************
     //
@@ -199,7 +199,7 @@
     //!         - Zero(false) if not full.
     //
     //******************************************************************************************
-    char fifo_s_isfull(fifo_s_t* p_fifo);
+    char fifo_s_isfull(fifo_s_t *p_fifo);
 
     //******************************************************************************************
     //
@@ -210,7 +210,7 @@
     //! \retval The number of elements in FIFO.
     //
     //******************************************************************************************
-    int fifo_s_used(fifo_s_t* p_fifo);
+    int fifo_s_used(fifo_s_t *p_fifo);
 
     //******************************************************************************************
     //
@@ -221,7 +221,7 @@
     //! \retval The number of elements in FIFO.
     //
     //******************************************************************************************
-    int fifo_s_free(fifo_s_t* p_fifo);
+    int fifo_s_free(fifo_s_t *p_fifo);
 
     //******************************************************************************************
     //
@@ -232,8 +232,8 @@
     //! \retval 0 if success, -1 if failure.
     //
     //******************************************************************************************
-    void fifo_s_flush(fifo_s_t* p_fifo);
-    int fifo_s_discard(fifo_s_t* p_fifo, int len);
+    void fifo_s_flush(fifo_s_t *p_fifo);
+    int fifo_s_discard(fifo_s_t *p_fifo, int len);
 
     //******************************************************************************************
     //
@@ -250,7 +250,7 @@
     //! \note   -# Functions FIFO_Create and FIFO_Destory must be used in pairs.
     //!
     //******************************************************************************************
-    fifo_t* fifo_create(char unit_size, int unit_cnt);
+    fifo_t *fifo_create(char unit_size, int unit_cnt);
 
     //******************************************************************************************
     //
@@ -264,7 +264,7 @@
     //!            Header file before use this function.
     //
     //******************************************************************************************
-    void fifo_destory(fifo_t* p_fifo);
+    void fifo_destory(fifo_t *p_fifo);
 
     //******************************************************************************************
     //
@@ -277,7 +277,7 @@
     //! \retval 0 if initialize successfully, otherwise return -1.
     //
     //******************************************************************************************
-    int fifo_init(fifo_t* p_fifo, void* p_base_addr, char unit_size, int unit_cnt);
+    int fifo_init(fifo_t *p_fifo, void *p_base_addr, char unit_size, int unit_cnt);
 
     //******************************************************************************************
     //
@@ -289,8 +289,8 @@
     //! \retval 0 if operate successfully, otherwise return -1.
     //
     //******************************************************************************************
-    int fifo_put(fifo_t* p_fifo, void* p_element);
-    int fifo_put_noprotect(fifo_t* p_fifo, void* p_element);
+    int fifo_put(fifo_t *p_fifo, void *p_element);
+    int fifo_put_noprotect(fifo_t *p_fifo, void *p_element);
     //******************************************************************************************
     //
     //! \brief  Get an element from FIFO.
@@ -301,8 +301,8 @@
     //! \retval 0 if operate successfully, otherwise return -1.
     //
     //******************************************************************************************
-    int fifo_get(fifo_t* p_fifo, void* p_element);
-    int fifo_get_noprotect(fifo_t* p_fifo, void* p_element);
+    int fifo_get(fifo_t *p_fifo, void *p_element);
+    int fifo_get_noprotect(fifo_t *p_fifo, void *p_element);
 
     //******************************************************************************************
     //
@@ -315,7 +315,7 @@
     //! \retval 0 if operate successfully, otherwise return -1.
     //
     //******************************************************************************************
-    int fifo_pre_read(fifo_t* p_fifo, char offset, void* p_element);
+    int fifo_pre_read(fifo_t *p_fifo, char offset, void *p_element);
 
     //******************************************************************************************
     //
@@ -327,7 +327,7 @@
     //!         - Zero(false) if not empty.
     //
     //******************************************************************************************
-    int fifo_is_empty(fifo_t* p_fifo);
+    int fifo_is_empty(fifo_t *p_fifo);
 
     //******************************************************************************************
     //
@@ -339,7 +339,7 @@
     //!         - Zero(false) if not full.
     //
     //******************************************************************************************
-    int fifo_is_full(fifo_t* p_fifo);
+    int fifo_is_full(fifo_t *p_fifo);
 
     //******************************************************************************************
     //
@@ -350,7 +350,7 @@
     //! \retval The number of elements in FIFO.
     //
     //******************************************************************************************
-    int fifo_used(fifo_t* p_fifo);
+    int fifo_used(fifo_t *p_fifo);
 
     //******************************************************************************************
     //
@@ -361,7 +361,7 @@
     //! \retval The number of elements in FIFO.
     //
     //******************************************************************************************
-    int fifo_free(fifo_t* p_fifo);
+    int fifo_free(fifo_t *p_fifo);
 
     //******************************************************************************************
     //
@@ -372,7 +372,7 @@
     //! \retval 0 if success, -1 if failure.
     //
     //******************************************************************************************
-    int fifo_flush(fifo_t* p_fifo);
+    int fifo_flush(fifo_t *p_fifo);
 
 #ifdef __cplusplus
 }

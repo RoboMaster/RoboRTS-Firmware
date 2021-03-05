@@ -60,12 +60,12 @@
 
 void pwm_device_init(void);
 void fric_set_output(uint16_t  fric_spd1, uint16_t  fric_spd2);
-void fric_get_speed(uint16_t*  fric_spd1, uint16_t*  fric_spd2);
+void fric_get_speed(uint16_t  *fric_spd1, uint16_t  *fric_spd2);
 
 void mpu_heat_output(uint16_t pwm_pulse);
 void beep_set_tune(uint16_t tune, uint16_t ctrl);
 int32_t beep_set_times(uint8_t times);
-int32_t beep_ctrl_times(void* argc);
-int32_t green_led_toggle(void* argc);
+int32_t beep_ctrl_times(void *argc);
+int32_t green_led_toggle(void *argc);
 
 #endif // __DRV_IO_H__

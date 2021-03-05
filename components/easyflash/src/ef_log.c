@@ -130,7 +130,7 @@ static SectorStatus get_sector_status(uint32_t addr)
     /* calculate the sector header address */
     header_addr = addr & (~(EF_ERASE_MIN_SIZE - 1));
 
-    if(ef_port_read(header_addr, header_buf, sizeof(header_buf)) == EF_NO_ERR)
+    if (ef_port_read(header_addr, header_buf, sizeof(header_buf)) == EF_NO_ERR)
     {
         sector_header_magic = header_buf[SECTOR_HEADER_MAGIC_INDEX];
         status_use_magic = header_buf[SECTOR_HEADER_USING_INDEX];
@@ -143,17 +143,17 @@ static SectorStatus get_sector_status(uint32_t addr)
     }
 
     /* compare header magic code */
-    if(sector_header_magic == LOG_SECTOR_MAGIC)
+    if (sector_header_magic == LOG_SECTOR_MAGIC)
     {
-        if((status_use_magic == SECTOR_STATUS_MAGIC_EMPUT) && (status_full_magic == SECTOR_STATUS_MAGIC_EMPUT))
+        if ((status_use_magic == SECTOR_STATUS_MAGIC_EMPUT) && (status_full_magic == SECTOR_STATUS_MAGIC_EMPUT))
         {
             return SECTOR_STATUS_EMPUT;
         }
-        else if((status_use_magic == SECTOR_STATUS_MAGIC_USING) && (status_full_magic == SECTOR_STATUS_MAGIC_EMPUT))
+        else if ((status_use_magic == SECTOR_STATUS_MAGIC_USING) && (status_full_magic == SECTOR_STATUS_MAGIC_EMPUT))
         {
             return SECTOR_STATUS_USING;
         }
-        else if((status_use_magic == SECTOR_STATUS_MAGIC_USING) && (status_full_magic == SECTOR_STATUS_MAGIC_FULL))
+        else if ((status_use_magic == SECTOR_STATUS_MAGIC_USING) && (status_full_magic == SECTOR_STATUS_MAGIC_FULL))
         {
             return SECTOR_STATUS_FULL;
         }
@@ -185,7 +185,7 @@ static EfErrCode write_sector_status(uint32_t addr, SectorStatus status)
     header_addr = addr & (~(EF_ERASE_MIN_SIZE - 1));
 
     /* calculate the sector staus magic */
-    switch(status)
+    switch (status)
     {
     case SECTOR_STATUS_EMPUT:
     {
@@ -228,9 +228,9 @@ static uint32_t find_sec_using_end_addr(uint32_t addr)
     data_start = sector_start + LOG_SECTOR_HEADER_SIZE;
 
     /* counts continuous 0xFF which is end of sector */
-    while(data_start < sector_start + EF_ERASE_MIN_SIZE)
+    while (data_start < sector_start + EF_ERASE_MIN_SIZE)
     {
-        if(data_start + READ_BUF_SIZE < sector_start + EF_ERASE_MIN_SIZE)
+        if (data_start + READ_BUF_SIZE < sector_start + EF_ERASE_MIN_SIZE)
         {
             read_buf_size = READ_BUF_SIZE;
         }
@@ -238,10 +238,10 @@ static uint32_t find_sec_using_end_addr(uint32_t addr)
         {
             read_buf_size = sector_start + EF_ERASE_MIN_SIZE - data_start;
         }
-        ef_port_read(data_start, (uint32_t*)buf, read_buf_size);
-        for(i = 0; i < read_buf_size; i++)
+        ef_port_read(data_start, (uint32_t *)buf, read_buf_size);
+        for (i = 0; i < read_buf_size; i++)
         {
-            if(buf[i] == 0xFF)
+            if (buf[i] == 0xFF)
             {
                 continue_ff++;
             }
@@ -253,16 +253,16 @@ static uint32_t find_sec_using_end_addr(uint32_t addr)
         data_start += read_buf_size;
     }
     /* calculate current flash sector using end address */
-    if(continue_ff >= EF_ERASE_MIN_SIZE - LOG_SECTOR_HEADER_SIZE)
+    if (continue_ff >= EF_ERASE_MIN_SIZE - LOG_SECTOR_HEADER_SIZE)
     {
         /* from 0 to sec_size all sector is 0xFF, so the sector is empty */
         return sector_start + LOG_SECTOR_HEADER_SIZE;
     }
-    else if(continue_ff >= 4)
+    else if (continue_ff >= 4)
     {
         /* form end_addr - 4 to sec_size length all area is 0xFF, so it's used part of the sector.
          * the address must be word alignment. */
-        if(continue_ff % 4 != 0)
+        if (continue_ff % 4 != 0)
         {
             continue_ff = (continue_ff / 4 + 1) * 4;
         }
@@ -314,16 +314,16 @@ static void find_start_and_end_addr(void)
     cur_sec_status = get_sector_status(log_area_start_addr);
     last_sec_status = cur_sec_status;
 
-    for(cur_size = EF_ERASE_MIN_SIZE; cur_size < LOG_AREA_SIZE; cur_size += EF_ERASE_MIN_SIZE)
+    for (cur_size = EF_ERASE_MIN_SIZE; cur_size < LOG_AREA_SIZE; cur_size += EF_ERASE_MIN_SIZE)
     {
         /* get current sector status */
         cur_sec_status = get_sector_status(log_area_start_addr + cur_size);
         /* compare last and current status */
-        switch(last_sec_status)
+        switch (last_sec_status)
         {
         case SECTOR_STATUS_EMPUT:
         {
-            switch(cur_sec_status)
+            switch (cur_sec_status)
             {
             case SECTOR_STATUS_EMPUT:
                 break;
@@ -341,7 +341,7 @@ static void find_start_and_end_addr(void)
         }
         case SECTOR_STATUS_USING:
         {
-            switch(cur_sec_status)
+            switch (cur_sec_status)
             {
             case SECTOR_STATUS_EMPUT:
                 /* like state 1 */
@@ -365,11 +365,11 @@ static void find_start_and_end_addr(void)
         }
         case SECTOR_STATUS_FULL:
         {
-            switch(cur_sec_status)
+            switch (cur_sec_status)
             {
             case SECTOR_STATUS_EMPUT:
                 /* like state 1 */
-                if(cur_log_sec_state == 2)
+                if (cur_log_sec_state == 2)
                 {
                     EF_DEBUG("Error: Log area error! Now will clean all log area.\n");
                     ef_log_clean();
@@ -384,7 +384,7 @@ static void find_start_and_end_addr(void)
                 }
                 break;
             case SECTOR_STATUS_USING:
-                if(total_sec_num <= 2)
+                if (total_sec_num <= 2)
                 {
                     /* like state 1 */
                     cur_log_sec_state = 1;
@@ -394,7 +394,7 @@ static void find_start_and_end_addr(void)
                 else
                 {
                     /* like state 2 when the sector is the last one */
-                    if(cur_size + EF_ERASE_MIN_SIZE >= LOG_AREA_SIZE)
+                    if (cur_size + EF_ERASE_MIN_SIZE >= LOG_AREA_SIZE)
                     {
                         cur_log_sec_state = 2;
                         log_start_addr = get_next_flash_sec_addr(log_area_start_addr + cur_size);
@@ -417,26 +417,26 @@ static void find_start_and_end_addr(void)
     }
 
     /* the last sector status counts */
-    if(cur_sec_status == SECTOR_STATUS_EMPUT)
+    if (cur_sec_status == SECTOR_STATUS_EMPUT)
     {
         empty_sec_counts++;
     }
-    else if(cur_sec_status == SECTOR_STATUS_USING)
+    else if (cur_sec_status == SECTOR_STATUS_USING)
     {
         using_sec_counts++;
     }
-    else if(cur_sec_status == SECTOR_STATUS_FULL)
+    else if (cur_sec_status == SECTOR_STATUS_FULL)
     {
         full_sector_counts++;
     }
-    else if(cur_sec_status == SECTOR_STATUS_HEADER_ERROR)
+    else if (cur_sec_status == SECTOR_STATUS_HEADER_ERROR)
     {
         EF_DEBUG("Error: Log sector header error! Now will clean all log area.\n");
         ef_log_clean();
         return;
     }
 
-    if(using_sec_counts != 1)
+    if (using_sec_counts != 1)
     {
         /* this state is almost impossible */
         EF_DEBUG("Error: There must be only one sector status is USING! Now will clean all log area.\n");
@@ -459,12 +459,12 @@ size_t ef_log_get_used_size(void)
 {
     size_t header_total_num = 0, physical_size = 0;
     /* must be call this function after initialize OK */
-    if(!init_ok)
+    if (!init_ok)
     {
         return 0;
     }
 
-    if(log_start_addr < log_end_addr)
+    if (log_start_addr < log_end_addr)
     {
         physical_size = log_end_addr - log_start_addr;
     }
@@ -487,26 +487,26 @@ size_t ef_log_get_used_size(void)
  *
  * @return result
  */
-static EfErrCode log_seq_read(uint32_t addr, uint32_t* log, size_t size)
+static EfErrCode log_seq_read(uint32_t addr, uint32_t *log, size_t size)
 {
     EfErrCode result = EF_NO_ERR;
     size_t read_size = 0, read_size_temp = 0;
 
-    while(size)
+    while (size)
     {
         /* move to sector data address */
-        if((addr + read_size) % EF_ERASE_MIN_SIZE == 0)
+        if ((addr + read_size) % EF_ERASE_MIN_SIZE == 0)
         {
             addr += LOG_SECTOR_HEADER_SIZE;
         }
         /* calculate current sector last data size */
         read_size_temp = EF_ERASE_MIN_SIZE - (addr % EF_ERASE_MIN_SIZE);
-        if(size < read_size_temp)
+        if (size < read_size_temp)
         {
             read_size_temp = size;
         }
         result = ef_port_read(addr + read_size, log + read_size / 4, read_size_temp);
-        if(result != EF_NO_ERR)
+        if (result != EF_NO_ERR)
         {
             return result;
         }
@@ -531,13 +531,13 @@ static uint32_t log_index2addr(size_t index)
     size_t sector_num = index / (EF_ERASE_MIN_SIZE - LOG_SECTOR_HEADER_SIZE) + 1;
 
     header_total_offset = sector_num * LOG_SECTOR_HEADER_SIZE;
-    if(log_start_addr < log_end_addr)
+    if (log_start_addr < log_end_addr)
     {
         return log_start_addr + index + header_total_offset;
     }
     else
     {
-        if(log_start_addr + index + header_total_offset < log_area_start_addr + LOG_AREA_SIZE)
+        if (log_start_addr + index + header_total_offset < log_area_start_addr + LOG_AREA_SIZE)
         {
             return log_start_addr + index + header_total_offset;
         }
@@ -560,14 +560,14 @@ static uint32_t log_index2addr(size_t index)
  *
  * @return result
  */
-EfErrCode ef_log_read(size_t index, uint32_t* log, size_t size)
+EfErrCode ef_log_read(size_t index, uint32_t *log, size_t size)
 {
     EfErrCode result = EF_NO_ERR;
     size_t cur_using_size = ef_log_get_used_size();
     size_t read_size_temp = 0;
     size_t header_total_num = 0;
 
-    if(!size)
+    if (!size)
     {
         return result;
     }
@@ -575,24 +575,24 @@ EfErrCode ef_log_read(size_t index, uint32_t* log, size_t size)
     EF_ASSERT(size % 4 == 0);
     EF_ASSERT(index < cur_using_size);
 
-    if(index + size > cur_using_size)
+    if (index + size > cur_using_size)
     {
         EF_DEBUG("Warning: Log read size out of bound. Cut read size.\n");
         size = cur_using_size - index;
     }
     /* must be call this function after initialize OK */
-    if(!init_ok)
+    if (!init_ok)
     {
         return EF_ENV_INIT_FAILED;
     }
 
-    if(log_start_addr < log_end_addr)
+    if (log_start_addr < log_end_addr)
     {
         log_seq_read(log_index2addr(index), log, size);
     }
     else
     {
-        if(log_index2addr(index) + size <= log_area_start_addr + LOG_AREA_SIZE)
+        if (log_index2addr(index) + size <= log_area_start_addr + LOG_AREA_SIZE)
         {
             /*                          Flash log area
              *                         |--------------|
@@ -613,7 +613,7 @@ EfErrCode ef_log_read(size_t index, uint32_t* log, size_t size)
              */
             result = log_seq_read(log_index2addr(index), log, size);
         }
-        else if(log_index2addr(index) < log_area_start_addr + LOG_AREA_SIZE)
+        else if (log_index2addr(index) < log_area_start_addr + LOG_AREA_SIZE)
         {
             /*                          Flash log area
              *                         |--------------|
@@ -638,7 +638,7 @@ EfErrCode ef_log_read(size_t index, uint32_t* log, size_t size)
             /* Minus some ignored bytes */
             read_size_temp -= header_total_num * LOG_SECTOR_HEADER_SIZE;
             result = log_seq_read(log_index2addr(index), log, read_size_temp);
-            if(result == EF_NO_ERR)
+            if (result == EF_NO_ERR)
             {
                 result = log_seq_read(log_area_start_addr, log + read_size_temp / 4, size - read_size_temp);
             }
@@ -676,7 +676,7 @@ EfErrCode ef_log_read(size_t index, uint32_t* log, size_t size)
  *
  * @return result
  */
-EfErrCode ef_log_write(const uint32_t* log, size_t size)
+EfErrCode ef_log_write(const uint32_t *log, size_t size)
 {
     EfErrCode result = EF_NO_ERR;
     size_t write_size = 0, writable_size = 0;
@@ -685,30 +685,30 @@ EfErrCode ef_log_write(const uint32_t* log, size_t size)
 
     EF_ASSERT(size % 4 == 0);
     /* must be call this function after initialize OK */
-    if(!init_ok)
+    if (!init_ok)
     {
         return EF_ENV_INIT_FAILED;
     }
 
-    if((sector_status = get_sector_status(write_addr)) == SECTOR_STATUS_HEADER_ERROR)
+    if ((sector_status = get_sector_status(write_addr)) == SECTOR_STATUS_HEADER_ERROR)
     {
         return EF_WRITE_ERR;
     }
     /* write some log when current sector status is USING and EMPTY */
-    if((sector_status == SECTOR_STATUS_USING) || (sector_status == SECTOR_STATUS_EMPUT))
+    if ((sector_status == SECTOR_STATUS_USING) || (sector_status == SECTOR_STATUS_EMPUT))
     {
         /* write the already erased but not used area */
         writable_size = EF_ERASE_MIN_SIZE - ((write_addr - log_area_start_addr) % EF_ERASE_MIN_SIZE);
-        if(size >= writable_size)
+        if (size >= writable_size)
         {
             result = ef_port_write(write_addr, log, writable_size);
-            if(result != EF_NO_ERR)
+            if (result != EF_NO_ERR)
             {
                 goto exit;
             }
             /* change the current sector status to FULL */
             result = write_sector_status(write_addr, SECTOR_STATUS_FULL);
-            if(result != EF_NO_ERR)
+            if (result != EF_NO_ERR)
             {
                 goto exit;
             }
@@ -722,25 +722,25 @@ EfErrCode ef_log_write(const uint32_t* log, size_t size)
         }
     }
     /* erase and write remain log */
-    while(true)
+    while (true)
     {
         /* calculate next available sector address */
         erase_addr = write_addr = get_next_flash_sec_addr(write_addr - 4);
         /* move the flash log start address to next available sector address */
-        if(log_start_addr == erase_addr)
+        if (log_start_addr == erase_addr)
         {
             log_start_addr = get_next_flash_sec_addr(log_start_addr);
         }
         /* erase sector */
         result = ef_port_erase(erase_addr, EF_ERASE_MIN_SIZE);
-        if(result != EF_NO_ERR)
+        if (result != EF_NO_ERR)
         {
             goto exit;
         }
         /* change the sector status to EMPTY and USING when write begin sector start address */
         result = write_sector_status(write_addr, SECTOR_STATUS_EMPUT);
         result = write_sector_status(write_addr, SECTOR_STATUS_USING);
-        if(result == EF_NO_ERR)
+        if (result == EF_NO_ERR)
         {
             write_addr += LOG_SECTOR_HEADER_SIZE;
         }
@@ -750,16 +750,16 @@ EfErrCode ef_log_write(const uint32_t* log, size_t size)
         }
         /* calculate current sector writable data size */
         writable_size = EF_ERASE_MIN_SIZE - LOG_SECTOR_HEADER_SIZE;
-        if(size - write_size >= writable_size)
+        if (size - write_size >= writable_size)
         {
             result = ef_port_write(write_addr, log + write_size / 4, writable_size);
-            if(result != EF_NO_ERR)
+            if (result != EF_NO_ERR)
             {
                 goto exit;
             }
             /* change the current sector status to FULL */
             result = write_sector_status(write_addr, SECTOR_STATUS_FULL);
-            if(result != EF_NO_ERR)
+            if (result != EF_NO_ERR)
             {
                 goto exit;
             }
@@ -770,7 +770,7 @@ EfErrCode ef_log_write(const uint32_t* log, size_t size)
         else
         {
             result = ef_port_write(write_addr, log + write_size / 4, size - write_size);
-            if(result != EF_NO_ERR)
+            if (result != EF_NO_ERR)
             {
                 goto exit;
             }
@@ -795,7 +795,7 @@ static uint32_t get_next_flash_sec_addr(uint32_t cur_addr)
     size_t cur_sec_id = (cur_addr - log_area_start_addr) / EF_ERASE_MIN_SIZE;
     size_t sec_total_num = LOG_AREA_SIZE / EF_ERASE_MIN_SIZE;
 
-    if(cur_sec_id + 1 >= sec_total_num)
+    if (cur_sec_id + 1 >= sec_total_num)
     {
         /* return to ring head */
         return log_area_start_addr;
@@ -821,28 +821,28 @@ EfErrCode ef_log_clean(void)
     log_end_addr = log_start_addr + LOG_SECTOR_HEADER_SIZE;
     /* erase log flash area */
     result = ef_port_erase(log_area_start_addr, LOG_AREA_SIZE);
-    if(result != EF_NO_ERR)
+    if (result != EF_NO_ERR)
     {
         goto exit;
     }
     /* setting first sector is EMPTY to USING */
     write_sector_status(write_addr, SECTOR_STATUS_EMPUT);
     write_sector_status(write_addr, SECTOR_STATUS_USING);
-    if(result != EF_NO_ERR)
+    if (result != EF_NO_ERR)
     {
         goto exit;
     }
     write_addr += EF_ERASE_MIN_SIZE;
     /* add sector header */
-    while(true)
+    while (true)
     {
         write_sector_status(write_addr, SECTOR_STATUS_EMPUT);
-        if(result != EF_NO_ERR)
+        if (result != EF_NO_ERR)
         {
             goto exit;
         }
         write_addr += EF_ERASE_MIN_SIZE;
-        if(write_addr >= log_area_start_addr + LOG_AREA_SIZE)
+        if (write_addr >= log_area_start_addr + LOG_AREA_SIZE)
         {
             break;
         }

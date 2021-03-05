@@ -64,9 +64,9 @@ struct pid_param pitch_inter_param =
 };
 
 void gimbal_center_adjust(gimbal_t p_gimbal);
-void gimbal_normol_handle(struct gimbal* p_gimbal, struct rc_device* p_rc, struct rc_info* p_info);
+void gimbal_normol_handle(struct gimbal *p_gimbal, struct rc_device *p_rc, struct rc_info *p_info);
 
-static void gimbal_dr16_data_update(uint32_t eventID, void* pMsgData, uint32_t timeStamp);
+static void gimbal_dr16_data_update(uint32_t eventID, void *pMsgData, uint32_t timeStamp);
 
 struct gimbal gimbal;
 struct rc_device gimbal_rc;
@@ -97,7 +97,7 @@ uint8_t gimbal_mode = NORMAL_MODE;
 
 static void gimbal_init_handle(gimbal_t p_gimbal);
 
-void gimbal_task(void const* argument)
+void gimbal_task(void const *argument)
 {
     uint32_t period = osKernelSysTick();
 
@@ -127,7 +127,7 @@ void gimbal_task(void const* argument)
 
     ef_get_env_blob(GIMBAL_PARAM_KEY, &center_param, sizeof(center_param), &read_len);
 
-    if(read_len != sizeof(center_param))
+    if (read_len != sizeof(center_param))
     {
         /* no init */
         gimbal_set_work_mode(ADJUST_MODE);
@@ -141,7 +141,7 @@ void gimbal_task(void const* argument)
     gimbal_yaw_disable(&gimbal);
     gimbal_pitch_disable(&gimbal);
 
-    while(1)
+    while (1)
     {
         /* dr16 data update */
         EventMsgProcess(&listSubs, 0);
@@ -151,7 +151,7 @@ void gimbal_task(void const* argument)
         gimbal_pitch_gyro_update(&gimbal, gimbal_gyro.pitch * RAD_TO_DEG);
         gimbal_rate_update(&gimbal, gimbal_gyro.gz * RAD_TO_DEG, gimbal_gyro.gy * RAD_TO_DEG);
 
-        switch(gimbal_mode)
+        switch (gimbal_mode)
         {
         case NORMAL_MODE:
         {
@@ -189,7 +189,7 @@ void gimbal_task(void const* argument)
     }
 }
 
-void gimbal_gyro_yaw_update(uint16_t std_id, uint8_t* data)
+void gimbal_gyro_yaw_update(uint16_t std_id, uint8_t *data)
 {
     single_gyro_update(&single_gyro, std_id, data);
     gimbal_yaw_gyro_update(&gimbal, single_gyro.yaw_gyro_angle + gimbal.ecd_angle.yaw);
@@ -221,13 +221,13 @@ static void gimbal_init_handle(gimbal_t p_gimbal)
     gimbal_yaw_disable(p_gimbal);
     gimbal_set_pitch_angle(p_gimbal, p_gimbal->ecd_angle.pitch * (1 - ramp_v0_calculate(&pitch_ramp)));
 
-    if((p_gimbal->ecd_angle.pitch != 0) && (p_gimbal->ecd_angle.yaw != 0))
+    if ((p_gimbal->ecd_angle.pitch != 0) && (p_gimbal->ecd_angle.yaw != 0))
     {
-        if(fabsf(p_gimbal->ecd_angle.pitch) < 2.0f)
+        if (fabsf(p_gimbal->ecd_angle.pitch) < 2.0f)
         {
             gimbal_yaw_enable(p_gimbal);
             gimbal_set_yaw_angle(p_gimbal, p_gimbal->ecd_angle.yaw * (1 - ramp_v0_calculate(&yaw_ramp)), 0);
-            if(fabsf(p_gimbal->ecd_angle.yaw) < 1.2f)
+            if (fabsf(p_gimbal->ecd_angle.yaw) < 1.2f)
             {
                 gimbal_set_work_mode(NORMAL_MODE);
             }
@@ -255,10 +255,10 @@ uint8_t gimbal_get_work_mode(void)
   * @param
   * @retval void
   */
-void gimbal_normol_handle(struct gimbal* p_gimbal, struct rc_device* p_rc, struct rc_info* p_info)
+void gimbal_normol_handle(struct gimbal *p_gimbal, struct rc_device *p_rc, struct rc_info *p_info)
 {
     /* follow mode */
-    if(rc_device_get_state(p_rc, RC_S2_UP) == E_OK)
+    if (rc_device_get_state(p_rc, RC_S2_UP) == E_OK)
     {
         gimbal_set_yaw_mode(p_gimbal, GYRO_MODE);
         pit_delta = -(float)p_info->ch4 * 0.0015f;
@@ -268,24 +268,24 @@ void gimbal_normol_handle(struct gimbal* p_gimbal, struct rc_device* p_rc, struc
     }
 
     /* encoder mode */
-    if(rc_device_get_state(p_rc, RC_S2_MID) == E_OK)
+    if (rc_device_get_state(p_rc, RC_S2_MID) == E_OK)
     {
         gimbal_set_yaw_mode(p_gimbal, ENCODER_MODE);
         pit_delta = -(float)p_info->ch4 * 0.0015f;
         gimbal_set_pitch_delta(p_gimbal, pit_delta);
 
-        if(rc_device_get_state(p_rc, RC_S2_UP2MID) == E_OK)
+        if (rc_device_get_state(p_rc, RC_S2_UP2MID) == E_OK)
         {
             gimbal_set_yaw_angle(p_gimbal, 0, 0);
         }
     }
 
-    if(rc_device_get_state(p_rc, RC_S2_DOWN2MID) == E_OK)
+    if (rc_device_get_state(p_rc, RC_S2_DOWN2MID) == E_OK)
     {
         gimbal_set_yaw_angle(p_gimbal, 0, 0);
     }
 
-    if(rc_device_get_state(p_rc, RC_S2_DOWN) == E_OK)
+    if (rc_device_get_state(p_rc, RC_S2_DOWN) == E_OK)
     {
         set_gimbal_sdk_mode(GIMBAL_SDK_ON);
         gimbal_set_yaw_mode(p_gimbal, ENCODER_MODE);
@@ -308,14 +308,14 @@ void gimbal_normol_handle(struct gimbal* p_gimbal, struct rc_device* p_rc, struc
   */
 void gimbal_center_adjust(gimbal_t p_gimbal)
 {
-    struct motor_device* p_motor;
+    struct motor_device *p_motor;
 
     p_motor = &p_gimbal->pitch_motor;
 
     /* pitch */
     {
         pit_time = get_time_ms();
-        while(get_time_ms() - pit_time <= 2000)
+        while (get_time_ms() - pit_time <= 2000)
         {
             motor_set_current(p_motor, 8000);
             pit_ecd_l = p_motor->data.ecd;
@@ -323,20 +323,20 @@ void gimbal_center_adjust(gimbal_t p_gimbal)
         }
 
         pit_time = HAL_GetTick();
-        while(HAL_GetTick() - pit_time <= 2000)
+        while (HAL_GetTick() - pit_time <= 2000)
         {
             motor_set_current(p_motor, -8000);
             pit_ecd_r = p_motor->data.ecd;
             HAL_Delay(2);
         }
 
-        if(pit_ecd_l > pit_ecd_r)
+        if (pit_ecd_l > pit_ecd_r)
         {
             center_param.pitch_ecd_center = (pit_ecd_l + pit_ecd_r) / 2;
         }
         else
         {
-            if((pit_ecd_l + pit_ecd_r) / 2 > 4096)
+            if ((pit_ecd_l + pit_ecd_r) / 2 > 4096)
             {
                 center_param.pitch_ecd_center = (pit_ecd_l + pit_ecd_r) / 2 - 4096;
             }
@@ -351,7 +351,7 @@ void gimbal_center_adjust(gimbal_t p_gimbal)
     /* yaw */
     {
         yaw_time = get_time_ms();
-        while(get_time_ms() - yaw_time <= 3000)
+        while (get_time_ms() - yaw_time <= 3000)
         {
             motor_set_current(p_motor, 6000);
             yaw_ecd_l = p_motor->data.ecd;
@@ -359,20 +359,20 @@ void gimbal_center_adjust(gimbal_t p_gimbal)
         }
 
         yaw_time = HAL_GetTick();
-        while(HAL_GetTick() - yaw_time <= 3000)
+        while (HAL_GetTick() - yaw_time <= 3000)
         {
             motor_set_current(p_motor, -6000);
             yaw_ecd_r = p_motor->data.ecd;
             HAL_Delay(2);
         }
 
-        if(yaw_ecd_l > yaw_ecd_r)
+        if (yaw_ecd_l > yaw_ecd_r)
         {
             center_param.yaw_ecd_center = (yaw_ecd_l + yaw_ecd_r) / 2;
         }
         else
         {
-            if((yaw_ecd_l + yaw_ecd_r) / 2 > 4096)
+            if ((yaw_ecd_l + yaw_ecd_r) / 2 > 4096)
             {
                 center_param.yaw_ecd_center = (yaw_ecd_l + yaw_ecd_r) / 2 - 4096;
             }
@@ -388,11 +388,11 @@ void gimbal_center_adjust(gimbal_t p_gimbal)
     /* reboot */
     __disable_irq();
     NVIC_SystemReset();
-    while(1)
+    while (1)
         ;
 }
 
-struct gimbal* get_gimbal(void)
+struct gimbal *get_gimbal(void)
 {
     return &gimbal;
 }
@@ -402,7 +402,7 @@ struct gimbal* get_gimbal(void)
   * @param
   * @retval void
   */
-static void gimbal_dr16_data_update(uint32_t eventID, void* pMsgData, uint32_t timeStamp)
+static void gimbal_dr16_data_update(uint32_t eventID, void *pMsgData, uint32_t timeStamp)
 {
     rc_device_date_update(&gimbal_rc, pMsgData);
 }

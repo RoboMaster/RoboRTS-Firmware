@@ -133,8 +133,8 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 
 static int8_t CDC_Init_FS(void);
 static int8_t CDC_DeInit_FS(void);
-static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length);
-static int8_t CDC_Receive_FS(uint8_t* pbuf, uint32_t* Len);
+static int8_t CDC_Control_FS(uint8_t cmd, uint8_t *pbuf, uint16_t length);
+static int8_t CDC_Receive_FS(uint8_t *pbuf, uint32_t *Len);
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
 
@@ -188,10 +188,10 @@ static int8_t CDC_DeInit_FS(void)
   * @param  length: Number of data to be sent (in bytes)
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
+static int8_t CDC_Control_FS(uint8_t cmd, uint8_t *pbuf, uint16_t length)
 {
     /* USER CODE BEGIN 5 */
-    switch(cmd)
+    switch (cmd)
     {
     case CDC_SEND_ENCAPSULATED_COMMAND:
 
@@ -268,11 +268,11 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   * @param  Len: Number of data received (in bytes)
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t* Len)
+static int8_t CDC_Receive_FS(uint8_t *Buf, uint32_t *Len)
 {
     /* USER CODE BEGIN 6 */
 
-    if(usb_vcp_call_back != NULL)
+    if (usb_vcp_call_back != NULL)
     {
         (*usb_vcp_call_back)(Buf, *Len);
     }
@@ -294,11 +294,11 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t* Len)
   * @param  Len: Number of data to be sent (in bytes)
   * @retval USBD_OK if all operations are OK else USBD_FAIL or USBD_BUSY
   */
-uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
+uint8_t CDC_Transmit_FS(uint8_t *Buf, uint16_t Len)
 {
     uint8_t result = USBD_OK;
     /* USER CODE BEGIN 7 */
-    fifo_s_puts(&usb_tx_fifo, (char*)Buf, Len);
+    fifo_s_puts(&usb_tx_fifo, (char *)Buf, Len);
     //  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
     //  if (hcdc->TxState != 0){
     //    return USBD_BUSY;
@@ -311,14 +311,14 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
-int32_t usb_tx_flush(void* argc)
+int32_t usb_tx_flush(void *argc)
 {
     var_cpu_sr();
 
     uint8_t result = USBD_OK;
-    USBD_CDC_HandleTypeDef* hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
+    USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceFS.pClassData;
 
-    if(hcdc->TxState != 0)
+    if (hcdc->TxState != 0)
     {
         return USBD_BUSY;
     }
@@ -328,7 +328,7 @@ int32_t usb_tx_flush(void* argc)
 
         enter_critical();
         send_num = usb_tx_fifo.used_num;
-        fifo_s_gets_noprotect(&usb_tx_fifo, (char*)UserTxBufferFS, send_num);
+        fifo_s_gets_noprotect(&usb_tx_fifo, (char *)UserTxBufferFS, send_num);
         exit_critical();
 
         USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, send_num);
@@ -339,7 +339,7 @@ int32_t usb_tx_flush(void* argc)
 
 int32_t usb_vcp_rx_callback_register(usb_vcp_call_back_f fun)
 {
-    if(usb_vcp_call_back == NULL)
+    if (usb_vcp_call_back == NULL)
     {
         usb_vcp_call_back = fun;
         return USBD_OK;
@@ -348,7 +348,7 @@ int32_t usb_vcp_rx_callback_register(usb_vcp_call_back_f fun)
     return USBD_FAIL;
 }
 
-uint32_t usb_interface_send(uint8_t* p_data, uint16_t len)
+uint32_t usb_interface_send(uint8_t *p_data, uint16_t len)
 {
     CDC_Transmit_FS(p_data, len);
     return 0;

@@ -22,10 +22,10 @@
 #define LOG_OUTPUT_LEVEL  LOG_INFO
 #include "log.h"
 
-static void get_dr16_data(rc_device_t rc_dev, uint8_t* buff);
+static void get_dr16_data(rc_device_t rc_dev, uint8_t *buff);
 static void get_dr16_state(rc_device_t rc_dev);
 
-int32_t rc_device_register(rc_device_t rc_dev, const char* name)
+int32_t rc_device_register(rc_device_t rc_dev, const char *name)
 {
     device_assert(rc_dev != NULL);
 
@@ -39,9 +39,9 @@ int32_t rc_device_register(rc_device_t rc_dev, const char* name)
     return E_OK;
 }
 
-int32_t rc_device_date_update(rc_device_t rc_dev, uint8_t* buff)
+int32_t rc_device_date_update(rc_device_t rc_dev, uint8_t *buff)
 {
-    if(rc_dev != NULL)
+    if (rc_dev != NULL)
     {
         rc_dev->get_data(rc_dev, buff);
         rc_dev->get_state(rc_dev);
@@ -56,9 +56,9 @@ int32_t rc_device_get_state(rc_device_t rc_dev, uint16_t state)
 
     enter_critical();
 
-    if(rc_dev != NULL)
+    if (rc_dev != NULL)
     {
-        if((rc_dev->state & state) == state)
+        if ((rc_dev->state & state) == state)
         {
             rc_dev->state &= (~(state & 0x00FF));
             exit_critical();
@@ -83,7 +83,7 @@ rc_info_t rc_device_get_info(rc_device_t rc_dev)
     return &(rc_dev->rc_info);
 }
 
-static void get_dr16_data(rc_device_t rc_dev, uint8_t* buff)
+static void get_dr16_data(rc_device_t rc_dev, uint8_t *buff)
 {
 
     memcpy(&(rc_dev->last_rc_info), &rc_dev->rc_info, sizeof(struct rc_info));
@@ -100,19 +100,19 @@ static void get_dr16_data(rc_device_t rc_dev, uint8_t* buff)
     rc->ch4 -= 1024;
 
     /* prevent remote control zero deviation */
-    if(rc->ch1 <= 5 && rc->ch1 >= -5)
+    if (rc->ch1 <= 5 && rc->ch1 >= -5)
     {
         rc->ch1 = 0;
     }
-    if(rc->ch2 <= 5 && rc->ch2 >= -5)
+    if (rc->ch2 <= 5 && rc->ch2 >= -5)
     {
         rc->ch2 = 0;
     }
-    if(rc->ch3 <= 5 && rc->ch3 >= -5)
+    if (rc->ch3 <= 5 && rc->ch3 >= -5)
     {
         rc->ch3 = 0;
     }
-    if(rc->ch4 <= 5 && rc->ch4 >= -5)
+    if (rc->ch4 <= 5 && rc->ch4 >= -5)
     {
         rc->ch4 = 0;
     }
@@ -120,7 +120,7 @@ static void get_dr16_data(rc_device_t rc_dev, uint8_t* buff)
     rc->sw1 = ((buff[5] >> 4) & 0x000C) >> 2;
     rc->sw2 = (buff[5] >> 4) & 0x0003;
 
-    if((abs(rc->ch1) > 660) || \
+    if ((abs(rc->ch1) > 660) || \
             (abs(rc->ch2) > 660) || \
             (abs(rc->ch3) > 660) || \
             (abs(rc->ch4) > 660))
@@ -143,71 +143,71 @@ static void get_dr16_data(rc_device_t rc_dev, uint8_t* buff)
 static void get_dr16_state(rc_device_t rc_dev)
 {
 
-    if(rc_dev->rc_info.sw1 == 3)
+    if (rc_dev->rc_info.sw1 == 3)
     {
         rc_dev->state |= RC_S1_MID;
         rc_dev->state &= ~RC_S1_UP;
         rc_dev->state &= ~RC_S1_DOWN;
-        if(rc_dev->last_rc_info.sw1 == 1)
+        if (rc_dev->last_rc_info.sw1 == 1)
         {
             rc_dev->state |= RC_S1_UP2MID;
         }
-        else if(rc_dev->last_rc_info.sw1 == 2)
+        else if (rc_dev->last_rc_info.sw1 == 2)
         {
             rc_dev->state |= RC_S1_DOWN2MID;
         }
     }
-    else if(rc_dev->rc_info.sw1 == 1)
+    else if (rc_dev->rc_info.sw1 == 1)
     {
         rc_dev->state &= ~RC_S1_MID;
         rc_dev->state |= RC_S1_UP;
         rc_dev->state &= ~RC_S1_DOWN;
-        if(rc_dev->last_rc_info.sw1 == 3)
+        if (rc_dev->last_rc_info.sw1 == 3)
         {
             rc_dev->state |= RC_S1_MID2UP;
         }
     }
-    else if(rc_dev->rc_info.sw1 == 2)
+    else if (rc_dev->rc_info.sw1 == 2)
     {
         rc_dev->state &= ~RC_S1_MID;
         rc_dev->state &= ~RC_S1_UP;
         rc_dev->state |= RC_S1_DOWN;
-        if(rc_dev->last_rc_info.sw1 == 3)
+        if (rc_dev->last_rc_info.sw1 == 3)
         {
             rc_dev->state |= RC_S1_MID2DOWN;
         }
     }
 
-    if(rc_dev->rc_info.sw2 == 3)
+    if (rc_dev->rc_info.sw2 == 3)
     {
         rc_dev->state |= RC_S2_MID;
         rc_dev->state &= ~RC_S2_UP;
         rc_dev->state &= ~RC_S2_DOWN;
-        if(rc_dev->last_rc_info.sw2 == 1)
+        if (rc_dev->last_rc_info.sw2 == 1)
         {
             rc_dev->state |= RC_S2_UP2MID;
         }
-        else if(rc_dev->last_rc_info.sw2 == 2)
+        else if (rc_dev->last_rc_info.sw2 == 2)
         {
             rc_dev->state |= RC_S2_DOWN2MID;
         }
     }
-    else if(rc_dev->rc_info.sw2 == 1)
+    else if (rc_dev->rc_info.sw2 == 1)
     {
         rc_dev->state &= ~RC_S2_MID;
         rc_dev->state |= RC_S2_UP;
         rc_dev->state &= ~RC_S2_DOWN;
-        if(rc_dev->last_rc_info.sw2 == 3)
+        if (rc_dev->last_rc_info.sw2 == 3)
         {
             rc_dev->state |= RC_S2_MID2UP;
         }
     }
-    else if(rc_dev->rc_info.sw2 == 2)
+    else if (rc_dev->rc_info.sw2 == 2)
     {
         rc_dev->state &= ~RC_S2_MID;
         rc_dev->state &= ~RC_S2_UP;
         rc_dev->state |= RC_S2_DOWN;
-        if(rc_dev->last_rc_info.sw2 == 3)
+        if (rc_dev->last_rc_info.sw2 == 3)
         {
             rc_dev->state |= RC_S2_MID2DOWN;
         }

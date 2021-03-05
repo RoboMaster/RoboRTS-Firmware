@@ -63,12 +63,12 @@
 
 /* Exported types ------------------------------------------------------------*/
 /********************CALLBACK TYPEDEF**********************/
-typedef void (*pack_handle_fn_t)(uint8_t* pack_data, uint16_t cmd,
+typedef void (*pack_handle_fn_t)(uint8_t *pack_data, uint16_t cmd,
                                  uint8_t session, uint8_t source_add);
 typedef void (*void_fn_t)(void);
 typedef int32_t (*ack_handle_fn_t)(int32_t err);
 typedef int32_t (*no_ack_handle_fn_t)(uint16_t cmd);
-typedef int32_t (*rcv_handle_fn_t)(uint8_t* buff, uint16_t len);
+typedef int32_t (*rcv_handle_fn_t)(uint8_t *buff, uint16_t len);
 
 struct rcv_cmd_info
 {
@@ -173,7 +173,7 @@ typedef struct
 typedef struct send_list_node
 {
     list_t send_list;                        /*!< Support List */
-    uint8_t* p_data;                         /*!< Pointer To Data Include Pack Header */
+    uint8_t *p_data;                         /*!< Pointer To Data Include Pack Header */
     uint16_t len;                            /*!< Length Of Data Include Pack Header */
     uint8_t seq;                             /*!< Sequence Number */
     uint8_t is_got_ack;                      /*!< Is Got Ack */
@@ -186,7 +186,7 @@ typedef struct send_list_node
     uint16_t timeout;                        /*!< Time Interval Between Each Transmissions*/
     uint32_t pre_timestamp;                  /*!< Last Sent Timestamp */
     uint8_t is_first_send;                   /*!< Is First Send */
-    struct perph_interface* forward_src_obj; /*!< Foward Src Interface Object */
+    struct perph_interface *forward_src_obj; /*!< Foward Src Interface Object */
     ack_handle_fn_t ack_callback;
     no_ack_handle_fn_t no_ack_callback;
 } send_list_node_t;
@@ -223,9 +223,9 @@ typedef struct
 } send_ctx_t;
 
 /* Exported functions --------------------------------------------------------*/
-void* protocol_p_malloc(uint32_t size);
-void protocol_p_free(void* ptr);
+void *protocol_p_malloc(uint32_t size);
+void protocol_p_free(void *ptr);
 uint32_t protocol_p_get_time(void);
-void protocol_p_printf(const char* format, ...);
+void protocol_p_printf(const char *format, ...);
 
 #endif /* PROTOCOL_COMMON_H_ */

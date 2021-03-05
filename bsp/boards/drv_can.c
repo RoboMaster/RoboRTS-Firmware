@@ -91,12 +91,12 @@ void can_manage_init(void)
     return;
 }
 
-uint32_t can1_std_transmit(uint16_t std_id, uint8_t* data, uint16_t len)
+uint32_t can1_std_transmit(uint16_t std_id, uint8_t *data, uint16_t len)
 {
     return can_msg_bytes_send(&hcan1, std_id, data, len);
 }
 
-uint32_t can2_std_transmit(uint16_t std_id, uint8_t* data, uint16_t len)
+uint32_t can2_std_transmit(uint16_t std_id, uint8_t *data, uint16_t len)
 {
     return can_msg_bytes_send(&hcan2, std_id, data, len);
 }
@@ -118,10 +118,10 @@ int32_t can_fifo0_rx_callback_register(can_manage_obj_t m_obj, can_stdmsg_rx_cal
   * @param
   * @retval send successful length
   */
-uint32_t can_msg_bytes_send(CAN_HandleTypeDef* hcan,
-                            uint16_t std_id, uint8_t* data, uint16_t len)
+uint32_t can_msg_bytes_send(CAN_HandleTypeDef *hcan,
+                            uint16_t std_id, uint8_t *data, uint16_t len)
 {
-    uint8_t* send_ptr;
+    uint8_t *send_ptr;
     uint16_t send_num;
     can_manage_obj_t m_obj;
     struct can_std_msg msg;
@@ -130,11 +130,11 @@ uint32_t can_msg_bytes_send(CAN_HandleTypeDef* hcan,
     msg.std_id = std_id;
     send_num = 0;
 
-    if(hcan == &hcan1)
+    if (hcan == &hcan1)
     {
         m_obj = &can1_manage;
     }
-    else if(hcan == &hcan2)
+    else if (hcan == &hcan2)
     {
         m_obj = &can2_manage;
     }
@@ -143,16 +143,16 @@ uint32_t can_msg_bytes_send(CAN_HandleTypeDef* hcan,
         return 0;
     }
 
-    while(send_num < len)
+    while (send_num < len)
     {
-        if(fifo_is_full(&(m_obj->tx_fifo)))
+        if (fifo_is_full(&(m_obj->tx_fifo)))
         {
             //can is error
             m_obj->is_sending = 0;
             break;
         }
 
-        if(len - send_num >= 8)
+        if (len - send_num >= 8)
         {
             msg.dlc = 8;
         }
@@ -162,8 +162,8 @@ uint32_t can_msg_bytes_send(CAN_HandleTypeDef* hcan,
         }
 
         //memcpy(msg.data, data, msg.dlc);
-        *((uint32_t*)(msg.data)) = *((uint32_t*)(send_ptr));
-        *((uint32_t*)(msg.data + 4)) = *((uint32_t*)(send_ptr + 4));
+        *((uint32_t *)(msg.data)) = *((uint32_t *)(send_ptr));
+        *((uint32_t *)(msg.data + 4)) = *((uint32_t *)(send_ptr + 4));
 
         send_ptr += msg.dlc;
         send_num += msg.dlc;
@@ -171,7 +171,7 @@ uint32_t can_msg_bytes_send(CAN_HandleTypeDef* hcan,
         fifo_put(&(m_obj->tx_fifo), &msg);
     }
 
-    if((m_obj->is_sending) == 0 && (!(fifo_is_empty(&(m_obj->tx_fifo)))))
+    if ((m_obj->is_sending) == 0 && (!(fifo_is_empty(&(m_obj->tx_fifo)))))
     {
         CAN_TxHeaderTypeDef header;
         uint32_t send_mail_box;
@@ -180,7 +180,7 @@ uint32_t can_msg_bytes_send(CAN_HandleTypeDef* hcan,
         header.IDE = CAN_ID_STD;
         header.RTR = CAN_RTR_DATA;
 
-        while(HAL_CAN_GetTxMailboxesFreeLevel(m_obj->hcan) && (!(fifo_is_empty(&(m_obj->tx_fifo)))))
+        while (HAL_CAN_GetTxMailboxesFreeLevel(m_obj->hcan) && (!(fifo_is_empty(&(m_obj->tx_fifo)))))
         {
             fifo_get(&(m_obj->tx_fifo), &msg);
             header.DLC = msg.dlc;
@@ -206,11 +206,11 @@ static void can_tx_mailbox_complete_hanle(can_manage_obj_t m_obj)
 
     CRITICAL_SETCION_ENTER();
 
-    if(!fifo_is_empty(&(m_obj->tx_fifo)))
+    if (!fifo_is_empty(&(m_obj->tx_fifo)))
     {
-        while(!fifo_is_empty(&(m_obj->tx_fifo)))
+        while (!fifo_is_empty(&(m_obj->tx_fifo)))
         {
-            if(HAL_CAN_GetTxMailboxesFreeLevel(m_obj->hcan))
+            if (HAL_CAN_GetTxMailboxesFreeLevel(m_obj->hcan))
             {
 
                 fifo_get_noprotect(&(m_obj->tx_fifo), &msg);
@@ -238,48 +238,48 @@ static void can_tx_mailbox_complete_hanle(can_manage_obj_t m_obj)
     return;
 }
 
-void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef* hcan)
+void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
 {
-    if(hcan == &hcan1)
+    if (hcan == &hcan1)
     {
         can_tx_mailbox_complete_hanle(&can1_manage);
     }
-    else if(hcan == &hcan2)
+    else if (hcan == &hcan2)
     {
         can_tx_mailbox_complete_hanle(&can2_manage);
     }
 }
 
-void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef* hcan)
+void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef *hcan)
 {
-    if(hcan == &hcan1)
+    if (hcan == &hcan1)
     {
         can_tx_mailbox_complete_hanle(&can1_manage);
     }
-    else if(hcan == &hcan2)
+    else if (hcan == &hcan2)
     {
         can_tx_mailbox_complete_hanle(&can2_manage);
     }
 }
-void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef* hcan)
+void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef *hcan)
 {
-    if(hcan == &hcan1)
+    if (hcan == &hcan1)
     {
         can_tx_mailbox_complete_hanle(&can1_manage);
     }
-    else if(hcan == &hcan2)
+    else if (hcan == &hcan2)
     {
         can_tx_mailbox_complete_hanle(&can2_manage);
     }
 }
 
-void HAL_CAN_ErrorCallback(CAN_HandleTypeDef* hcan)
+void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
 {
-    if(hcan == &hcan1)
+    if (hcan == &hcan1)
     {
         can_tx_mailbox_complete_hanle(&can1_manage);
     }
-    else if(hcan == &hcan2)
+    else if (hcan == &hcan2)
     {
         can_tx_mailbox_complete_hanle(&can2_manage);
     }
@@ -291,23 +291,23 @@ void HAL_CAN_ErrorCallback(CAN_HandleTypeDef* hcan)
   * @param
   * @retval void
   */
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan)
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
     CAN_RxHeaderTypeDef rx_header;
     uint8_t rx_data[8];
 
     HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data);
 
-    if(hcan == &hcan1)
+    if (hcan == &hcan1)
     {
-        if(can1_manage.can_rec_callback != NULL)
+        if (can1_manage.can_rec_callback != NULL)
         {
             (*(can1_manage.can_rec_callback))(&rx_header, rx_data);
         }
     }
-    else if(hcan == &hcan2)
+    else if (hcan == &hcan2)
     {
-        if(can2_manage.can_rec_callback != NULL)
+        if (can2_manage.can_rec_callback != NULL)
         {
             (*(can2_manage.can_rec_callback))(&rx_header, rx_data);
         }

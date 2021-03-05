@@ -20,7 +20,7 @@
 #include "referee_system.h"
 #include "protocol.h"
 
-static void communicate_task(void const* argument);
+static void communicate_task(void const *argument);
 
 osThreadId communicate_task_t;
 
@@ -30,7 +30,7 @@ void communicate_task_init(void)
     communicate_task_t = osThreadCreate(osThread(COMMUNICATE_TASK), NULL);
 }
 
-int32_t report_firmware_version(uint8_t* buff, uint16_t len)
+int32_t report_firmware_version(uint8_t *buff, uint16_t len)
 {
     return FIRMWARE_VERSION;
 }
@@ -40,13 +40,13 @@ int32_t report_firmware_version(uint8_t* buff, uint16_t len)
   * @param
   * @retval void
   */
-void communicate_task(void const* argument)
+void communicate_task(void const *argument)
 {
 
     protocol_rcv_cmd_register(CMD_REPORT_VERSION, report_firmware_version);
 
 
-    while(1)
+    while (1)
     {
         protocol_send_flush();
         protocol_unpack_flush();

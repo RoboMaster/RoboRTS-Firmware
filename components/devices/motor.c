@@ -34,17 +34,17 @@ static fn_can_send motor_can_send = NULL;
   * @retval error code
   */
 int32_t motor_register(motor_device_t motor_dev,
-                       const char* name)
+                       const char *name)
 {
     device_assert(motor_dev != NULL);
     device_assert(name != NULL);
 
-    if(motor_find_by_canid(motor_dev->can_periph, motor_dev->can_id) != NULL)
+    if (motor_find_by_canid(motor_dev->can_periph, motor_dev->can_id) != NULL)
     {
         return -E_EXISTED;
     }
 
-    if((motor_dev->can_id < 0x201) && (motor_dev->can_id > 0x208))
+    if ((motor_dev->can_id < 0x201) && (motor_dev->can_id > 0x208))
     {
         return -E_ERROR;
     }
@@ -103,9 +103,9 @@ int32_t motor_set_current(motor_device_t motor_dev, int16_t current)
   */
 motor_device_t motor_find_by_canid(enum device_can can, uint16_t can_id)
 {
-    struct device* object;
-    list_t* node = NULL;
-    struct device_information* information;
+    struct device *object;
+    list_t *node = NULL;
+    struct device_information *information;
 
     var_cpu_sr();
 
@@ -115,17 +115,17 @@ motor_device_t motor_find_by_canid(enum device_can can, uint16_t can_id)
     /* try to find device object */
     information = get_device_information();
 
-    for(node = information->object_list.next;
+    for (node = information->object_list.next;
             node != &(information->object_list);
             node = node->next)
     {
         object = list_entry(node, struct device, list);
 
-        if(object->type != DEVICE_MOTOR)
+        if (object->type != DEVICE_MOTOR)
         {
             continue;
         }
-        else if((((motor_device_t)object)->can_id == can_id) && (((motor_device_t)object)->can_periph == can))
+        else if ((((motor_device_t)object)->can_id == can_id) && (((motor_device_t)object)->can_periph == can))
         {
             /* leave critical */
             exit_critical();
@@ -150,9 +150,9 @@ struct can_msg motor_msg[DEVICE_CAN_NUM][2];
   */
 void motor_fill_data(void)
 {
-    struct device* object;
-    list_t* node = NULL;
-    struct device_information* information;
+    struct device *object;
+    list_t *node = NULL;
+    struct device_information *information;
     motor_device_t motor_dev;
 
     memset(&motor_msg, 0, sizeof(motor_msg));
@@ -160,15 +160,15 @@ void motor_fill_data(void)
     /* try to find device object */
     information = get_device_information();
 
-    for(node = information->object_list.next;
+    for (node = information->object_list.next;
             node != &(information->object_list);
             node = node->next)
     {
         object = list_entry(node, struct device, list);
         motor_dev = (motor_device_t)object;
-        if(motor_dev->parent.type == DEVICE_MOTOR)
+        if (motor_dev->parent.type == DEVICE_MOTOR)
         {
-            if(((motor_device_t)object)->can_id < 0x205)
+            if (((motor_device_t)object)->can_id < 0x205)
             {
                 motor_msg[motor_dev->can_periph][0].id = 0x200;
                 motor_msg[motor_dev->can_periph][0].data[(motor_dev->can_id - 0x201) * 2] = motor_dev->current >> 8;
@@ -194,15 +194,15 @@ void motor_fill_data(void)
 int32_t motor_can_output(enum device_can m_can)
 {
     motor_fill_data();
-    if(m_can == DEVICE_CAN_ALL)
+    if (m_can == DEVICE_CAN_ALL)
     {
-        for(int i = 0; i < 2; i++)
+        for (int i = 0; i < 2; i++)
         {
-            for(enum device_can e_can = DEVICE_CAN1; e_can != DEVICE_CAN_ALL; e_can++)
+            for (enum device_can e_can = DEVICE_CAN1; e_can != DEVICE_CAN_ALL; e_can++)
             {
-                if(motor_send_flag[e_can][i] == 1)
+                if (motor_send_flag[e_can][i] == 1)
                 {
-                    if(motor_can_send != NULL)
+                    if (motor_can_send != NULL)
                     {
                         motor_can_send(e_can, motor_msg[e_can][i]);
                     }
@@ -213,11 +213,11 @@ int32_t motor_can_output(enum device_can m_can)
     }
     else
     {
-        for(int j = 0; j < 2; j++)
+        for (int j = 0; j < 2; j++)
         {
-            if(motor_send_flag[m_can][j] == 1)
+            if (motor_send_flag[m_can][j] == 1)
             {
-                if(motor_can_send != NULL)
+                if (motor_can_send != NULL)
                 {
                     motor_can_send(m_can, motor_msg[m_can][j]);
                 }
@@ -239,7 +239,7 @@ int32_t motor_data_update(enum device_can can, uint16_t can_id, uint8_t can_rx_d
 {
     motor_device_t motor_dev;
     motor_dev = motor_find_by_canid(can, can_id);
-    if(motor_dev != NULL)
+    if (motor_dev != NULL)
     {
         motor_dev->get_data(motor_dev, can_rx_data);
         return E_OK;
@@ -266,13 +266,13 @@ static void get_encoder_data(motor_device_t motor, uint8_t can_rx_data[])
     motor_data_t ptr = &(motor->data);
     ptr->msg_cnt++;
 
-    if(ptr->msg_cnt > 50)
+    if (ptr->msg_cnt > 50)
     {
         motor->init_offset_f = 0;
     }
 
     /* initial value */
-    if(motor->init_offset_f == 1)
+    if (motor->init_offset_f == 1)
     {
         get_motor_offset(ptr, can_rx_data);
         return;
@@ -281,12 +281,12 @@ static void get_encoder_data(motor_device_t motor, uint8_t can_rx_data[])
     ptr->last_ecd = ptr->ecd;
     ptr->ecd = (uint16_t)(can_rx_data[0] << 8 | can_rx_data[1]);
 
-    if(ptr->ecd - ptr->last_ecd > 4096)
+    if (ptr->ecd - ptr->last_ecd > 4096)
     {
         ptr->round_cnt--;
         ptr->ecd_raw_rate = ptr->ecd - ptr->last_ecd - 8192;
     }
-    else if(ptr->ecd - ptr->last_ecd < -4096)
+    else if (ptr->ecd - ptr->last_ecd < -4096)
     {
         ptr->round_cnt++;
         ptr->ecd_raw_rate = ptr->ecd - ptr->last_ecd + 8192;

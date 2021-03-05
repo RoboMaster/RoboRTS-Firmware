@@ -45,7 +45,7 @@
   *        output: every wheel speed(rpm)
   * @note  1=FR 2=FL 3=BL 4=BR
   */
-void mecanum_calculate(struct mecanum* mec)
+void mecanum_calculate(struct mecanum *mec)
 {
     static float rotate_ratio_fr;
     static float rotate_ratio_fl;
@@ -73,19 +73,19 @@ void mecanum_calculate(struct mecanum* mec)
     wheel_rpm[3] = (-mec->speed.vx + mec->speed.vy - mec->speed.vw * rotate_ratio_br) * wheel_rpm_ratio;
 
     //find max item
-    for(uint8_t i = 0; i < 4; i++)
+    for (uint8_t i = 0; i < 4; i++)
     {
-        if(fabs(wheel_rpm[i]) > max)
+        if (fabs(wheel_rpm[i]) > max)
         {
             max = fabs(wheel_rpm[i]);
         }
     }
 
     //equal proportion
-    if(max > MAX_WHEEL_RPM)
+    if (max > MAX_WHEEL_RPM)
     {
         float rate = MAX_WHEEL_RPM / max;
-        for(uint8_t i = 0; i < 4; i++)
+        for (uint8_t i = 0; i < 4; i++)
         {
             wheel_rpm[i] *= rate;
         }
@@ -98,7 +98,7 @@ void mecanum_calculate(struct mecanum* mec)
   * @param
   * @note
   */
-void mecanum_position_measure(struct mecanum* mec, struct mecanum_motor_fdb wheel_fdb[])
+void mecanum_position_measure(struct mecanum *mec, struct mecanum_motor_fdb wheel_fdb[])
 {
     static float rotate_ratio_fr;
     static float rotate_ratio_fl;

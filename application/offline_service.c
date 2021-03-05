@@ -20,8 +20,8 @@
 #include "drv_io.h"
 #include "offline_service.h"
 
-static void offline_service(void const* argument);
-static void offline_event_callback(struct offline_manage_obj* obj);
+static void offline_service(void const *argument);
+static void offline_event_callback(struct offline_manage_obj *obj);
 
 struct offline_manage_obj offline_manage[OFFLINE_EVENT_MAX_NUM] = {NO_OFFLINE};
 
@@ -29,7 +29,7 @@ osThreadId offline_service_task_t;
 
 void offline_service_task_init(void)
 {
-    for(int i = 1; i < OFFLINE_EVENT_MAX_NUM; i++)
+    for (int i = 1; i < OFFLINE_EVENT_MAX_NUM; i++)
     {
         offline_manage[i].online_state = STATE_OFFLINE;
     }
@@ -43,12 +43,12 @@ void offline_service_task_init(void)
   * @param
   * @retval void
   */
-void offline_service(void const* argument)
+void offline_service(void const *argument)
 {
     offline_event display_event;
     uint32_t time_now;
 
-    while(1)
+    while (1)
     {
         time_now = get_time_ms();
         uint8_t beep_time = 0xFF;
@@ -56,19 +56,19 @@ void offline_service(void const* argument)
 
         display_event = NO_OFFLINE;
 
-        for(int i = 1; i < OFFLINE_EVENT_MAX_NUM; i++)
+        for (int i = 1; i < OFFLINE_EVENT_MAX_NUM; i++)
         {
-            if((time_now - offline_manage[i].last_time > offline_manage[i].offline_time) && (offline_manage[i].enable))
+            if ((time_now - offline_manage[i].last_time > offline_manage[i].offline_time) && (offline_manage[i].enable))
             {
                 offline_manage[i].online_state = STATE_OFFLINE;
-                if(error_level > offline_manage[i].error_level)
+                if (error_level > offline_manage[i].error_level)
                 {
                     error_level = offline_manage[i].error_level;
                 }
 
-                if(offline_manage[i].beep_times < beep_time)
+                if (offline_manage[i].beep_times < beep_time)
                 {
-                    if(offline_manage[i].error_level <= OFFLINE_WARNING_LEVEL)
+                    if (offline_manage[i].error_level <= OFFLINE_WARNING_LEVEL)
                     {
                         beep_time = offline_manage[i].beep_times;
                         display_event = (offline_event)i;
@@ -81,7 +81,7 @@ void offline_service(void const* argument)
             }
         }
 
-        if((error_level == OFFLINE_ERROR_LEVEL) && (offline_manage[SYSTEM_PROTECT].enable))
+        if ((error_level == OFFLINE_ERROR_LEVEL) && (offline_manage[SYSTEM_PROTECT].enable))
         {
             offline_manage[SYSTEM_PROTECT].online_state = STATE_OFFLINE;
             offline_event_callback(&offline_manage[SYSTEM_PROTECT]);
@@ -91,16 +91,16 @@ void offline_service(void const* argument)
             offline_manage[SYSTEM_PROTECT].online_state = STATE_ONLINE;
             offline_event_callback(&offline_manage[SYSTEM_PROTECT]);
 
-            for(int i = 1; i < OFFLINE_EVENT_MAX_NUM; i++)
+            for (int i = 1; i < OFFLINE_EVENT_MAX_NUM; i++)
             {
                 offline_event_callback(&offline_manage[i]);
             }
         }
 
-        if(display_event != NO_OFFLINE)
+        if (display_event != NO_OFFLINE)
         {
             beep_set_times(offline_manage[display_event].beep_times);
-            if(offline_manage[display_event].beep_times == 0)
+            if (offline_manage[display_event].beep_times == 0)
             {
                 LED_R_ON();
             }
@@ -152,20 +152,20 @@ void offline_event_init(struct offline_manage_obj obj)
   * @param
   * @retval void
   */
-void offline_event_callback(struct offline_manage_obj* obj)
+void offline_event_callback(struct offline_manage_obj *obj)
 {
-    if(obj->online_state == STATE_OFFLINE)
+    if (obj->online_state == STATE_OFFLINE)
     {
-        if(obj->last_state == STATE_ONLINE)
+        if (obj->last_state == STATE_ONLINE)
         {
-            if(obj->offline_first_func != NULL)
+            if (obj->offline_first_func != NULL)
             {
                 obj->offline_first_func();
             }
         }
         else
         {
-            if(obj->offline_func != NULL)
+            if (obj->offline_func != NULL)
             {
                 obj->offline_func();
             }
@@ -174,16 +174,16 @@ void offline_event_callback(struct offline_manage_obj* obj)
     else
     {
         obj->online_state = STATE_ONLINE;
-        if(obj->last_state == STATE_OFFLINE)
+        if (obj->last_state == STATE_OFFLINE)
         {
-            if(obj->online_first_func != NULL)
+            if (obj->online_first_func != NULL)
             {
                 obj->online_first_func();
             }
         }
         else
         {
-            if(obj->online_func != NULL)
+            if (obj->online_func != NULL)
             {
                 obj->online_func();
             }

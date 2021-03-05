@@ -30,12 +30,12 @@ void set_gimbal_sdk_mode(uint8_t state);
 void set_gimbal_heart_mode(uint8_t state);
 uint8_t get_gimbal_sdk_mode(void);
 
-int32_t gimbal_manifold_heart(uint8_t* buff, uint16_t len);
+int32_t gimbal_manifold_heart(uint8_t *buff, uint16_t len);
 
-int32_t gimbal_info_push(void* argc);
-int32_t shoot_num_ctrl(uint8_t* buff, uint16_t len);
-int32_t shoot_firction_ctrl(uint8_t* buff, uint16_t len);
-int32_t gimbal_angle_ctrl(uint8_t* buff, uint16_t len);
-int32_t gimbal_adjust_cmd(uint8_t* buff, uint16_t len);
+int32_t gimbal_info_push(void *argc);
+int32_t shoot_num_ctrl(uint8_t *buff, uint16_t len);
+int32_t shoot_firction_ctrl(uint8_t *buff, uint16_t len);
+int32_t gimbal_angle_ctrl(uint8_t *buff, uint16_t len);
+int32_t gimbal_adjust_cmd(uint8_t *buff, uint16_t len);
 
 #endif // __GIMBAL_CMD_H__

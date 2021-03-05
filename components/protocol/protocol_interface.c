@@ -31,12 +31,12 @@ extern local_info_t protocol_local_info;
   *            send_fn  send function pointer
   * @retval    error code
   */
-int32_t protocol_interface_init(struct perph_interface* perph,
-                                char* interface_name,
+int32_t protocol_interface_init(struct perph_interface *perph,
+                                char *interface_name,
                                 uint8_t broadcast_output_enable,
                                 uint16_t rcv_buf_size)
 {
-    struct perph_interface* interface;
+    struct perph_interface *interface;
 
     uint32_t status;
     int32_t idx = PROTOCOL_INTERFACE_MAX;
@@ -44,16 +44,16 @@ int32_t protocol_interface_init(struct perph_interface* perph,
     status = PROTOCOL_SUCCESS;
 
     /* zero is local loop interface */
-    for(int i = 1; i < PROTOCOL_INTERFACE_MAX; i++)
+    for (int i = 1; i < PROTOCOL_INTERFACE_MAX; i++)
     {
-        if(protocol_local_info.interface[i].is_valid == 0)
+        if (protocol_local_info.interface[i].is_valid == 0)
         {
             idx = i;
             break;
         }
     }
 
-    if(idx == PROTOCOL_INTERFACE_MAX)
+    if (idx == PROTOCOL_INTERFACE_MAX)
     {
         status = PROTOCOL_ERR_OBJECT_NOT_FOUND;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
@@ -64,17 +64,17 @@ int32_t protocol_interface_init(struct perph_interface* perph,
 
     memcpy(interface, perph, sizeof(struct perph_interface));
 
-    if((interface_name != NULL) && (strlen(interface_name) < PROTOCOL_OBJ_NAME_MAX_LEN))
+    if ((interface_name != NULL) && (strlen(interface_name) < PROTOCOL_OBJ_NAME_MAX_LEN))
     {
-        strncpy(interface->object_name, (const char*)interface_name, strlen(interface_name));
+        strncpy(interface->object_name, (const char *)interface_name, strlen(interface_name));
     }
     else
     {
         strcpy(interface->object_name, "NULL");
     }
 
-    uint8_t* rcv_buf = protocol_p_malloc(rcv_buf_size);
-    if(rcv_buf == NULL)
+    uint8_t *rcv_buf = protocol_p_malloc(rcv_buf_size);
+    if (rcv_buf == NULL)
     {
         status = PROTOCOL_ERR_NOT_ENOUGH_MEM;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
@@ -101,13 +101,13 @@ int32_t protocol_interface_init(struct perph_interface* perph,
   * @param[in]
   * @retval    error code
   */
-int32_t protocol_can_interface_register(char* interface_name,
+int32_t protocol_can_interface_register(char *interface_name,
                                         uint16_t rcv_buf_size,
                                         uint8_t broadcast_output_enable,
                                         can_port_t can_port,
                                         uint32_t can_tx_id,
                                         uint32_t can_rx_id,
-                                        uint32_t (*can_send_fn)(uint16_t std_id, uint8_t* p_data, uint16_t len))
+                                        uint32_t (*can_send_fn)(uint16_t std_id, uint8_t *p_data, uint16_t len))
 {
     struct perph_interface interface = {0};
     uint32_t status;
@@ -128,11 +128,11 @@ int32_t protocol_can_interface_register(char* interface_name,
   * @param[in]
   * @retval    error code
   */
-int32_t protocol_uart_interface_register(char* interface_name,
+int32_t protocol_uart_interface_register(char *interface_name,
         uint16_t rcv_buf_size,
         uint8_t broadcast_output_enable,
         com_port_t com_port,
-        uint32_t (*com_send_fn)(uint8_t* p_data, uint16_t len))
+        uint32_t (*com_send_fn)(uint8_t *p_data, uint16_t len))
 {
     struct perph_interface interface = {0};
     uint32_t status;
@@ -151,21 +151,21 @@ int32_t protocol_uart_interface_register(char* interface_name,
   * @param[in]
   * @retval    error code
   */
-int32_t protocol_interface_send_data(struct perph_interface* perph, uint8_t* buff, uint16_t len)
+int32_t protocol_interface_send_data(struct perph_interface *perph, uint8_t *buff, uint16_t len)
 {
     uint32_t status;
     status = PROTOCOL_SUCCESS;
 
-    if(perph == NULL)
+    if (perph == NULL)
     {
         status = PROTOCOL_ERR_INTER_NOT_FOUND;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
         return status;
     }
 
-    if(perph->type == CAN_PORT)
+    if (perph->type == CAN_PORT)
     {
-        if(perph->send_callback.can_send_fn != NULL)
+        if (perph->send_callback.can_send_fn != NULL)
         {
             perph->send_callback.can_send_fn(perph->user_data.can.send_id, buff, len);
         }
@@ -175,9 +175,9 @@ int32_t protocol_interface_send_data(struct perph_interface* perph, uint8_t* buf
             PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
         }
     }
-    else if(perph->type == COM_PORT)
+    else if (perph->type == COM_PORT)
     {
-        if(perph->send_callback.com_send_fn != NULL)
+        if (perph->send_callback.com_send_fn != NULL)
         {
             perph->send_callback.com_send_fn(buff, len);
         }
@@ -195,13 +195,13 @@ int32_t protocol_interface_send_data(struct perph_interface* perph, uint8_t* buf
   * @param[in]
   * @retval    error code
   */
-uint32_t protocol_can_rcv_data(can_port_t can_port, uint32_t rcv_id, void* p_data, uint32_t data_len)
+uint32_t protocol_can_rcv_data(can_port_t can_port, uint32_t rcv_id, void *p_data, uint32_t data_len)
 {
     uint32_t status = PROTOCOL_SUCCESS;
 
-    for(int i = 1; i < PROTOCOL_INTERFACE_MAX; i++)
+    for (int i = 1; i < PROTOCOL_INTERFACE_MAX; i++)
     {
-        if((protocol_local_info.interface[i].type == CAN_PORT)
+        if ((protocol_local_info.interface[i].type == CAN_PORT)
                 && (protocol_local_info.interface[i].user_data.can.rcv_id == rcv_id)
                 && (protocol_local_info.interface[i].user_data.can.port == can_port))
         {
@@ -216,13 +216,13 @@ uint32_t protocol_can_rcv_data(can_port_t can_port, uint32_t rcv_id, void* p_dat
   * @param[in]
   * @retval    error code
   */
-uint32_t protocol_uart_rcv_data(com_port_t com_port, void* p_data, uint32_t data_len)
+uint32_t protocol_uart_rcv_data(com_port_t com_port, void *p_data, uint32_t data_len)
 {
     uint32_t status = PROTOCOL_SUCCESS;
 
-    for(int i = 1; i < PROTOCOL_INTERFACE_MAX; i++)
+    for (int i = 1; i < PROTOCOL_INTERFACE_MAX; i++)
     {
-        if((protocol_local_info.interface[i].type == COM_PORT)
+        if ((protocol_local_info.interface[i].type == COM_PORT)
                 && (protocol_local_info.interface[i].user_data.com.port == com_port))
         {
             protocol_rcv_data(p_data, data_len, &protocol_local_info.interface[i]);
@@ -236,27 +236,27 @@ uint32_t protocol_uart_rcv_data(com_port_t com_port, void* p_data, uint32_t data
   * @param
   * @retval
   */
-int32_t protocol_set_route(uint8_t tar_add, const char* name)
+int32_t protocol_set_route(uint8_t tar_add, const char *name)
 {
     uint32_t status;
-    struct perph_interface* perph;
+    struct perph_interface *perph;
     perph = protocol_get_interface(name);
 
     status = PROTOCOL_SUCCESS;
-    if(perph == NULL)
+    if (perph == NULL)
     {
         status = PROTOCOL_ERR_INTER_NOT_FOUND;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
         return status;
     }
-    if(tar_add > PROTOCOL_ROUTE_TABLE_MAX_NUM)
+    if (tar_add > PROTOCOL_ROUTE_TABLE_MAX_NUM)
     {
         status = PROTOCOL_ERR_ROUTEU_SET_BEYOND;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
         return status;
     }
 
-    if(perph->is_valid == 0)
+    if (perph->is_valid == 0)
     {
         status = PROTOCOL_ERR_INTER_NOT_FOUND;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
@@ -271,13 +271,13 @@ int32_t protocol_set_route(uint8_t tar_add, const char* name)
     return status;
 }
 
-struct perph_interface* protocol_get_interface(const char* name)
+struct perph_interface *protocol_get_interface(const char *name)
 {
     var_cpu_sr();
     enter_critical();
-    for(int i = 0; i < PROTOCOL_INTERFACE_MAX; i++)
+    for (int i = 0; i < PROTOCOL_INTERFACE_MAX; i++)
     {
-        if(strncmp(protocol_local_info.interface[i].object_name, name, strlen(name)) == 0)
+        if (strncmp(protocol_local_info.interface[i].object_name, name, strlen(name)) == 0)
         {
             exit_critical();
             return &protocol_local_info.interface[i];

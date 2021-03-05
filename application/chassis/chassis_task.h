@@ -20,10 +20,10 @@
 
 #include "chassis.h"
 
-struct chassis* get_chassis(void);
-void chassis_task(void const* argument);
+struct chassis *get_chassis(void);
+void chassis_task(void const *argument);
 int32_t chassis_set_relative_angle(float angle);
-int32_t follow_angle_info_rcv(uint8_t* buff, uint16_t len);
+int32_t follow_angle_info_rcv(uint8_t *buff, uint16_t len);
 void set_follow_relative(float val);
 
 #endif // __CHASSIS_TASK_H__

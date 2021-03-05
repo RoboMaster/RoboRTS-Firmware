@@ -22,7 +22,7 @@
 #include "cmsis_os.h"
 #include "sensor_task.h"
 
-static void sensor_task(void const* argc);
+static void sensor_task(void const *argc);
 
 osThreadId sensor_task_t;
 
@@ -39,7 +39,7 @@ float ahrs_run_time;
   * @param
   * @retval void
   */
-void sensor_task(void const* argc)
+void sensor_task(void const *argc)
 {
     /* The parameters are not used. */
     (void)argc;
@@ -53,11 +53,11 @@ void sensor_task(void const* argc)
     bmi088_get_offset();
 
     imu_temp_ctrl_init();
-    soft_timer_register(imu_temp_keep, (void*)NULL, 5);
+    soft_timer_register(imu_temp_keep, (void *)NULL, 5);
 
     EventPostInit(&ahrsPub, AHRS_MSG, AHRS_MSG_LEN);
 
-    while(1)
+    while (1)
     {
         uint32_t time_id;
 

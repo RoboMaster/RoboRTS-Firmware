@@ -26,15 +26,15 @@
 
 typedef struct
 {
-    void* freeList;
+    void *freeList;
     uint16_t freeNum;
     uint16_t blkSize;
 } memUint_t;
 
-void MemPoolInit(memUint_t* pMemUint, void* memAddr, int blkNum, int blkSize);
-void MemAddBlksToPool(memUint_t* pMemUint, void* memAddr, int blkAddNum, int blkSize);
-void* MemGetBlk(memUint_t* pMemUint);
-int MemPutBlk(memUint_t* pMemUint, void* pMem);
+void MemPoolInit(memUint_t *pMemUint, void *memAddr, int blkNum, int blkSize);
+void MemAddBlksToPool(memUint_t *pMemUint, void *memAddr, int blkAddNum, int blkSize);
+void *MemGetBlk(memUint_t *pMemUint);
+int MemPutBlk(memUint_t *pMemUint, void *pMem);
 
 
 #endif

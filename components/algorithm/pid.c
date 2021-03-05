@@ -18,20 +18,20 @@
 #include "sys.h"
 #include "pid.h"
 
-static void abs_limit(float* a, float ABS_MAX)
+static void abs_limit(float *a, float ABS_MAX)
 {
-    if(*a > ABS_MAX)
+    if (*a > ABS_MAX)
     {
         *a = ABS_MAX;
     }
-    if(*a < -ABS_MAX)
+    if (*a < -ABS_MAX)
     {
         *a = -ABS_MAX;
     }
 }
 
 static void pid_param_init(
-    struct pid* pid,
+    struct pid *pid,
     float maxout,
     float integral_limit,
     float kp,
@@ -53,7 +53,7 @@ static void pid_param_init(
   * @param[in] p/i/d: pid parameter
   * @retval    none
   */
-static void pid_reset(struct pid* pid, float kp, float ki, float kd)
+static void pid_reset(struct pid *pid, float kp, float ki, float kd)
 {
     pid->param.p = kp;
     pid->param.i = ki;
@@ -72,12 +72,12 @@ static void pid_reset(struct pid* pid, float kp, float ki, float kd)
   * @param[in] set: target value
   * @retval    pid calculate output
   */
-float pid_calculate(struct pid* pid, float get, float set)
+float pid_calculate(struct pid *pid, float get, float set)
 {
     pid->get = get;
     pid->set = set;
     pid->err = set - get;
-    if((pid->param.input_max_err != 0) && (fabs(pid->err) > pid->param.input_max_err))
+    if ((pid->param.input_max_err != 0) && (fabs(pid->err) > pid->param.input_max_err))
     {
         return 0;
     }
@@ -90,7 +90,7 @@ float pid_calculate(struct pid* pid, float get, float set)
     pid->out = pid->pout + pid->iout + pid->dout;
     abs_limit(&(pid->out), pid->param.max_out);
 
-    if(pid->enable == 0)
+    if (pid->enable == 0)
     {
         pid->out = 0;
     }
@@ -102,7 +102,7 @@ float pid_calculate(struct pid* pid, float get, float set)
   * @retval    none
   */
 void pid_struct_init(
-    struct pid* pid,
+    struct pid *pid,
     float maxout,
     float integral_limit,
 

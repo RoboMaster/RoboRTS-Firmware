@@ -49,22 +49,22 @@ struct device
     char name[OBJECT_NAME_MAX_LEN];
     uint8_t type;
     list_t  list;
-    void* param;
-    void* user_data;
+    void *param;
+    void *user_data;
 
-    void (*device_init)(void* param);
+    void (*device_init)(void *param);
 };
 
-typedef struct device* device_t;
+typedef struct device *device_t;
 
 struct device_information
 {
     list_t object_list;          /**< object list */
 };
 
-device_t device_find(const char* name, uint8_t type);
-int32_t device_init(struct device* object, const char* name);
+device_t device_find(const char *name, uint8_t type);
+int32_t device_init(struct device *object, const char *name);
 void device_detach(device_t object);
-struct device_information* get_device_information(void);
+struct device_information *get_device_information(void);
 
 #endif // __DEVICE_H__

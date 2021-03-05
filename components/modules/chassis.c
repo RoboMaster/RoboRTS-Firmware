@@ -26,7 +26,7 @@
   * @param[in]
   * @retval    error code
   */
-int32_t chassis_pid_init(struct chassis* chassis, const char* name, struct pid_param param, enum device_can can)
+int32_t chassis_pid_init(struct chassis *chassis, const char *name, struct pid_param param, enum device_can can)
 {
     char motor_name[4][OBJECT_NAME_MAX_LEN] = {0};
     uint8_t name_len;
@@ -35,7 +35,7 @@ int32_t chassis_pid_init(struct chassis* chassis, const char* name, struct pid_p
 
     name_len = strlen(name);
 
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         memcpy(&motor_name[i], name, name_len);
         chassis->motor[i].can_periph = can;
@@ -56,10 +56,10 @@ int32_t chassis_pid_init(struct chassis* chassis, const char* name, struct pid_p
     memcpy(&motor_name[2][name_len], "_BL\0", 4);
     memcpy(&motor_name[3][name_len], "_BR\0", 4);
 
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         err = motor_register(&(chassis->motor[i]), motor_name[i]);
-        if(err != E_OK)
+        if (err != E_OK)
         {
             goto end;
         }
@@ -75,10 +75,10 @@ end:
   * @param[in]
   * @retval    error code
   */
-int32_t chassis_pid_calculate(struct chassis* chassis)
+int32_t chassis_pid_calculate(struct chassis *chassis)
 {
     float motor_out;
-    struct motor_data* pdata;
+    struct motor_data *pdata;
     struct mecanum_motor_fdb wheel_fdb[4];
 
     static uint8_t init_f = 0;
@@ -88,7 +88,7 @@ int32_t chassis_pid_calculate(struct chassis* chassis)
 
     period  = get_time_ms_us() - last_time;
 
-    if(!init_f)
+    if (!init_f)
     {
         period = 0;
         last_time = get_time_ms_us();
@@ -105,7 +105,7 @@ int32_t chassis_pid_calculate(struct chassis* chassis)
 
     mecanum_calculate(&(chassis->mecanum));
 
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         pdata = motor_get_data(&(chassis->motor[i]));
 
@@ -127,7 +127,7 @@ int32_t chassis_pid_calculate(struct chassis* chassis)
   * @param[in]
   * @retval    error code
   */
-int32_t chassis_gyro_updata(struct chassis* chassis, float yaw_angle, float yaw_rate)
+int32_t chassis_gyro_updata(struct chassis *chassis, float yaw_angle, float yaw_rate)
 {
     device_assert(chassis != NULL);
 
@@ -141,9 +141,9 @@ int32_t chassis_gyro_updata(struct chassis* chassis, float yaw_angle, float yaw_
   * @param[in]
   * @retval    error code
   */
-int32_t chassis_set_speed(struct chassis* chassis, float vx, float vy, float vw)
+int32_t chassis_set_speed(struct chassis *chassis, float vx, float vy, float vw)
 {
-    if(chassis == NULL)
+    if (chassis == NULL)
     {
         return -E_INVAL;
     }
@@ -153,9 +153,9 @@ int32_t chassis_set_speed(struct chassis* chassis, float vx, float vy, float vw)
     return E_OK;
 }
 
-int32_t chassis_set_acc(struct chassis* chassis, float ax, float ay, float wz)
+int32_t chassis_set_acc(struct chassis *chassis, float ax, float ay, float wz)
 {
-    if(chassis == NULL)
+    if (chassis == NULL)
     {
         return -E_INVAL;
     }
@@ -165,9 +165,9 @@ int32_t chassis_set_acc(struct chassis* chassis, float ax, float ay, float wz)
     return E_OK;
 }
 
-int32_t chassis_set_vw(struct chassis* chassis, float vw)
+int32_t chassis_set_vw(struct chassis *chassis, float vw)
 {
-    if(chassis == NULL)
+    if (chassis == NULL)
     {
         return -E_INVAL;
     }
@@ -175,9 +175,9 @@ int32_t chassis_set_vw(struct chassis* chassis, float vw)
     return E_OK;
 }
 
-int32_t chassis_set_vx_vy(struct chassis* chassis, float vx, float vy)
+int32_t chassis_set_vx_vy(struct chassis *chassis, float vx, float vy)
 {
-    if(chassis == NULL)
+    if (chassis == NULL)
     {
         return -E_INVAL;
     }
@@ -186,9 +186,9 @@ int32_t chassis_set_vx_vy(struct chassis* chassis, float vx, float vy)
     return E_OK;
 }
 
-int32_t chassis_set_offset(struct chassis* chassis, float offset_x, float offset_y)
+int32_t chassis_set_offset(struct chassis *chassis, float offset_x, float offset_y)
 {
-    if(chassis == NULL)
+    if (chassis == NULL)
     {
         return -E_INVAL;
     }
@@ -204,9 +204,9 @@ int32_t chassis_set_offset(struct chassis* chassis, float offset_x, float offset
   * @param[in]
   * @retval    error code
   */
-int32_t chassis_get_info(struct chassis* chassis, struct chassis_info* info)
+int32_t chassis_get_info(struct chassis *chassis, struct chassis_info *info)
 {
-    if(chassis == NULL)
+    if (chassis == NULL)
     {
         return -E_INVAL;
     }
@@ -216,7 +216,7 @@ int32_t chassis_get_info(struct chassis* chassis, struct chassis_info* info)
     ANGLE_LIMIT_180(info->yaw_gyro_angle, chassis->mecanum.gyro.yaw_gyro_angle);
     info->yaw_gyro_rate = chassis->mecanum.gyro.yaw_gyro_rate;
 
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         info->wheel_rpm[i] = chassis->mecanum.wheel_rpm[i] * MOTOR_DECELE_RATIO;
     }
@@ -224,14 +224,14 @@ int32_t chassis_get_info(struct chassis* chassis, struct chassis_info* info)
     return E_OK;
 }
 
-int32_t chassis_enable(struct chassis* chassis)
+int32_t chassis_enable(struct chassis *chassis)
 {
-    if(chassis == NULL)
+    if (chassis == NULL)
     {
         return -E_INVAL;
     }
 
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         chassis->motor_pid[i].enable = 1;
     }
@@ -239,14 +239,14 @@ int32_t chassis_enable(struct chassis* chassis)
     return E_OK;
 }
 
-int32_t chassis_disable(struct chassis* chassis)
+int32_t chassis_disable(struct chassis *chassis)
 {
-    if(chassis == NULL)
+    if (chassis == NULL)
     {
         return -E_INVAL;
     }
 
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         chassis->motor_pid[i].enable = 0;
     }

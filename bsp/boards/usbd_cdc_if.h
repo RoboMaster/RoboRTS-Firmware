@@ -49,7 +49,7 @@ extern "C" {
   * @{
   */
 /* USER CODE BEGIN EXPORTED_DEFINES */
-typedef  int32_t(*usb_vcp_call_back_f)(uint8_t* buf, uint32_t len);
+typedef  int32_t(*usb_vcp_call_back_f)(uint8_t *buf, uint32_t len);
 int32_t usb_vcp_rx_callback_register(usb_vcp_call_back_f fun);
 /* USER CODE END EXPORTED_DEFINES */
 
@@ -92,8 +92,8 @@ int32_t usb_vcp_rx_callback_register(usb_vcp_call_back_f fun);
 extern USBD_CDC_ItfTypeDef USBD_Interface_fops_FS;
 
 /* USER CODE BEGIN EXPORTED_VARIABLES */
-int32_t usb_tx_flush(void* argc);
-uint32_t usb_interface_send(uint8_t* p_data, uint16_t len);
+int32_t usb_tx_flush(void *argc);
+uint32_t usb_interface_send(uint8_t *p_data, uint16_t len);
 /* USER CODE END EXPORTED_VARIABLES */
 
 /**
@@ -105,7 +105,7 @@ uint32_t usb_interface_send(uint8_t* p_data, uint16_t len);
   * @{
   */
 
-uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
+uint8_t CDC_Transmit_FS(uint8_t *Buf, uint16_t Len);
 
 /* USER CODE BEGIN EXPORTED_FUNCTIONS */
 

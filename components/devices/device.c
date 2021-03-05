@@ -22,7 +22,7 @@
 #define LOG_OUTPUT_LEVEL  5
 #include "log.h"
 
-char* device_name[DEVICE_UNKNOW] =
+char *device_name[DEVICE_UNKNOW] =
 {
     "NULL",
     "MOTOR",
@@ -35,7 +35,7 @@ static struct device_information
     object_container = {{&(object_container.object_list), &(object_container.object_list)}};
 
 /* return device infornation pointer */
-struct device_information* get_device_information(void)
+struct device_information *get_device_information(void)
 {
     return &object_container;
 }
@@ -45,15 +45,15 @@ struct device_information* get_device_information(void)
   * @param  int32_t
   * @retval error code
   */
-int32_t device_init(struct device* object,
-                    const char* name)
+int32_t device_init(struct device *object,
+                    const char *name)
 {
     var_cpu_sr();
 
     device_assert(object != NULL);
 
     /* copy name */
-    if(strlen(name) > OBJECT_NAME_MAX_LEN - 1)
+    if (strlen(name) > OBJECT_NAME_MAX_LEN - 1)
     {
         return -1;
     }
@@ -78,15 +78,15 @@ int32_t device_init(struct device* object,
   * @param  int32_t
   * @retval error code
   */
-device_t device_find(const char* name, uint8_t type)
+device_t device_find(const char *name, uint8_t type)
 {
-    struct device* object = NULL;
-    list_t* node = NULL;
+    struct device *object = NULL;
+    list_t *node = NULL;
 
     var_cpu_sr();
 
     /* parameter check */
-    if((name == NULL) || (type >= DEVICE_UNKNOW))
+    if ((name == NULL) || (type >= DEVICE_UNKNOW))
     {
         return NULL;
     }
@@ -95,12 +95,12 @@ device_t device_find(const char* name, uint8_t type)
     enter_critical();
 
     /* try to find object */
-    for(node = object_container.object_list.next;
+    for (node = object_container.object_list.next;
             node != &(object_container.object_list);
             node = node->next)
     {
         object = list_entry(node, struct device, list);
-        if((strncmp(object->name, name, strlen(name)) == 0) && (type == object->type))
+        if ((strncmp(object->name, name, strlen(name)) == 0) && (type == object->type))
         {
             /* leave critical */
             exit_critical();

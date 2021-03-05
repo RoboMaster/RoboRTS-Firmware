@@ -9,20 +9,20 @@
 
 typedef struct cmd_input_list
 {
-    const cli_cmd_t* cli_cmd;
-    struct cmd_input_list* next;
+    const cli_cmd_t *cli_cmd;
+    struct cmd_input_list *next;
 } cli_list_item_t;
 
 /*
  * The callback function that is executed when "help" is entered.  This is the
  * only default command that is always present.
  */
-static int help_cmd(char* write_buf, int buf_len, const char* cmd_str);
+static int help_cmd(char *write_buf, int buf_len, const char *cmd_str);
 
 /*
  * Return the number of parameters that follow the command name.
  */
-static char get_param_num(const char* cmd_str);
+static char get_param_num(const char *cmd_str);
 
 /* The definition of the "help" command.  This command is always at the front
 of the list of registered commands. */
@@ -58,20 +58,20 @@ static char output_buf[CLI_MAX_OUTPUT_SIZE];
 
 /*-----------------------------------------------------------*/
 
-int cli_cmd_register(const cli_cmd_t* const cli_cmd)
+int cli_cmd_register(const cli_cmd_t *const cli_cmd)
 {
-    static cli_list_item_t* last_cmd = &head_cmds;
-    cli_list_item_t* new_list_item;
+    static cli_list_item_t *last_cmd = &head_cmds;
+    cli_list_item_t *new_list_item;
     int ret = -1;
 
     /* Check the parameter is not NULL. */
     CLI_ASSERT(cli_cmd);
 
     /* Create a new list item that will reference the command being registered. */
-    new_list_item = (cli_list_item_t*)malloc(sizeof(cli_list_item_t));
+    new_list_item = (cli_list_item_t *)malloc(sizeof(cli_list_item_t));
     CLI_ASSERT(new_list_item);
 
-    if(new_list_item != NULL)
+    if (new_list_item != NULL)
     {
         // ENTER_CRITICAL();
         {
@@ -99,20 +99,20 @@ int cli_cmd_register(const cli_cmd_t* const cli_cmd)
 }
 /*-----------------------------------------------------------*/
 
-int cli_cmd_process(const char* const cmd_input, char* write_buf, int buf_len)
+int cli_cmd_process(const char *const cmd_input, char *write_buf, int buf_len)
 {
-    static const cli_list_item_t* list_item = NULL;
+    static const cli_list_item_t *list_item = NULL;
     int ret = 1;
-    const char* cmd_str;
+    const char *cmd_str;
     int cmd_str_len;
 
     /* Note:  This function is not re-entrant.  It must not be called from more
     than one task. */
 
-    if(list_item == NULL)
+    if (list_item == NULL)
     {
         /* Search for the command string in the list of registered commands. */
-        for(list_item = &head_cmds; list_item != NULL; list_item = list_item->next)
+        for (list_item = &head_cmds; list_item != NULL; list_item = list_item->next)
         {
             cmd_str = list_item->cli_cmd->cmd_str;
             cmd_str_len = strlen(cmd_str);
@@ -121,17 +121,17 @@ int cli_cmd_process(const char* const cmd_input, char* write_buf, int buf_len)
             a sub-string of a longer command, check the byte after the expected
             end of the string is either the end of the string or a space before
             a parameter. */
-            if((cmd_input[cmd_str_len] == ' ') || (cmd_input[cmd_str_len] == '\0'))
+            if ((cmd_input[cmd_str_len] == ' ') || (cmd_input[cmd_str_len] == '\0'))
             {
-                if(strncmp(cmd_input, cmd_str, cmd_str_len) == 0)
+                if (strncmp(cmd_input, cmd_str, cmd_str_len) == 0)
                 {
                     /* The command has been found.  Check it has the expected
                     number of parameters.  If expect_param_num is -1,
                     then there could be a variable number of parameters and no
                     check is made. */
-                    if(list_item->cli_cmd->expect_param_num >= 0)
+                    if (list_item->cli_cmd->expect_param_num >= 0)
                     {
-                        if(get_param_num(cmd_input) != list_item->cli_cmd->expect_param_num)
+                        if (get_param_num(cmd_input) != list_item->cli_cmd->expect_param_num)
                         {
                             ret = 0;
                         }
@@ -142,7 +142,7 @@ int cli_cmd_process(const char* const cmd_input, char* write_buf, int buf_len)
         }
     }
 
-    if((list_item != NULL) && (ret == 0))
+    if ((list_item != NULL) && (ret == 0))
     {
         const char tip[] = "incorrect command parameter(s).\r\n";
         /* The command was found, but the number of parameters with the command
@@ -151,7 +151,7 @@ int cli_cmd_process(const char* const cmd_input, char* write_buf, int buf_len)
         strncpy(write_buf + sizeof(tip) - 1, list_item->cli_cmd->help_str, buf_len - sizeof(tip));
         list_item = NULL;
     }
-    else if(list_item != NULL)
+    else if (list_item != NULL)
     {
         /* Call the callback function that is registered to this command. */
         *write_buf = '\0';
@@ -160,7 +160,7 @@ int cli_cmd_process(const char* const cmd_input, char* write_buf, int buf_len)
         /* If ret is 0, then no further strings will be returned
         after this one, and list_item can be reset to NULL ready to search
         for the next entered command. */
-        if(ret == 0)
+        if (ret == 0)
         {
             list_item = NULL;
         }
@@ -177,51 +177,51 @@ int cli_cmd_process(const char* const cmd_input, char* write_buf, int buf_len)
 }
 /*-----------------------------------------------------------*/
 
-char* cli_get_output_buf(void)
+char *cli_get_output_buf(void)
 {
     return output_buf;
 }
 /*-----------------------------------------------------------*/
 
-const char* cli_get_param(const char* cmd_str, int wanted_param, int* param_str_len)
+const char *cli_get_param(const char *cmd_str, int wanted_param, int *param_str_len)
 {
     int param_found = 0;
     int str_len = 0;
-    const char* ret = NULL;
+    const char *ret = NULL;
 
 
-    while(param_found < wanted_param)
+    while (param_found < wanted_param)
     {
         /* Index the character pointer past the current word.  If this is the start
         of the command string then the first word is the command itself. */
-        while(((*cmd_str) != '\0') && ((*cmd_str) != ' '))
+        while (((*cmd_str) != '\0') && ((*cmd_str) != ' '))
         {
             cmd_str++;
         }
 
         /* Find the start of the next string. */
-        while(((*cmd_str) != '\0') && ((*cmd_str) == ' '))
+        while (((*cmd_str) != '\0') && ((*cmd_str) == ' '))
         {
             cmd_str++;
         }
 
         /* Was a string found? */
-        if(*cmd_str != '\0')
+        if (*cmd_str != '\0')
         {
             /* Is this the start of the required parameter? */
             param_found++;
 
-            if(param_found == wanted_param)
+            if (param_found == wanted_param)
             {
                 /* How long is the parameter? */
                 ret = cmd_str;
-                while(((*cmd_str) != '\0') && ((*cmd_str) != ' '))
+                while (((*cmd_str) != '\0') && ((*cmd_str) != ' '))
                 {
                     str_len++;
                     cmd_str++;
                 }
 
-                if(str_len == 0)
+                if (str_len == 0)
                 {
                     ret = NULL;
                 }
@@ -235,7 +235,7 @@ const char* cli_get_param(const char* cmd_str, int wanted_param, int* param_str_
         }
     }
 
-    if(param_str_len != NULL)
+    if (param_str_len != NULL)
     {
         *param_str_len = str_len;
     }
@@ -244,18 +244,18 @@ const char* cli_get_param(const char* cmd_str, int wanted_param, int* param_str_
 }
 /*-----------------------------------------------------------*/
 
-int cli_get_param_end(const char* cmd_str)
+int cli_get_param_end(const char *cmd_str)
 {
-    char* str = (char*)cmd_str;
+    char *str = (char *)cmd_str;
 
-    if(str == NULL)
+    if (str == NULL)
     {
         return -1;
     }
 
-    while(*str != '\0')
+    while (*str != '\0')
     {
-        if(*str == ' ')
+        if (*str == ' ')
         {
             *str = '\0';
         }
@@ -266,23 +266,23 @@ int cli_get_param_end(const char* cmd_str)
 }
 /*-----------------------------------------------------------*/
 
-static int help_cmd(char* write_buf, int buf_len, const char* cmd_str)
+static int help_cmd(char *write_buf, int buf_len, const char *cmd_str)
 {
-    static const cli_list_item_t* list_item = NULL;
+    static const cli_list_item_t *list_item = NULL;
     static int once_flag = 0;
-    const char* param;
+    const char *param;
     int ret;
 
     /* Find the specified cmd help string. */
-    if(once_flag == 0)
+    if (once_flag == 0)
     {
         param = cli_get_param(cmd_str, 1, NULL);
-        if(param != NULL)
+        if (param != NULL)
         {
             list_item = &head_cmds;
-            while(list_item != NULL)
+            while (list_item != NULL)
             {
-                if(strcmp(param, list_item->cli_cmd->cmd_str) == 0)
+                if (strcmp(param, list_item->cli_cmd->cmd_str) == 0)
                 {
                     strncpy(write_buf, list_item->cli_cmd->help_str, buf_len);
                     list_item = NULL;
@@ -297,7 +297,7 @@ static int help_cmd(char* write_buf, int buf_len, const char* cmd_str)
         once_flag = 1;
     }
 
-    if(list_item == NULL)
+    if (list_item == NULL)
     {
         /* Reset the list_item pointer back to the start of the list. */
         list_item = &head_cmds;
@@ -308,7 +308,7 @@ static int help_cmd(char* write_buf, int buf_len, const char* cmd_str)
     strncpy(write_buf, list_item->cli_cmd->help_str, buf_len);
     list_item = list_item->next;
 
-    if(list_item == NULL)
+    if (list_item == NULL)
     {
         /* There are no more commands in the list, so there will be no more
         strings to return after this one and 0 should be returned. */
@@ -324,17 +324,17 @@ static int help_cmd(char* write_buf, int buf_len, const char* cmd_str)
 }
 /*-----------------------------------------------------------*/
 
-static char get_param_num(const char* cmd_str)
+static char get_param_num(const char *cmd_str)
 {
     char param_num = 0;
     int last_was_space = 0;
 
     /* Count the number of space delimited words in cmd_str. */
-    while(*cmd_str != '\0')
+    while (*cmd_str != '\0')
     {
-        if((*cmd_str) == ' ')
+        if ((*cmd_str) == ' ')
         {
-            if(last_was_space != 1)
+            if (last_was_space != 1)
             {
                 param_num++;
                 last_was_space = 1;
@@ -350,7 +350,7 @@ static char get_param_num(const char* cmd_str)
 
     /* If the command string ended with spaces, then there will have been too
     many parameters counted. */
-    if(last_was_space == 1)
+    if (last_was_space == 1)
     {
         param_num--;
     }

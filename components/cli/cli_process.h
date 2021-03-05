@@ -27,11 +27,11 @@
 #define CLI_INPUT_SIZE      MAX_CMD_SIZE    /* 输入命令最大长度 */
 
 
-typedef int (*cli_output_t)(char* out_buf);
+typedef int (*cli_output_t)(char *out_buf);
 
-void cli_process(char* str_buf, int str_len, cli_output_t out_fun);
+void cli_process(char *str_buf, int str_len, cli_output_t out_fun);
 void backspace_n(int n, cli_output_t out_fun);
-int str2int(int* int_out, const char* str_in);
+int str2int(int *int_out, const char *str_in);
 
 
 

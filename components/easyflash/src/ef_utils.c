@@ -84,14 +84,14 @@ static const uint32_t crc32_table[] =
  *
  * @return calculated CRC32 value
  */
-uint32_t ef_calc_crc32(uint32_t crc, const void* buf, size_t size)
+uint32_t ef_calc_crc32(uint32_t crc, const void *buf, size_t size)
 {
-    const uint8_t* p;
+    const uint8_t *p;
 
-    p = (const uint8_t*)buf;
+    p = (const uint8_t *)buf;
     crc = crc ^ ~0U;
 
-    while(size--)
+    while (size--)
     {
         crc = crc32_table[(crc ^ *p++) & 0xFF] ^ (crc >> 8);
     }

@@ -33,11 +33,11 @@ extern broadcast_object_t broadcast_object;
 /**
   * @brief malloc a interface session
   */
-uint8_t protocol_get_session(struct perph_interface* interface)
+uint8_t protocol_get_session(struct perph_interface *interface)
 {
-    for(int i = 0; i < 31; i++)
+    for (int i = 0; i < 31; i++)
     {
-        if(interface->session[i] == 0)
+        if (interface->session[i] == 0)
         {
             interface->session[i] = 1;
             return i + 1;
@@ -49,9 +49,9 @@ uint8_t protocol_get_session(struct perph_interface* interface)
 /**
   * @brief free session
   */
-int32_t protocol_release_session(struct perph_interface* interface, uint8_t id)
+int32_t protocol_release_session(struct perph_interface *interface, uint8_t id)
 {
-    if((id > 0) && (id < 32))
+    if ((id > 0) && (id < 32))
     {
         interface->session[id - 1] = 0;
         return 0;
@@ -61,21 +61,21 @@ int32_t protocol_release_session(struct perph_interface* interface, uint8_t id)
 
 /* add a new frame */
 uint32_t protocol_s_add_sendnode(uint8_t reciver, uint8_t session, uint8_t pack_type,
-                                 void* p_data, uint32_t data_len, uint16_t cmd, uint16_t ack_seq)
+                                 void *p_data, uint32_t data_len, uint16_t cmd, uint16_t ack_seq)
 {
     send_ctx_t ctx = {0};
-    struct perph_interface* int_obj;
+    struct perph_interface *int_obj;
     uint32_t status;
     uint32_t malloc_size;
-    uint8_t* malloc_zone;
+    uint8_t *malloc_zone;
     uint32_t pack_head_offset;
-    protocol_pack_desc_t* pack_head;
-    send_list_node_t* send_node;
+    protocol_pack_desc_t *pack_head;
+    send_list_node_t *send_node;
     uint16_t seq;
 
     status = PROTOCOL_SUCCESS;
 
-    if(data_len > PROTOCOL_MAX_DATA_LEN)
+    if (data_len > PROTOCOL_MAX_DATA_LEN)
     {
         status = PROTOCOL_ERR_DATA_TOO_LONG;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
@@ -91,7 +91,7 @@ uint32_t protocol_s_add_sendnode(uint8_t reciver, uint8_t session, uint8_t pack_
 
     int_obj = protocol_s_get_route(reciver);
 
-    if(int_obj == NULL)
+    if (int_obj == NULL)
     {
         status = PROTOCOL_ERR_ROUTE_NOT_FOUND;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
@@ -99,9 +99,9 @@ uint32_t protocol_s_add_sendnode(uint8_t reciver, uint8_t session, uint8_t pack_
         return status;
     }
 
-    if((pack_type == PROTOCOL_PACK_NOR) && (session != 0))
+    if ((pack_type == PROTOCOL_PACK_NOR) && (session != 0))
     {
-        if(protocol_s_session_get_node(int_obj, reciver, session) != NULL)
+        if (protocol_s_session_get_node(int_obj, reciver, session) != NULL)
         {
             status = PROTOCOL_ERR_SESSION_IS_USE;
             PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
@@ -110,7 +110,7 @@ uint32_t protocol_s_add_sendnode(uint8_t reciver, uint8_t session, uint8_t pack_
     }
 
     /* caculate memory size */
-    if(pack_type == PROTOCOL_PACK_ACK)
+    if (pack_type == PROTOCOL_PACK_ACK)
     {
         malloc_size = PROTOCOL_PACK_HEAD_TAIL_SIZE + PROTOCOL_SEND_NODE_SIZE +
                       data_len;
@@ -121,14 +121,14 @@ uint32_t protocol_s_add_sendnode(uint8_t reciver, uint8_t session, uint8_t pack_
                       data_len + PROTOCOL_PACK_CMD_SIZE;
     }
     malloc_zone = protocol_p_malloc(malloc_size);
-    if(malloc_zone == NULL)
+    if (malloc_zone == NULL)
     {
         status = PROTOCOL_ERR_NOT_ENOUGH_MEM;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
         return status;
     }
 
-    if(pack_type == PROTOCOL_PACK_NOR)
+    if (pack_type == PROTOCOL_PACK_NOR)
     {
         MUTEX_LOCK(int_obj->send.mutex_lock);
         seq = int_obj->send.send_seq++;
@@ -140,11 +140,11 @@ uint32_t protocol_s_add_sendnode(uint8_t reciver, uint8_t session, uint8_t pack_
     }
 
     pack_head_offset = PROTOCOL_SEND_NODE_SIZE;
-    pack_head = (protocol_pack_desc_t*)&malloc_zone[pack_head_offset];
-    send_node = (send_list_node_t*)&malloc_zone[0];
+    pack_head = (protocol_pack_desc_t *)&malloc_zone[pack_head_offset];
+    send_node = (send_list_node_t *)&malloc_zone[0];
 
     /* fill data */
-    protocol_s_fill_pack(&ctx, p_data, data_len, (uint8_t*)(pack_head), seq, cmd);
+    protocol_s_fill_pack(&ctx, p_data, data_len, (uint8_t *)(pack_head), seq, cmd);
 
     /* fill send node */
     send_node->session = ctx.s_a_r.session;
@@ -159,9 +159,9 @@ uint32_t protocol_s_add_sendnode(uint8_t reciver, uint8_t session, uint8_t pack_
     send_node->cmd = cmd;
     send_node->forward_src_obj = NULL;
 
-    struct send_cmd_info* cmd_info;
+    struct send_cmd_info *cmd_info;
     cmd_info = protocol_get_send_cmd_info(cmd);
-    if(cmd_info != NULL)
+    if (cmd_info != NULL)
     {
         send_node->rest_cnt = cmd_info->resend_times;
         send_node->timeout = cmd_info->resend_timeout;
@@ -179,9 +179,9 @@ uint32_t protocol_s_add_sendnode(uint8_t reciver, uint8_t session, uint8_t pack_
     /* add send node to send list */
     MUTEX_LOCK(int_obj->send.mutex_lock);
 
-    if((pack_type == PROTOCOL_PACK_NOR) && (session != 0))
+    if ((pack_type == PROTOCOL_PACK_NOR) && (session != 0))
     {
-        if(protocol_s_session_get_node(int_obj, reciver, session) != NULL)
+        if (protocol_s_session_get_node(int_obj, reciver, session) != NULL)
         {
             status = PROTOCOL_ERR_SESSION_IS_USE;
             MUTEX_UNLOCK(int_obj->send.mutex_lock);
@@ -190,7 +190,7 @@ uint32_t protocol_s_add_sendnode(uint8_t reciver, uint8_t session, uint8_t pack_
         }
     }
 
-    if(pack_type == PROTOCOL_PACK_NOR)
+    if (pack_type == PROTOCOL_PACK_NOR)
     {
         list_add(&(send_node->send_list), &(int_obj->send.normal_list_header));
         int_obj->send.normal_node_num++;
@@ -203,7 +203,7 @@ uint32_t protocol_s_add_sendnode(uint8_t reciver, uint8_t session, uint8_t pack_
 
     MUTEX_UNLOCK(int_obj->send.mutex_lock);
 
-    if(pack_type == PROTOCOL_PACK_NOR)
+    if (pack_type == PROTOCOL_PACK_NOR)
     {
         PROTOCOL_SEND_DBG_PRINTF("Send pack, Address:0x%02X, Cmd:0x%04X, Session: %d Normal pack.",
                                  reciver, cmd, session);
@@ -218,19 +218,19 @@ uint32_t protocol_s_add_sendnode(uint8_t reciver, uint8_t session, uint8_t pack_
 }
 
 /* broadcast frame handle */
-uint32_t protocol_s_broadcast_add_node(void* p_data, uint32_t data_len, uint16_t cmd)
+uint32_t protocol_s_broadcast_add_node(void *p_data, uint32_t data_len, uint16_t cmd)
 {
     send_ctx_t ctx;
     uint32_t status;
     uint32_t malloc_size;
-    uint8_t* malloc_zone;
+    uint8_t *malloc_zone;
     uint32_t pack_head_offset;
-    protocol_pack_desc_t* pack_head;
-    send_list_node_t* send_node;
+    protocol_pack_desc_t *pack_head;
+    send_list_node_t *send_node;
 
     status = PROTOCOL_SUCCESS;
 
-    if(data_len > PROTOCOL_MAX_DATA_LEN)
+    if (data_len > PROTOCOL_MAX_DATA_LEN)
     {
         status = PROTOCOL_ERR_DATA_TOO_LONG;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
@@ -248,7 +248,7 @@ uint32_t protocol_s_broadcast_add_node(void* p_data, uint32_t data_len, uint16_t
                   data_len + PROTOCOL_PACK_CMD_SIZE;
 
     malloc_zone = protocol_p_malloc(malloc_size);
-    if(malloc_zone == NULL)
+    if (malloc_zone == NULL)
     {
         status = PROTOCOL_ERR_NOT_ENOUGH_MEM;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
@@ -256,10 +256,10 @@ uint32_t protocol_s_broadcast_add_node(void* p_data, uint32_t data_len, uint16_t
     }
 
     pack_head_offset = PROTOCOL_SEND_NODE_SIZE;
-    pack_head = (protocol_pack_desc_t*)&malloc_zone[pack_head_offset];
-    send_node = (send_list_node_t*)&malloc_zone[0];
+    pack_head = (protocol_pack_desc_t *)&malloc_zone[pack_head_offset];
+    send_node = (send_list_node_t *)&malloc_zone[0];
 
-    protocol_s_fill_pack(&ctx, p_data, data_len, (uint8_t*)(pack_head), 0, cmd);
+    protocol_s_fill_pack(&ctx, p_data, data_len, (uint8_t *)(pack_head), 0, cmd);
 
     send_node->session = 0;
     send_node->p_data = &malloc_zone[pack_head_offset];
@@ -288,13 +288,13 @@ uint32_t protocol_s_broadcast_add_node(void* p_data, uint32_t data_len, uint16_t
 }
 
 /* fill pack data */
-uint32_t protocol_s_fill_pack(send_ctx_t* ctx, uint8_t* p_data,
-                              uint32_t data_len, uint8_t* pack_zone, uint16_t seq, uint16_t cmd)
+uint32_t protocol_s_fill_pack(send_ctx_t *ctx, uint8_t *p_data,
+                              uint32_t data_len, uint8_t *pack_zone, uint16_t seq, uint16_t cmd)
 {
     uint32_t status = 0;
-    protocol_pack_desc_t* p_pack_head;
+    protocol_pack_desc_t *p_pack_head;
 
-    p_pack_head = (protocol_pack_desc_t*)pack_zone;
+    p_pack_head = (protocol_pack_desc_t *)pack_zone;
 
     /* get local module */
     p_pack_head->sof = PROTOCOL_HEADER;
@@ -307,7 +307,7 @@ uint32_t protocol_s_fill_pack(send_ctx_t* ctx, uint8_t* p_data,
     p_pack_head->res1 = 0;
 
     /* cpy data */
-    if(ctx->s_a_r.pack_type == PROTOCOL_PACK_ACK)
+    if (ctx->s_a_r.pack_type == PROTOCOL_PACK_ACK)
     {
         p_pack_head->data_len = data_len + PROTOCOL_PACK_HEAD_TAIL_SIZE;
         memcpy(pack_zone + PROTOCOL_PACK_HEAD_SIZE, p_data, data_len);
@@ -315,14 +315,14 @@ uint32_t protocol_s_fill_pack(send_ctx_t* ctx, uint8_t* p_data,
     else
     {
         p_pack_head->data_len = data_len + PROTOCOL_PACK_HEAD_TAIL_SIZE + PROTOCOL_PACK_CMD_SIZE;
-        *((uint16_t*)(pack_zone + PROTOCOL_PACK_HEAD_SIZE)) = cmd;
+        *((uint16_t *)(pack_zone + PROTOCOL_PACK_HEAD_SIZE)) = cmd;
         memcpy(pack_zone + PROTOCOL_PACK_HEAD_SIZE + PROTOCOL_PACK_CMD_SIZE, p_data, data_len);
     }
 
     /* crc */
     append_crc16(pack_zone, 12);
 
-    if(ctx->s_a_r.pack_type == PROTOCOL_PACK_ACK)
+    if (ctx->s_a_r.pack_type == PROTOCOL_PACK_ACK)
     {
         append_crc32(pack_zone, data_len + PROTOCOL_PACK_HEAD_TAIL_SIZE);
     }
@@ -335,12 +335,12 @@ uint32_t protocol_s_fill_pack(send_ctx_t* ctx, uint8_t* p_data,
 }
 
 /* send data by interface */
-uint32_t protocol_s_interface_send_data(send_list_node_t* cur_send_node, struct perph_interface* obj)
+uint32_t protocol_s_interface_send_data(send_list_node_t *cur_send_node, struct perph_interface *obj)
 {
 
 #if (PROTOCOL_AUTO_LOOPBACK == PROTOCOL_ENABLE)
 
-    if(cur_send_node->address != protocol_local_info.address)
+    if (cur_send_node->address != protocol_local_info.address)
     {
         /* forward */
         protocol_interface_send_data(obj, cur_send_node->p_data, cur_send_node->len);
@@ -354,7 +354,7 @@ uint32_t protocol_s_interface_send_data(send_list_node_t* cur_send_node, struct 
     }
 
 #else
-    if(obj->send.send_fn != NULL)
+    if (obj->send.send_fn != NULL)
     {
         (*(obj->send.send_fn))(cur_send_node->p_data,
                                cur_send_node->len,
@@ -365,24 +365,24 @@ uint32_t protocol_s_interface_send_data(send_list_node_t* cur_send_node, struct 
     return PROTOCOL_SUCCESS;
 }
 
-uint32_t protocol_s_interface_normal_send_flush(struct perph_interface* obj)
+uint32_t protocol_s_interface_normal_send_flush(struct perph_interface *obj)
 {
-    list_t* head_node;
-    list_t* cur_node;
-    list_t* store_list;
-    send_list_node_t* cur_send_node;
+    list_t *head_node;
+    list_t *cur_node;
+    list_t *store_list;
+    send_list_node_t *cur_send_node;
     uint32_t timeout;
 
     head_node = &(obj->send.normal_list_header);
     list_for_each_prev_safe(cur_node, store_list, head_node)
     {
 
-        cur_send_node = (send_list_node_t*)cur_node;
+        cur_send_node = (send_list_node_t *)cur_node;
 
         MUTEX_LOCK(obj->send.mutex_lock);
 
         /* delete send node when revceiving ack */
-        if(cur_send_node->is_got_ack)
+        if (cur_send_node->is_got_ack)
         {
             list_del(cur_node);
             protocol_p_free(cur_send_node);
@@ -395,12 +395,12 @@ uint32_t protocol_s_interface_normal_send_flush(struct perph_interface* obj)
         }
 
         /* resend cnt is equal 0 */
-        if(cur_send_node->is_ready_realse)
+        if (cur_send_node->is_ready_realse)
         {
             list_del(cur_node);
             obj->send.normal_node_num--;
 
-            if(cur_send_node->no_ack_callback != NULL)
+            if (cur_send_node->no_ack_callback != NULL)
             {
                 cur_send_node->no_ack_callback(cur_send_node->cmd);
             }
@@ -420,7 +420,7 @@ uint32_t protocol_s_interface_normal_send_flush(struct perph_interface* obj)
         timeout = protocol_p_get_time() - cur_send_node->pre_timestamp;
 
         /* resend or first send */
-        if((timeout > cur_send_node->timeout || cur_send_node->is_first_send) &&
+        if ((timeout > cur_send_node->timeout || cur_send_node->is_first_send) &&
                 cur_send_node->rest_cnt >= 1)
         {
             cur_send_node->is_first_send = 0;
@@ -429,7 +429,7 @@ uint32_t protocol_s_interface_normal_send_flush(struct perph_interface* obj)
 
             protocol_s_interface_send_data(cur_send_node, obj);
 
-            if(cur_send_node->session == 0)
+            if (cur_send_node->session == 0)
             {
                 MUTEX_LOCK(obj->send.mutex_lock);
                 list_del(cur_node);
@@ -440,7 +440,7 @@ uint32_t protocol_s_interface_normal_send_flush(struct perph_interface* obj)
             }
             else
             {
-                if(cur_send_node->rest_cnt == 0)
+                if (cur_send_node->rest_cnt == 0)
                 {
                     cur_send_node->is_ready_realse = 1;
                 }
@@ -456,18 +456,18 @@ uint32_t protocol_s_interface_normal_send_flush(struct perph_interface* obj)
 }
 
 /* flush ack send list */
-uint32_t protocol_s_interface_ack_send_flush(struct perph_interface* obj)
+uint32_t protocol_s_interface_ack_send_flush(struct perph_interface *obj)
 {
-    list_t* head_node;
-    list_t* cur_node;
-    list_t* store_list;
-    send_list_node_t* cur_send_node;
+    list_t *head_node;
+    list_t *cur_node;
+    list_t *store_list;
+    send_list_node_t *cur_send_node;
 
     head_node = &(obj->send.ack_list_header);
     list_for_each_prev_safe(cur_node, store_list, head_node)
     {
 
-        cur_send_node = (send_list_node_t*)cur_node;
+        cur_send_node = (send_list_node_t *)cur_node;
 
         protocol_s_interface_send_data(cur_send_node, obj);
 
@@ -484,27 +484,27 @@ uint32_t protocol_s_interface_ack_send_flush(struct perph_interface* obj)
 /* flush broadcast list */
 uint32_t protocol_s_broadcast_send_flush(void)
 {
-    list_t* head_node;
-    list_t* cur_node;
-    list_t* store_list;
-    send_list_node_t* cur_send_node;
+    list_t *head_node;
+    list_t *cur_node;
+    list_t *store_list;
+    send_list_node_t *cur_send_node;
 
     head_node = &(broadcast_object.send_list_header);
     list_for_each_prev_safe(cur_node, store_list, head_node)
     {
-        cur_send_node = (send_list_node_t*)cur_node;
+        cur_send_node = (send_list_node_t *)cur_node;
 
-        for(uint8_t i = 0; i < PROTOCOL_INTERFACE_MAX; i++)
+        for (uint8_t i = 0; i < PROTOCOL_INTERFACE_MAX; i++)
         {
-            if(cur_send_node->forward_src_obj == protocol_local_info.interface + i)
+            if (cur_send_node->forward_src_obj == protocol_local_info.interface + i)
             {
                 continue;
             }
-            if(!cur_send_node->forward_src_obj->is_valid)
+            if (!cur_send_node->forward_src_obj->is_valid)
             {
                 continue;
             }
-            if(!protocol_local_info.interface[i].broadcast_output_enable)
+            if (!protocol_local_info.interface[i].broadcast_output_enable)
             {
                 continue;
             }
@@ -522,17 +522,17 @@ uint32_t protocol_s_broadcast_send_flush(void)
     return 0;
 }
 
-struct perph_interface* protocol_s_get_route(uint8_t tar_add)
+struct perph_interface *protocol_s_get_route(uint8_t tar_add)
 {
     uint8_t int_obj_idx;
 
     int_obj_idx = protocol_local_info.route_table[tar_add];
-    if(int_obj_idx > PROTOCOL_INTERFACE_MAX)
+    if (int_obj_idx > PROTOCOL_INTERFACE_MAX)
     {
         return NULL;
     }
 
-    if(protocol_local_info.interface[int_obj_idx].is_valid)
+    if (protocol_local_info.interface[int_obj_idx].is_valid)
     {
         return &(protocol_local_info.interface[int_obj_idx]);
     }
@@ -542,22 +542,22 @@ struct perph_interface* protocol_s_get_route(uint8_t tar_add)
     }
 }
 
-send_list_node_t* protocol_s_session_get_node(struct perph_interface* obj,
+send_list_node_t *protocol_s_session_get_node(struct perph_interface *obj,
         uint8_t address, uint8_t session)
 {
-    list_t* head_node;
-    list_t* cur_node;
-    list_t* store_list;
-    send_list_node_t* cur_send_node;
+    list_t *head_node;
+    list_t *cur_node;
+    list_t *store_list;
+    send_list_node_t *cur_send_node;
 
     head_node = &(obj->send.normal_list_header);
 
     MUTEX_LOCK(protocol_local_info.mutex_lock);
     list_for_each_prev_safe(cur_node, store_list, head_node)
     {
-        cur_send_node = (send_list_node_t*)cur_node;
+        cur_send_node = (send_list_node_t *)cur_node;
 
-        if((cur_send_node->session == session) &&
+        if ((cur_send_node->session == session) &&
                 (cur_send_node->address == address))
         {
             MUTEX_UNLOCK(protocol_local_info.mutex_lock);
@@ -568,22 +568,22 @@ send_list_node_t* protocol_s_session_get_node(struct perph_interface* obj,
     return NULL;
 }
 
-uint32_t protocol_s_pack_forward(protocol_pack_desc_t* p_pack, struct perph_interface* src_obj)
+uint32_t protocol_s_pack_forward(protocol_pack_desc_t *p_pack, struct perph_interface *src_obj)
 {
 
-    struct perph_interface* tar_inter = NULL;
-    uint8_t* malloc_zone;
+    struct perph_interface *tar_inter = NULL;
+    uint8_t *malloc_zone;
     uint32_t status;
     uint32_t pack_head_offset;
-    send_list_node_t* send_node;
+    send_list_node_t *send_node;
 
     status = PROTOCOL_SUCCESS;
 
-    if(p_pack->reciver != PROTOCOL_BROADCAST_ADDR)
+    if (p_pack->reciver != PROTOCOL_BROADCAST_ADDR)
     {
         tar_inter = protocol_s_get_route(p_pack->reciver);
 
-        if(tar_inter == NULL)
+        if (tar_inter == NULL)
         {
             PROTOCOL_RCV_ERR_PRINTF("Pack forward error, Route to address 0x%02x does not exist.", p_pack->reciver);
 
@@ -592,7 +592,7 @@ uint32_t protocol_s_pack_forward(protocol_pack_desc_t* p_pack, struct perph_inte
     }
 
     malloc_zone = protocol_p_malloc(p_pack->data_len + PROTOCOL_SEND_NODE_SIZE);
-    if(malloc_zone == NULL)
+    if (malloc_zone == NULL)
     {
         status = PROTOCOL_ERR_NOT_ENOUGH_MEM;
         PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
@@ -600,7 +600,7 @@ uint32_t protocol_s_pack_forward(protocol_pack_desc_t* p_pack, struct perph_inte
     }
 
     pack_head_offset = PROTOCOL_SEND_NODE_SIZE;
-    send_node = (send_list_node_t*)&malloc_zone[0];
+    send_node = (send_list_node_t *)&malloc_zone[0];
 
     send_node->session = 0;
     send_node->p_data = &malloc_zone[pack_head_offset];
@@ -617,7 +617,7 @@ uint32_t protocol_s_pack_forward(protocol_pack_desc_t* p_pack, struct perph_inte
     send_node->forward_src_obj = src_obj;
 
     memcpy(send_node->p_data, p_pack, p_pack->data_len);
-    if(p_pack->reciver != PROTOCOL_BROADCAST_ADDR)
+    if (p_pack->reciver != PROTOCOL_BROADCAST_ADDR)
     {
         MUTEX_LOCK(tar_inter->send.mutex_lock);
         list_add(&(send_node->send_list), &(tar_inter->send.ack_list_header)); /* send as ack */
@@ -643,23 +643,23 @@ uint32_t protocol_s_pack_forward(protocol_pack_desc_t* p_pack, struct perph_inte
 }
 
 /* receive data process handle(internal) */
-uint32_t protocol_s_unpack_data_handle(struct perph_interface* obj)
+uint32_t protocol_s_unpack_data_handle(struct perph_interface *obj)
 {
     uint32_t status;
     uint16_t cmd;
-    protocol_pack_desc_t* p_pack;
-    send_list_node_t* session_node;
+    protocol_pack_desc_t *p_pack;
+    send_list_node_t *session_node;
 
     status = PROTOCOL_SUCCESS;
-    p_pack = (protocol_pack_desc_t*)(obj->rcvd.p_data);
+    p_pack = (protocol_pack_desc_t *)(obj->rcvd.p_data);
 
 #if PROTOCOL_ROUTE_FORWARD == PROTOCOL_ENABLE
 
     /* forward send */
-    if(p_pack->reciver != protocol_local_info.address)
+    if (p_pack->reciver != protocol_local_info.address)
     {
         status = protocol_s_pack_forward(p_pack, obj);
-        if(p_pack->reciver != PROTOCOL_BROADCAST_ADDR)
+        if (p_pack->reciver != PROTOCOL_BROADCAST_ADDR)
         {
             return status;
         }
@@ -667,13 +667,13 @@ uint32_t protocol_s_unpack_data_handle(struct perph_interface* obj)
 
 #endif
 
-    if(p_pack->pack_type == PROTOCOL_PACK_ACK)
+    if (p_pack->pack_type == PROTOCOL_PACK_ACK)
     {
         session_node = protocol_s_session_get_node(obj,
                        p_pack->sender,
                        p_pack->session);
 
-        if(session_node == NULL)
+        if (session_node == NULL)
         {
             status = PROTOCOL_ERR_SESSION_NOT_FOUND;
             PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
@@ -687,19 +687,19 @@ uint32_t protocol_s_unpack_data_handle(struct perph_interface* obj)
         PROTOCOL_RCV_DBG_PRINTF("Rcv pack, Address:0x%02X, Cmd:0x%04X, Session:%d Ack pack.",
                                 p_pack->sender, cmd, p_pack->session);
 
-        if(session_node->ack_callback != NULL)
+        if (session_node->ack_callback != NULL)
         {
-            session_node->ack_callback(*(int32_t*)(p_pack->pdata));
+            session_node->ack_callback(*(int32_t *)(p_pack->pdata));
         }
     }
     else
     {
-        cmd = *((uint16_t*)(p_pack->pdata));
+        cmd = *((uint16_t *)(p_pack->pdata));
         PROTOCOL_RCV_DBG_PRINTF("Rcv pack, Address:0x%02X, Cmd:0x%04X, Normal pack.",
                                 p_pack->sender, cmd);
-        if(protocol_local_info.rcv_nor_callBack != NULL)
+        if (protocol_local_info.rcv_nor_callBack != NULL)
         {
-            protocol_local_info.rcv_nor_callBack((uint8_t*)p_pack,
+            protocol_local_info.rcv_nor_callBack((uint8_t *)p_pack,
                                                  cmd,
                                                  p_pack->session,
                                                  p_pack->sender);
@@ -711,26 +711,26 @@ uint32_t protocol_s_unpack_data_handle(struct perph_interface* obj)
 
 
 /* get receive fifo data, unpack */
-uint32_t protocol_s_extract(struct perph_interface* obj)
+uint32_t protocol_s_extract(struct perph_interface *obj)
 {
     uint32_t status = 0;
-    rcvd_desc_t* rcvd;
+    rcvd_desc_t *rcvd;
 
     rcvd = &obj->rcvd;
-    if(fifo_s_isempty(&rcvd->fifo))
+    if (fifo_s_isempty(&rcvd->fifo))
     {
         status = PROTOCOL_ERR_FIFO_EMPTY;
         return status;
     }
 
-    while(1)
+    while (1)
     {
-        switch(rcvd->state)
+        switch (rcvd->state)
         {
         case UNPACK_PACK_STAGE_FIND_SOF:
 
             status = protocol_s_find_pack_header(rcvd);
-            if(status == PROTOCOL_SUCCESS)
+            if (status == PROTOCOL_SUCCESS)
             {
                 rcvd->state = UNPACK_PACK_STAGE_AUTH_HEADER;
             }
@@ -740,12 +740,12 @@ uint32_t protocol_s_extract(struct perph_interface* obj)
 
             status = protocol_s_auth_pack_header(rcvd);
 
-            if(status == PROTOCOL_SUCCESS)
+            if (status == PROTOCOL_SUCCESS)
             {
                 /* malloc memory size equal to header size adding data size */
                 rcvd->state = UNPACK_PACK_STAGE_RECV_DATA;
                 rcvd->p_data = protocol_p_malloc(rcvd->total_num);
-                if(rcvd->p_data == NULL)
+                if (rcvd->p_data == NULL)
                 {
                     status = PROTOCOL_ERR_NOT_ENOUGH_MEM;
                     PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
@@ -753,7 +753,7 @@ uint32_t protocol_s_extract(struct perph_interface* obj)
                 }
                 memset(rcvd->p_data, 0, rcvd->rcvd_num);
             }
-            else if(status == PROTOCOL_ERR_AUTH_FAILURE)
+            else if (status == PROTOCOL_ERR_AUTH_FAILURE)
             {
 
                 fifo_s_get(&rcvd->fifo);
@@ -766,7 +766,7 @@ uint32_t protocol_s_extract(struct perph_interface* obj)
 
         case UNPACK_PACK_STAGE_RECV_DATA:
 
-            if(rcvd->p_data)
+            if (rcvd->p_data)
             {
                 status = protocol_s_fetch_pack_data(rcvd);
             }
@@ -776,7 +776,7 @@ uint32_t protocol_s_extract(struct perph_interface* obj)
                 PROTOCOL_ERR_INFO_PRINTF(status, __FILE__, __LINE__);
             }
 
-            if(status == PROTOCOL_SUCCESS)
+            if (status == PROTOCOL_SUCCESS)
             {
                 rcvd->state = UNPACK_PACK_STAGE_AUTH_PACK;
             }
@@ -785,7 +785,7 @@ uint32_t protocol_s_extract(struct perph_interface* obj)
 
         case UNPACK_PACK_STAGE_AUTH_PACK:
 
-            if(verify_crc32(rcvd->p_data, rcvd->total_num))
+            if (verify_crc32(rcvd->p_data, rcvd->total_num))
             {
                 rcvd->state = UNPACK_PACK_STAGE_DATA_HANDLE;
             }
@@ -812,7 +812,7 @@ uint32_t protocol_s_extract(struct perph_interface* obj)
             break;
         }
 
-        if(status == PROTOCOL_ERR_DATA_NOT_ENOUGH ||
+        if (status == PROTOCOL_ERR_DATA_NOT_ENOUGH ||
                 status == PROTOCOL_ERR_NOT_ENOUGH_MEM ||
                 status == PROTOCOL_ERR_NOT_FIND_HEADER)
         {
@@ -824,14 +824,14 @@ uint32_t protocol_s_extract(struct perph_interface* obj)
 }
 
 /* find Header */
-uint32_t protocol_s_find_pack_header(rcvd_desc_t* rcvd)
+uint32_t protocol_s_find_pack_header(rcvd_desc_t *rcvd)
 {
     uint32_t status;
 
-    while(fifo_s_isempty(&rcvd->fifo) == 0)
+    while (fifo_s_isempty(&rcvd->fifo) == 0)
     {
         // if fifo not empty, loop
-        if((uint8_t)(fifo_s_preread(&rcvd->fifo, 0)) == PROTOCOL_HEADER)
+        if ((uint8_t)(fifo_s_preread(&rcvd->fifo, 0)) == PROTOCOL_HEADER)
         {
             status = PROTOCOL_SUCCESS;
             goto END;
@@ -850,22 +850,22 @@ END:
 }
 
 /* check Header */
-uint32_t protocol_s_auth_pack_header(rcvd_desc_t* rcvd)
+uint32_t protocol_s_auth_pack_header(rcvd_desc_t *rcvd)
 {
     uint32_t status;
     uint8_t auth_array[12];
     ver_data_len_t ver_len;
 
-    if(fifo_s_prereads(&rcvd->fifo, (char*)auth_array, 0, 12) == 12)
+    if (fifo_s_prereads(&rcvd->fifo, (char *)auth_array, 0, 12) == 12)
     {
         ver_len = protocol_s_get_ver_datalen(auth_array);
-        if(ver_len.data_len - PROTOCOL_PACK_HEAD_TAIL_SIZE > PROTOCOL_MAX_DATA_LEN)
+        if (ver_len.data_len - PROTOCOL_PACK_HEAD_TAIL_SIZE > PROTOCOL_MAX_DATA_LEN)
         {
             status = PROTOCOL_ERR_AUTH_FAILURE;
         }
         else
         {
-            if((ver_len.version == 0) && (verify_crc16(auth_array, 12) == 1))
+            if ((ver_len.version == 0) && (verify_crc16(auth_array, 12) == 1))
             {
                 status = PROTOCOL_SUCCESS;
                 rcvd->total_num = ver_len.data_len;
@@ -886,7 +886,7 @@ uint32_t protocol_s_auth_pack_header(rcvd_desc_t* rcvd)
 }
 
 /* fetch receive data */
-uint32_t protocol_s_fetch_pack_data(rcvd_desc_t* rcvd)
+uint32_t protocol_s_fetch_pack_data(rcvd_desc_t *rcvd)
 {
     uint32_t status;
     uint32_t length;
@@ -894,11 +894,11 @@ uint32_t protocol_s_fetch_pack_data(rcvd_desc_t* rcvd)
 
     want_len = rcvd->total_num - rcvd->rcvd_num;
     length = fifo_s_gets(&rcvd->fifo,
-                         (char*)rcvd->p_data + rcvd->rcvd_num,
+                         (char *)rcvd->p_data + rcvd->rcvd_num,
                          want_len);
     rcvd->rcvd_num += length;
 
-    if(rcvd->rcvd_num < rcvd->total_num)
+    if (rcvd->rcvd_num < rcvd->total_num)
     {
         status = PROTOCOL_ERR_DATA_NOT_ENOUGH;
     }
@@ -910,12 +910,12 @@ uint32_t protocol_s_fetch_pack_data(rcvd_desc_t* rcvd)
 }
 
 /* get version & data length */
-ver_data_len_t protocol_s_get_ver_datalen(void* pack)
+ver_data_len_t protocol_s_get_ver_datalen(void *pack)
 
 {
     ver_data_len_t ver_len = {0};
-    uint16_t* tmp = (uint16_t*)&ver_len;
-    uint8_t* ptr = (uint8_t*)pack;
+    uint16_t *tmp = (uint16_t *)&ver_len;
+    uint8_t *ptr = (uint8_t *)pack;
 
     *tmp = ptr[2] << 8 | ptr[1];
 
@@ -923,11 +923,11 @@ ver_data_len_t protocol_s_get_ver_datalen(void* pack)
 }
 
 /* error printf */
-void protocol_s_error_info_printf(uint32_t status, char* file, int line)
+void protocol_s_error_info_printf(uint32_t status, char *file, int line)
 {
-    char* err_info ;
+    char *err_info ;
 
-    switch(status)
+    switch (status)
     {
     case PROTOCOL_SUCCESS:
         err_info = "PROTOCOL_SUCCESS";

@@ -75,7 +75,7 @@ static uint32_t stm32_get_sector_size(uint32_t sector);
  *
  * @return result
  */
-EfErrCode ef_port_init(ef_env const** default_env, size_t* default_env_size)
+EfErrCode ef_port_init(ef_env const **default_env, size_t *default_env_size)
 {
     EfErrCode result = EF_NO_ERR;
 
@@ -95,16 +95,16 @@ EfErrCode ef_port_init(ef_env const** default_env, size_t* default_env_size)
  *
  * @return result
  */
-EfErrCode ef_port_read(uint32_t addr, uint32_t* buf, size_t size)
+EfErrCode ef_port_read(uint32_t addr, uint32_t *buf, size_t size)
 {
     EfErrCode result = EF_NO_ERR;
-    uint8_t* buf_8 = (uint8_t*)buf;
+    uint8_t *buf_8 = (uint8_t *)buf;
     size_t i;
 
     /*copy from flash to ram */
-    for(i = 0; i < size; i++, addr ++, buf_8++)
+    for (i = 0; i < size; i++, addr ++, buf_8++)
     {
-        *buf_8 = *(uint8_t*) addr;
+        *buf_8 = *(uint8_t *) addr;
     }
 
     return result;
@@ -140,12 +140,12 @@ EfErrCode ef_port_erase(uint32_t addr, size_t size)
     HAL_FLASH_Unlock();
 
     /* it will stop when erased size is greater than setting size */
-    while(erased_size < size)
+    while (erased_size < size)
     {
         cur_erase_sector = stm32_get_sector(addr + erased_size);
         EraseInitStruct.Sector = cur_erase_sector;
 
-        if(HAL_OK != HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError))
+        if (HAL_OK != HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError))
         {
             result = EF_ERASE_ERR;
             break;
@@ -168,23 +168,23 @@ EfErrCode ef_port_erase(uint32_t addr, size_t size)
  *
  * @return result
  */
-EfErrCode ef_port_write(uint32_t addr, const uint32_t* buf, size_t size)
+EfErrCode ef_port_write(uint32_t addr, const uint32_t *buf, size_t size)
 {
     EfErrCode result = EF_NO_ERR;
     size_t i;
     uint32_t read_data;
-    uint8_t* buf_8 = (uint8_t*)buf;
+    uint8_t *buf_8 = (uint8_t *)buf;
 
     HAL_FLASH_Unlock();
 
-    for(i = 0; i < size; i++, buf_8++, addr++)
+    for (i = 0; i < size; i++, buf_8++, addr++)
     {
         /* write data */
         HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, addr, *buf_8);
 
-        read_data = *(uint8_t*) addr;
+        read_data = *(uint8_t *) addr;
         /* check data */
-        if(read_data != *buf_8)
+        if (read_data != *buf_8)
         {
             result = EF_WRITE_ERR;
             break;
@@ -223,51 +223,51 @@ static uint32_t stm32_get_sector(uint32_t address)
 {
     uint32_t sector = 0;
 
-    if((address < ADDR_FLASH_SECTOR_1) && (address >= ADDR_FLASH_SECTOR_0))
+    if ((address < ADDR_FLASH_SECTOR_1) && (address >= ADDR_FLASH_SECTOR_0))
     {
         sector = FLASH_SECTOR_0;
     }
-    else if((address < ADDR_FLASH_SECTOR_2) && (address >= ADDR_FLASH_SECTOR_1))
+    else if ((address < ADDR_FLASH_SECTOR_2) && (address >= ADDR_FLASH_SECTOR_1))
     {
         sector = FLASH_SECTOR_1;
     }
-    else if((address < ADDR_FLASH_SECTOR_3) && (address >= ADDR_FLASH_SECTOR_2))
+    else if ((address < ADDR_FLASH_SECTOR_3) && (address >= ADDR_FLASH_SECTOR_2))
     {
         sector = FLASH_SECTOR_2;
     }
-    else if((address < ADDR_FLASH_SECTOR_4) && (address >= ADDR_FLASH_SECTOR_3))
+    else if ((address < ADDR_FLASH_SECTOR_4) && (address >= ADDR_FLASH_SECTOR_3))
     {
         sector = FLASH_SECTOR_3;
     }
-    else if((address < ADDR_FLASH_SECTOR_5) && (address >= ADDR_FLASH_SECTOR_4))
+    else if ((address < ADDR_FLASH_SECTOR_5) && (address >= ADDR_FLASH_SECTOR_4))
     {
         sector = FLASH_SECTOR_4;
     }
-    else if((address < ADDR_FLASH_SECTOR_6) && (address >= ADDR_FLASH_SECTOR_5))
+    else if ((address < ADDR_FLASH_SECTOR_6) && (address >= ADDR_FLASH_SECTOR_5))
     {
         sector = FLASH_SECTOR_5;
     }
-    else if((address < ADDR_FLASH_SECTOR_7) && (address >= ADDR_FLASH_SECTOR_6))
+    else if ((address < ADDR_FLASH_SECTOR_7) && (address >= ADDR_FLASH_SECTOR_6))
     {
         sector = FLASH_SECTOR_6;
     }
-    else if((address < ADDR_FLASH_SECTOR_8) && (address >= ADDR_FLASH_SECTOR_7))
+    else if ((address < ADDR_FLASH_SECTOR_8) && (address >= ADDR_FLASH_SECTOR_7))
     {
         sector = FLASH_SECTOR_7;
     }
-    else if((address < ADDR_FLASH_SECTOR_9) && (address >= ADDR_FLASH_SECTOR_8))
+    else if ((address < ADDR_FLASH_SECTOR_9) && (address >= ADDR_FLASH_SECTOR_8))
     {
         sector = FLASH_SECTOR_8;
     }
-    else if((address < ADDR_FLASH_SECTOR_10) && (address >= ADDR_FLASH_SECTOR_9))
+    else if ((address < ADDR_FLASH_SECTOR_10) && (address >= ADDR_FLASH_SECTOR_9))
     {
         sector = FLASH_SECTOR_9;
     }
-    else if((address < ADDR_FLASH_SECTOR_11) && (address >= ADDR_FLASH_SECTOR_10))
+    else if ((address < ADDR_FLASH_SECTOR_11) && (address >= ADDR_FLASH_SECTOR_10))
     {
         sector = FLASH_SECTOR_10;
     }
-    else if((address < ADDR_FLASH_SECTOR_12) && (address >= ADDR_FLASH_SECTOR_11))
+    else if ((address < ADDR_FLASH_SECTOR_12) && (address >= ADDR_FLASH_SECTOR_11))
     {
         sector = FLASH_SECTOR_11;
     }
@@ -312,7 +312,7 @@ static uint32_t stm32_get_sector_size(uint32_t sector)
 {
     EF_ASSERT(IS_FLASH_SECTOR(sector));
 
-    switch(sector)
+    switch (sector)
     {
     case FLASH_SECTOR_0:
         return 16 * 1024;
@@ -367,7 +367,7 @@ static uint32_t stm32_get_sector_size(uint32_t sector)
  * @param ... args
  *
  */
-void ef_log_debug(const char* file, const long line, const char* format, ...)
+void ef_log_debug(const char *file, const long line, const char *format, ...)
 {
 
 #ifdef PRINT_DEBUG
@@ -391,7 +391,7 @@ void ef_log_debug(const char* file, const long line, const char* format, ...)
  * @param format output format
  * @param ... args
  */
-void ef_log_info(const char* format, ...)
+void ef_log_info(const char *format, ...)
 {
     va_list args;
 
@@ -408,7 +408,7 @@ void ef_log_info(const char* format, ...)
  * @param format output format
  * @param ... args
  */
-void ef_print(const char* format, ...)
+void ef_print(const char *format, ...)
 {
     va_list args;
     /* args point to the first variable parameter */

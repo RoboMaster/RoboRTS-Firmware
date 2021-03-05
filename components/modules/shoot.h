@@ -64,7 +64,7 @@ struct shoot_target
     float motor_speed;
 };
 
-typedef struct shoot* shoot_t;
+typedef struct shoot *shoot_t;
 
 struct shoot
 {
@@ -87,14 +87,14 @@ struct shoot
     struct pid motor_pid;
 };
 
-int32_t shoot_pid_init(struct shoot* shoot, const char* name, struct pid_param param, enum device_can can);
-int32_t shoot_set_fric_speed(struct shoot* shoot, uint16_t fric_spd1, uint16_t fric_spd2);
-int32_t shoot_get_fric_speed(struct shoot* shoot, uint16_t* fric_spd1, uint16_t* fric_spd2);
-int32_t shoot_set_cmd(struct shoot* shoot, uint8_t cmd, uint32_t shoot_num);
-int32_t shoot_pid_calculate(struct shoot* shoot);
-int32_t shoot_state_update(struct shoot* shoot);
-int32_t shoot_enable(struct shoot* shoot);
-int32_t shoot_disable(struct shoot* shoot);
-int32_t shoot_set_turn_speed(struct shoot* shoot, uint16_t speed);
+int32_t shoot_pid_init(struct shoot *shoot, const char *name, struct pid_param param, enum device_can can);
+int32_t shoot_set_fric_speed(struct shoot *shoot, uint16_t fric_spd1, uint16_t fric_spd2);
+int32_t shoot_get_fric_speed(struct shoot *shoot, uint16_t *fric_spd1, uint16_t *fric_spd2);
+int32_t shoot_set_cmd(struct shoot *shoot, uint8_t cmd, uint32_t shoot_num);
+int32_t shoot_pid_calculate(struct shoot *shoot);
+int32_t shoot_state_update(struct shoot *shoot);
+int32_t shoot_enable(struct shoot *shoot);
+int32_t shoot_disable(struct shoot *shoot);
+int32_t shoot_set_turn_speed(struct shoot *shoot, uint16_t speed);
 
 #endif // __SHOOT_H__

@@ -32,12 +32,12 @@ void BMI088_Delay_us(uint16_t us)
     reload = SysTick->LOAD;
     ticks = us * 168;
     told = SysTick->VAL;
-    while(1)
+    while (1)
     {
         tnow = SysTick->VAL;
-        if(tnow != told)
+        if (tnow != told)
         {
-            if(tnow < told)
+            if (tnow < told)
             {
                 tcnt += told - tnow;
             }
@@ -46,7 +46,7 @@ void BMI088_Delay_us(uint16_t us)
                 tcnt += reload - tnow + told;
             }
             told = tnow;
-            if(tcnt >= ticks)
+            if (tcnt >= ticks)
             {
                 break;
             }

@@ -22,9 +22,9 @@
 #include "fifo.h"
 #define REFEREE_FIFO_BUFLEN 500
 
-typedef void (*ref_send_handler_t)(uint8_t* buf, uint16_t len);
-typedef void (*ref_rx_complete_callabck_t)(uint8_t* buf, uint16_t len);
-typedef void (*ref_cmd_callback_t)(uint16_t cmd_id, uint8_t* pdata, uint16_t len);
+typedef void (*ref_send_handler_t)(uint8_t *buf, uint16_t len);
+typedef void (*ref_rx_complete_callabck_t)(uint8_t *buf, uint16_t len);
+typedef void (*ref_cmd_callback_t)(uint16_t cmd_id, uint8_t *pdata, uint16_t len);
 
 #define REF_PROTOCOL_HEADER                 0xA5
 #define REF_PROTOCOL_HEADER_SIZE            sizeof(frame_header_t)
@@ -64,8 +64,8 @@ typedef enum
 
 typedef struct
 {
-    fifo_s_t*       data_fifo;
-    frame_header_t* p_header;
+    fifo_s_t       *data_fifo;
+    frame_header_t *p_header;
     uint16_t       data_len;
     uint8_t        protocol_packet[REF_PROTOCOL_FRAME_MAX_SIZE];
     unpack_step_e  unpack_step;
@@ -76,7 +76,7 @@ void referee_param_init(ref_send_handler_t send_t,
                         ref_rx_complete_callabck_t rx_callback,
                         ref_cmd_callback_t cmd_callback);
 void     referee_unpack_fifo_data(void);
-uint32_t referee_uart_rx_data_handle(uint8_t* data, uint16_t len);
-void     referee_protocol_tansmit(uint16_t cmd_id, void* p_buf, uint16_t len);
+uint32_t referee_uart_rx_data_handle(uint8_t *data, uint16_t len);
+void     referee_protocol_tansmit(uint16_t cmd_id, void *p_buf, uint16_t len);
 
 #endif // __REFEREE_SYSTEM_H__
