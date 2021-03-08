@@ -35,6 +35,40 @@
 /* gimbal back center time (ms) */
 #define BACK_CENTER_TIME 3000
 
+#include "appcfg.h"
+
+#ifdef ICRA2019
+
+struct pid_param yaw_outer_param =
+{
+    .p = 50.0f,
+    .max_out = 2000.0f,
+};
+
+struct pid_param yaw_inter_param =
+{
+    .p = 70.0f,
+    .i = 0.2f,
+    .max_out = 30000,
+    .integral_limit = 3000,
+};
+
+struct pid_param pitch_outer_param =
+{
+    .p = 30.0f,
+    .max_out = 2000,
+};
+
+struct pid_param pitch_inter_param =
+{
+    .p = 65.0f,
+    .i = 0.2f,
+    .max_out = 30000,
+    .integral_limit = 3000,
+};
+
+#else
+
 struct pid_param yaw_outer_param =
 {
     .p = 25.0f,
@@ -62,6 +96,10 @@ struct pid_param pitch_inter_param =
     .max_out = 30000,
     .integral_limit = 3000,
 };
+
+#endif
+
+
 
 void gimbal_center_adjust(gimbal_t p_gimbal);
 void gimbal_normol_handle(struct gimbal *p_gimbal, struct rc_device *p_rc, struct rc_info *p_info);
@@ -147,10 +185,13 @@ void gimbal_task(void const *argument)
         EventMsgProcess(&listSubs, 0);
         /* gyro data update */
         EventMsgGetLast(&nolistSubs, AHRS_MSG, &gimbal_gyro, NULL);
-
+#ifdef ICRA2019
+        gimbal_pitch_gyro_update(&gimbal, gimbal_gyro.roll * RAD_TO_DEG);
+        gimbal_rate_update(&gimbal, gimbal_gyro.gz * RAD_TO_DEG, -gimbal_gyro.gx * RAD_TO_DEG);
+#else
         gimbal_pitch_gyro_update(&gimbal, gimbal_gyro.pitch * RAD_TO_DEG);
         gimbal_rate_update(&gimbal, gimbal_gyro.gz * RAD_TO_DEG, gimbal_gyro.gy * RAD_TO_DEG);
-
+#endif
         switch (gimbal_mode)
         {
         case NORMAL_MODE:
@@ -257,10 +298,14 @@ uint8_t gimbal_get_work_mode(void)
   */
 void gimbal_normol_handle(struct gimbal *p_gimbal, struct rc_device *p_rc, struct rc_info *p_info)
 {
+#ifdef ICRA2019
+    p_info->ch4 = -p_info->ch4;
+#endif
     /* follow mode */
     if (rc_device_get_state(p_rc, RC_S2_UP) == E_OK)
     {
         gimbal_set_yaw_mode(p_gimbal, GYRO_MODE);
+
         pit_delta = -(float)p_info->ch4 * 0.0015f;
         yaw_delta = -(float)p_info->ch3 * 0.0015f;
         gimbal_set_pitch_delta(p_gimbal, pit_delta);
@@ -298,6 +343,10 @@ void gimbal_normol_handle(struct gimbal *p_gimbal, struct rc_device *p_rc, struc
         set_gimbal_sdk_mode(GIMBAL_SDK_OFF);
         offline_event_disable(OFFLINE_MANIFOLD2_HEART);
         offline_event_disable(OFFLINE_CONTROL_CMD);
+
+        offline_event_enable(OFFLINE_GIMBAL_PITCH);
+        offline_event_enable(OFFLINE_GIMBAL_YAW);
+        offline_event_enable(OFFLINE_GIMBAL_TURN_MOTOR);
     }
 }
 

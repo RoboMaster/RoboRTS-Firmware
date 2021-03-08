@@ -53,8 +53,8 @@
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>0</DebugInformation>
-          <BrowseInformation>0</BrowseInformation>
+          <DebugInformation>1</DebugInformation>
+          <BrowseInformation>1</BrowseInformation>
           <ListingPath>..\build\MDK-ARM\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -421,6 +421,11 @@
               <FileName>infantry_cmd.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\application\infantry_cmd.h</FilePath>
+            </File>
+            <File>
+              <FileName>appcfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\application\appcfg.h</FilePath>
             </File>
           </Files>
         </Group>

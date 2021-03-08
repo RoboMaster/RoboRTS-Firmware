@@ -135,6 +135,11 @@ void chassis_task(void const *argument)
             set_chassis_sdk_mode(CHASSIS_SDK_OFF);
             offline_event_disable(OFFLINE_MANIFOLD2_HEART);
             offline_event_disable(OFFLINE_CONTROL_CMD);
+
+            offline_event_enable(OFFLINE_CHASSIS_MOTOR1);
+            offline_event_enable(OFFLINE_CHASSIS_MOTOR2);
+            offline_event_enable(OFFLINE_CHASSIS_MOTOR3);
+            offline_event_enable(OFFLINE_CHASSIS_MOTOR4);
         }
 
         osDelay(5);

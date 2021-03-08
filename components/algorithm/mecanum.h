@@ -29,10 +29,20 @@
 #define RADIUS 76
 /* the perimeter of wheel(mm) */
 #define PERIMETER 478
-/* wheel track distance(mm) */
-#define WHEELTRACK 400
-/* wheelbase distance(mm) */
-#define WHEELBASE 376
+
+#include "appcfg.h"
+
+#ifdef ICRA2019
+    /* wheel track distance(mm) */
+    #define WHEELTRACK 394
+    /* wheelbase distance(mm) */
+    #define WHEELBASE 415
+#else
+    /* wheel track distance(mm) */
+    #define WHEELTRACK 400
+    /* wheelbase distance(mm) */
+    #define WHEELBASE 376
+#endif
 
 /* gimbal is relative to chassis center x axis offset(mm) */
 #define ROTATE_X_OFFSET 7

@@ -24,6 +24,8 @@
 #include "protocol.h"
 #include "offline_service.h"
 
+#include "appcfg.h"
+
 uint8_t gimbal_sdk_state = GIMBAL_SDK_OFF;
 uint8_t gimbal_heart_state = GIMBAL_HEART_OFF;
 
@@ -154,7 +156,11 @@ int32_t gimbal_info_push(void *argc)
     gimbal_get_info(p_gimbal, &info);
 
     cmd_gimbal_info.mode = info.mode;
+#ifdef ICRA2019
+    cmd_gimbal_info.pitch_ecd_angle = -info.pitch_ecd_angle * 10;
+#else
     cmd_gimbal_info.pitch_ecd_angle = info.pitch_ecd_angle * 10;
+#endif
     cmd_gimbal_info.pitch_gyro_angle = info.pitch_gyro_angle * 10;
     cmd_gimbal_info.pitch_rate = info.pitch_rate * 10;
     cmd_gimbal_info.yaw_ecd_angle = info.yaw_ecd_angle * 10;
