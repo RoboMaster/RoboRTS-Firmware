@@ -66,7 +66,7 @@ int32_t gimbal_cascade_init(struct gimbal *gimbal, const char *name,
 
     gimbal->mode.bit.yaw_mode = ENCODER_MODE;
     pid_struct_init(&(gimbal->yaw_outer_pid), yaw_outer_param.max_out, yaw_outer_param.integral_limit, yaw_outer_param.p, yaw_outer_param.i, yaw_outer_param.d);
-    pid_struct_init(&(gimbal->yaw_inter_pid), yaw_inter_param.max_out, yaw_inter_param.integral_limit, yaw_inter_param.p, yaw_inter_param.i, yaw_outer_param.d);
+    pid_struct_init(&(gimbal->yaw_inter_pid), yaw_inter_param.max_out, yaw_inter_param.integral_limit, yaw_inter_param.p, yaw_inter_param.i, yaw_inter_param.d);
 
     gimbal->mode.bit.pitch_mode = ENCODER_MODE;
     pid_struct_init(&(gimbal->pitch_outer_pid), pitch_inter_param.max_out, pitch_outer_param.integral_limit, pitch_outer_param.p, pitch_outer_param.i, pitch_outer_param.d);
